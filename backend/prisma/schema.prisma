@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Currency {
+  RSD
+  EUR
+  USD
+}
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+  // Serbian business details
+  companyName  String? @map("company_name")
+  pib          String? @unique // Poreski identifikacioni broj (Tax ID)
+  mbr          String? @unique // Matični broj registracije
+  activityCode String? @map("activity_code") // Šifra delatnosti
+  address      String?
+  city         String?
+  municipality String? // Opština — affects tax coefficient
+  phone        String?
+  bankAccounts BankAccount[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("users")
+}
+
+model BankAccount {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  bankName      String   @map("bank_name")
+  accountNumber String   @map("account_number") // Format: XXX-XXXXXXXXXX-XX
+  currency      Currency @default(RSD)
+  isDefault     Boolean  @default(false) @map("is_default")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("bank_accounts")
+}

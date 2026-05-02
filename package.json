@@ -1,0 +1,10 @@
+{
+  "name": "preduzetnik-helper",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev": "pnpm run --parallel dev:backend dev:frontend"
+  }
+}
