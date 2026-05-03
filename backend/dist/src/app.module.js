@@ -15,12 +15,14 @@ const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const config_1 = require("@nestjs/config");
 const clients_module_1 = require("./clients/clients.module");
+const invoices_module_1 = require("./invoices/invoices.module");
+const bank_accounts_module_1 = require("./bank-accounts/bank-accounts.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot(), prisma_module_1.PrismaModule, auth_module_1.AuthModule, users_module_1.UsersModule, clients_module_1.ClientsModule],
+        imports: [config_1.ConfigModule.forRoot(), prisma_module_1.PrismaModule, auth_module_1.AuthModule, users_module_1.UsersModule, clients_module_1.ClientsModule, bank_accounts_module_1.BankAccountsModule, invoices_module_1.InvoicesModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

@@ -24,3 +24,13 @@ export const ClientType = {
 } as const
 
 export type ClientType = (typeof ClientType)[keyof typeof ClientType]
+
+
+export const InvoiceStatus = {
+  DRAFT: 'DRAFT',
+  SENT: 'SENT',
+  PAID: 'PAID',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
