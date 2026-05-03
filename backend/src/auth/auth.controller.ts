@@ -3,7 +3,10 @@ import {AuthService} from "./auth.service";
 import {LoginDto} from "./dto/login.dto";
 import {Public} from "./helpers/auth.helpers";
 import {RegisterDto} from "./dto/register.dto";
+import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {AuthResponseDto} from "./dto/auth-response.dto";
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {
@@ -11,13 +14,17 @@ export class AuthController {
 
     @Public()
     @Post('login')
-    async login(@Body() loginDto: LoginDto) {
+    @ApiOperation({ summary: 'Login with email and password' })
+    @ApiResponse({ status: 200, type: AuthResponseDto })
+    async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
         return this.authService.login(loginDto);
     }
 
     @Public()
     @Post('register')
-    async register(@Body() registerDto: RegisterDto) {
+    @ApiOperation({ summary: 'Register a new user' })
+    @ApiResponse({ status: 201, type: AuthResponseDto })
+    async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
         return this.authService.register(registerDto);
     }
 }

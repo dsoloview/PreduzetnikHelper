@@ -9,23 +9,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginDto = void 0;
-const class_validator_1 = require("class-validator");
+exports.UserResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-class LoginDto {
+class UserResponseDto {
+    id;
     email;
-    password;
+    name;
+    companyName;
+    pib;
+    createdAt;
 }
-exports.LoginDto = LoginDto;
+exports.UserResponseDto = UserResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '550e8400-e29b-41d4-a716-446655440000' }),
+    __metadata("design:type", String)
+], UserResponseDto.prototype, "id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'user@example.com' }),
-    (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
-], LoginDto.prototype, "email", void 0);
+], UserResponseDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', minLength: 6 }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, swagger_1.ApiProperty)({ example: 'User' }),
     __metadata("design:type", String)
-], LoginDto.prototype, "password", void 0);
-//# sourceMappingURL=login.dto.js.map
+], UserResponseDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'My Company', required: false }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "companyName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123456789', required: false }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "pib", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Date)
+], UserResponseDto.prototype, "createdAt", void 0);
+//# sourceMappingURL=user-response.dto.js.map
