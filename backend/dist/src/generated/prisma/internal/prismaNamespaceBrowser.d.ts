@@ -14,6 +14,8 @@ export declare const ModelName: {
     readonly User: "User";
     readonly BankAccount: "BankAccount";
     readonly Client: "Client";
+    readonly Invoice: "Invoice";
+    readonly InvoiceItem: "InvoiceItem";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -67,6 +69,36 @@ export declare const ClientScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum];
+export declare const InvoiceScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly clientId: "clientId";
+    readonly invoiceNumber: "invoiceNumber";
+    readonly year: "year";
+    readonly status: "status";
+    readonly issueDate: "issueDate";
+    readonly dueDate: "dueDate";
+    readonly placeOfIssue: "placeOfIssue";
+    readonly domesticSupply: "domesticSupply";
+    readonly currency: "currency";
+    readonly exchangeRate: "exchangeRate";
+    readonly totalAmount: "totalAmount";
+    readonly totalRsd: "totalRsd";
+    readonly note: "note";
+    readonly bankAccountId: "bankAccountId";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum];
+export declare const InvoiceItemScalarFieldEnum: {
+    readonly id: "id";
+    readonly invoiceId: "invoiceId";
+    readonly description: "description";
+    readonly quantity: "quantity";
+    readonly unitPrice: "unitPrice";
+    readonly total: "total";
+};
+export type InvoiceItemScalarFieldEnum = (typeof InvoiceItemScalarFieldEnum)[keyof typeof InvoiceItemScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";

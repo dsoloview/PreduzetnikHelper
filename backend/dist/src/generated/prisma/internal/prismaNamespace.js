@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.ClientScalarFieldEnum = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.InvoiceItemScalarFieldEnum = exports.InvoiceScalarFieldEnum = exports.ClientScalarFieldEnum = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/client"));
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -62,7 +62,9 @@ exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
     User: 'User',
     BankAccount: 'BankAccount',
-    Client: 'Client'
+    Client: 'Client',
+    Invoice: 'Invoice',
+    InvoiceItem: 'InvoiceItem'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -110,6 +112,34 @@ exports.ClientScalarFieldEnum = {
     registrationNumber: 'registrationNumber',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+exports.InvoiceScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    clientId: 'clientId',
+    invoiceNumber: 'invoiceNumber',
+    year: 'year',
+    status: 'status',
+    issueDate: 'issueDate',
+    dueDate: 'dueDate',
+    placeOfIssue: 'placeOfIssue',
+    domesticSupply: 'domesticSupply',
+    currency: 'currency',
+    exchangeRate: 'exchangeRate',
+    totalAmount: 'totalAmount',
+    totalRsd: 'totalRsd',
+    note: 'note',
+    bankAccountId: 'bankAccountId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.InvoiceItemScalarFieldEnum = {
+    id: 'id',
+    invoiceId: 'invoiceId',
+    description: 'description',
+    quantity: 'quantity',
+    unitPrice: 'unitPrice',
+    total: 'total'
 };
 exports.SortOrder = {
     asc: 'asc',

@@ -32,3 +32,13 @@ export type BankAccount = Prisma.BankAccountModel
  * 
  */
 export type Client = Prisma.ClientModel
+/**
+ * Model Invoice
+ * 
+ */
+export type Invoice = Prisma.InvoiceModel
+/**
+ * Model InvoiceItem
+ * 
+ */
+export type InvoiceItem = Prisma.InvoiceItemModel

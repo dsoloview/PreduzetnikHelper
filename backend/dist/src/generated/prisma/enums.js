@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClientType = exports.Currency = void 0;
+exports.InvoiceStatus = exports.ClientType = exports.Currency = void 0;
 exports.Currency = {
     RSD: 'RSD',
     EUR: 'EUR',
@@ -9,5 +9,11 @@ exports.Currency = {
 exports.ClientType = {
     DOMESTIC: 'DOMESTIC',
     INTERNATIONAL: 'INTERNATIONAL'
+};
+exports.InvoiceStatus = {
+    DRAFT: 'DRAFT',
+    SENT: 'SENT',
+    PAID: 'PAID',
+    CANCELLED: 'CANCELLED'
 };
 //# sourceMappingURL=enums.js.map

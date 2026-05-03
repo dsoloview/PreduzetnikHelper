@@ -37,20 +37,22 @@ model User {
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   clients      Client[]
+  invoices     Invoice[]
 
   @@map("users")
 }
 
 model BankAccount {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  bankName      String   @map("bank_name")
-  accountNumber String   @map("account_number") // Format: XXX-XXXXXXXXXX-XX
-  currency      Currency @default(RSD)
-  isDefault     Boolean  @default(false) @map("is_default")
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  bankName      String    @map("bank_name")
+  accountNumber String    @map("account_number") // Format: XXX-XXXXXXXXXX-XX
+  currency      Currency  @default(RSD)
+  isDefault     Boolean   @default(false) @map("is_default")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  invoices      Invoice[]
 
   @@map("bank_accounts")
 }
@@ -75,6 +77,56 @@ model Client {
   user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt          DateTime   @default(now()) @map("created_at")
   updatedAt          DateTime   @updatedAt @map("updated_at")
+  invoices           Invoice[]
 
   @@map("clients")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  CANCELLED
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  clientId       String        @map("client_id")
+  invoiceNumber  Int           @map("invoice_number") // Sequential per user per year
+  year           Int // Year for numbering (e.g. 2026)
+  status         InvoiceStatus @default(DRAFT)
+  issueDate      DateTime      @map("issue_date")
+  dueDate        DateTime      @map("due_date")
+  placeOfIssue   String        @default("Beograd") @map("place_of_issue")
+  domesticSupply Boolean       @default(true) @map("domestic_supply")
+  // true = mesto prometa u Srbiji → counts toward 8M
+  // false = mesto prometa van Srbije → does NOT count toward 8M
+  currency       Currency      @default(RSD)
+  exchangeRate   Decimal?      @map("exchange_rate") // NBS rate if non-RSD
+  totalAmount    Decimal       @map("total_amount") // In invoice currency
+  totalRsd       Decimal       @map("total_rsd") // Always in RSD (for KPO)
+  note           String?
+  bankAccountId  String        @map("bank_account_id")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client         Client        @relation(fields: [clientId], references: [id])
+  bankAccount    BankAccount   @relation(fields: [bankAccountId], references: [id])
+  items          InvoiceItem[]
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@unique([userId, invoiceNumber, year]) // 1/2026 unique per user
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoiceId   String  @map("invoice_id")
+  description String
+  quantity    Decimal
+  unitPrice   Decimal @map("unit_price")
+  total       Decimal // quantity * unitPrice
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
 }
