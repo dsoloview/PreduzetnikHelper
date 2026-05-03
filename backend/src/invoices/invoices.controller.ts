@@ -1,7 +1,8 @@
 import {
     Controller, Get, Post, Patch, Delete,
-    Param, Body, Query, ParseUUIDPipe,
+    Param, Body, Query, ParseUUIDPipe, Res
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
     ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery,
 } from '@nestjs/swagger';
@@ -72,5 +73,25 @@ export class InvoicesController {
         @CurrentUser() user: JwtPayload,
     ): Promise<InvoiceResponseDto> {
         return this.invoicesService.remove(id, user.userId);
+    }
+
+    @Get(':id/pdf')
+    @ApiOperation({ summary: 'Generate PDF for an invoice' })
+    @ApiResponse({ status: 200, description: 'PDF file generated successfully' })
+    async getPdf(
+        @Param('id', ParseUUIDPipe) id: string,
+        @CurrentUser() user: JwtPayload,
+        @Res() res: Response
+    ): Promise<void> {
+        const pdfBuffer = await this.invoicesService.generatePdf(id, user.userId);
+        const invoice = await this.invoicesService.findOne(id, user.userId);
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="faktura-${invoice.displayNumber.replace('/', '-')}.pdf"`,
+            'Content-Length': pdfBuffer.length,
+        });
+
+        res.end(pdfBuffer);
     }
 }

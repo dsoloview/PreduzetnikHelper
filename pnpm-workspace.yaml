@@ -8,4 +8,5 @@ allowBuilds:
   '@scarf/scarf': true
   bcrypt: true
   prisma: true
+  puppeteer: true
   unrs-resolver: true
