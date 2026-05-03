@@ -59,18 +59,30 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnprocessableEntityException("Invalid credentials");
         }
-        const payload = { username: user.name, sub: user.id };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
+        if (!await bcrypt.compare(loginDto.password, user.password)) {
+            throw new common_1.UnprocessableEntityException("Invalid credentials");
+        }
+        return this.createAccessToken(user);
     }
     async register(registerDto) {
-        const user = await this.usersService.user({ email: registerDto.email });
-        if (user) {
+        const existingUser = await this.usersService.user({ email: registerDto.email });
+        if (existingUser) {
             throw new common_1.UnprocessableEntityException("Email already exists");
         }
-        registerDto.password = await bcrypt.hash(registerDto.password, 10);
-        return this.usersService.createUser(registerDto);
+        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+        const createdUser = await this.usersService.createUser({
+            ...registerDto,
+            password: hashedPassword
+        });
+        if (!createdUser) {
+            throw new common_1.UnprocessableEntityException("Failed to create user");
+        }
+        return this.createAccessToken(createdUser);
+    }
+    createAccessToken(user) {
+        return {
+            accessToken: this.jwtService.sign({ username: user.name, sub: user.id }),
+        };
     }
 };
 exports.AuthService = AuthService;

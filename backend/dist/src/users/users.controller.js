@@ -15,26 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
-const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const swagger_1 = require("@nestjs/swagger");
+const user_response_dto_1 = require("./dto/user-response.dto");
+const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
         this.usersService = usersService;
     }
-    async profile(req) {
-        return req.user;
+    async profile(userPayload) {
+        const user = await this.usersService.user({ id: userPayload.userId });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const { password, ...profile } = user;
+        return profile;
     }
 };
 exports.UsersController = UsersController;
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)(),
-    __param(0, (0, common_1.Request)()),
+    (0, common_1.Get)('profile'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get current user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: user_response_dto_1.UserResponseDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "profile", null);
 exports.UsersController = UsersController = __decorate([
+    (0, swagger_1.ApiTags)('Users'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);

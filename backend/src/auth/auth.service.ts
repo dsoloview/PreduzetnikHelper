@@ -5,6 +5,7 @@ import {LoginDto} from "./dto/login.dto";
 import {RegisterDto} from "./dto/register.dto";
 import * as bcrypt from 'bcrypt';
 import {User} from "../generated/prisma/client";
+import {AuthResponseDto} from "./dto/auth-response.dto";
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     ) {
     }
 
-    async login(loginDto: LoginDto) {
+    async login(loginDto: LoginDto): Promise<AuthResponseDto> {
         const user = await this.usersService.user({email: loginDto.email});
         if (!user) {
             throw new UnprocessableEntityException("Invalid credentials")
@@ -27,7 +28,7 @@ export class AuthService {
         return this.createAccessToken(user);
     }
 
-    async register(registerDto: RegisterDto) {
+    async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
         const existingUser = await this.usersService.user({email: registerDto.email});
         if (existingUser) {
             throw new UnprocessableEntityException("Email already exists")
@@ -46,7 +47,7 @@ export class AuthService {
         return this.createAccessToken(createdUser);
     }
 
-    private createAccessToken(user: User) {
+    private createAccessToken(user: User): AuthResponseDto {
         return {
             accessToken: this.jwtService.sign({username: user.name, sub: user.id}),
         }

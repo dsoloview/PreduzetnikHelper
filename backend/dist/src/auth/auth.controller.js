@@ -18,6 +18,8 @@ const auth_service_1 = require("./auth.service");
 const login_dto_1 = require("./dto/login.dto");
 const auth_helpers_1 = require("./helpers/auth.helpers");
 const register_dto_1 = require("./dto/register.dto");
+const swagger_1 = require("@nestjs/swagger");
+const auth_response_dto_1 = require("./dto/auth-response.dto");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -34,6 +36,8 @@ exports.AuthController = AuthController;
 __decorate([
     (0, auth_helpers_1.Public)(),
     (0, common_1.Post)('login'),
+    (0, swagger_1.ApiOperation)({ summary: 'Login with email and password' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: auth_response_dto_1.AuthResponseDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
@@ -42,12 +46,15 @@ __decorate([
 __decorate([
     (0, auth_helpers_1.Public)(),
     (0, common_1.Post)('register'),
+    (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
+    (0, swagger_1.ApiResponse)({ status: 201, type: auth_response_dto_1.AuthResponseDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [register_dto_1.RegisterDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
