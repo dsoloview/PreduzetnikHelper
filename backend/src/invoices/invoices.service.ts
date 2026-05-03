@@ -7,13 +7,15 @@ import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { InvoiceResponseDto } from './dto/invoice-response.dto';
 import { ClientsService } from '../clients/clients.service';
 import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class InvoicesService {
     constructor(
         private prisma: PrismaService,
         private clientsService: ClientsService,
-        private bankAccountsService: BankAccountsService
+        private bankAccountsService: BankAccountsService,
+        private pdfService: PdfService
     ) {}
 
     async create(userId: string, dto: CreateInvoiceDto): Promise<InvoiceResponseDto> {
@@ -219,6 +221,36 @@ export class InvoicesService {
         });
 
         return this.mapToResponseDto(deleted);
+    }
+
+    async generatePdf(id: string, userId: string): Promise<Buffer> {
+        const invoice = await this.prisma.invoice.findUnique({
+            where: { id },
+            include: { 
+                client: true, 
+                items: true,
+                user: true,
+                bankAccount: true,
+            },
+        });
+
+        if (!invoice) {
+            throw new NotFoundException('Invoice not found');
+        }
+        if (invoice.userId !== userId) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        // Format data for handlebars
+        const mappedDto = this.mapToResponseDto(invoice);
+        const pdfData = {
+            ...mappedDto,
+            user: invoice.user,
+            client: invoice.client,
+            bankAccount: invoice.bankAccount,
+        };
+
+        return this.pdfService.generateInvoicePdf(pdfData);
     }
 
     // Helper to map Prisma entity to DTO
