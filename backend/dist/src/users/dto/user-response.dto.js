@@ -33,11 +33,11 @@ __decorate([
     __metadata("design:type", String)
 ], UserResponseDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'My Company', required: false }),
+    (0, swagger_1.ApiProperty)({ example: 'My Company', nullable: true }),
     __metadata("design:type", Object)
 ], UserResponseDto.prototype, "companyName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '123456789', required: false }),
+    (0, swagger_1.ApiProperty)({ example: '123456789', nullable: true }),
     __metadata("design:type", Object)
 ], UserResponseDto.prototype, "pib", void 0);
 __decorate([

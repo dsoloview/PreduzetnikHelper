@@ -169,6 +169,7 @@ export type UserWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     bankAccounts?: Prisma.BankAccountListRelationFilter;
+    clients?: Prisma.ClientListRelationFilter;
 };
 export type UserOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -186,6 +187,7 @@ export type UserOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     bankAccounts?: Prisma.BankAccountOrderByRelationAggregateInput;
+    clients?: Prisma.ClientOrderByRelationAggregateInput;
 };
 export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -206,6 +208,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     bankAccounts?: Prisma.BankAccountListRelationFilter;
+    clients?: Prisma.ClientListRelationFilter;
 }, "id" | "email" | "pib" | "mbr">;
 export type UserOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -261,6 +264,7 @@ export type UserCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bankAccounts?: Prisma.BankAccountCreateNestedManyWithoutUserInput;
+    clients?: Prisma.ClientCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateInput = {
     id?: string;
@@ -278,6 +282,7 @@ export type UserUncheckedCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bankAccounts?: Prisma.BankAccountUncheckedCreateNestedManyWithoutUserInput;
+    clients?: Prisma.ClientUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -295,6 +300,7 @@ export type UserUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bankAccounts?: Prisma.BankAccountUpdateManyWithoutUserNestedInput;
+    clients?: Prisma.ClientUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -312,6 +318,7 @@ export type UserUncheckedUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bankAccounts?: Prisma.BankAccountUncheckedUpdateManyWithoutUserNestedInput;
+    clients?: Prisma.ClientUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateManyInput = {
     id?: string;
@@ -434,6 +441,18 @@ export type UserUpdateOneRequiredWithoutBankAccountsNestedInput = {
     connect?: Prisma.UserWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBankAccountsInput, Prisma.UserUpdateWithoutBankAccountsInput>, Prisma.UserUncheckedUpdateWithoutBankAccountsInput>;
 };
+export type UserCreateNestedOneWithoutClientsInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutClientsInput, Prisma.UserUncheckedCreateWithoutClientsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutClientsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutClientsNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutClientsInput, Prisma.UserUncheckedCreateWithoutClientsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutClientsInput;
+    upsert?: Prisma.UserUpsertWithoutClientsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutClientsInput, Prisma.UserUpdateWithoutClientsInput>, Prisma.UserUncheckedUpdateWithoutClientsInput>;
+};
 export type UserCreateWithoutBankAccountsInput = {
     id?: string;
     email: string;
@@ -449,6 +468,7 @@ export type UserCreateWithoutBankAccountsInput = {
     phone?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    clients?: Prisma.ClientCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutBankAccountsInput = {
     id?: string;
@@ -465,6 +485,7 @@ export type UserUncheckedCreateWithoutBankAccountsInput = {
     phone?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    clients?: Prisma.ClientUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutBankAccountsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -494,6 +515,7 @@ export type UserUpdateWithoutBankAccountsInput = {
     phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clients?: Prisma.ClientUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutBankAccountsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -510,18 +532,105 @@ export type UserUncheckedUpdateWithoutBankAccountsInput = {
     phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clients?: Prisma.ClientUncheckedUpdateManyWithoutUserNestedInput;
+};
+export type UserCreateWithoutClientsInput = {
+    id?: string;
+    email: string;
+    password: string;
+    name: string;
+    companyName?: string | null;
+    pib?: string | null;
+    mbr?: string | null;
+    activityCode?: string | null;
+    address?: string | null;
+    city?: string | null;
+    municipality?: string | null;
+    phone?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    bankAccounts?: Prisma.BankAccountCreateNestedManyWithoutUserInput;
+};
+export type UserUncheckedCreateWithoutClientsInput = {
+    id?: string;
+    email: string;
+    password: string;
+    name: string;
+    companyName?: string | null;
+    pib?: string | null;
+    mbr?: string | null;
+    activityCode?: string | null;
+    address?: string | null;
+    city?: string | null;
+    municipality?: string | null;
+    phone?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    bankAccounts?: Prisma.BankAccountUncheckedCreateNestedManyWithoutUserInput;
+};
+export type UserCreateOrConnectWithoutClientsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutClientsInput, Prisma.UserUncheckedCreateWithoutClientsInput>;
+};
+export type UserUpsertWithoutClientsInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutClientsInput, Prisma.UserUncheckedUpdateWithoutClientsInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutClientsInput, Prisma.UserUncheckedCreateWithoutClientsInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutClientsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutClientsInput, Prisma.UserUncheckedUpdateWithoutClientsInput>;
+};
+export type UserUpdateWithoutClientsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    password?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    pib?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    mbr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    bankAccounts?: Prisma.BankAccountUpdateManyWithoutUserNestedInput;
+};
+export type UserUncheckedUpdateWithoutClientsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    password?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    pib?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    mbr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    bankAccounts?: Prisma.BankAccountUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCountOutputType = {
     bankAccounts: number;
+    clients: number;
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bankAccounts?: boolean | UserCountOutputTypeCountBankAccountsArgs;
+    clients?: boolean | UserCountOutputTypeCountClientsArgs;
 };
 export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null;
 };
 export type UserCountOutputTypeCountBankAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.BankAccountWhereInput;
+};
+export type UserCountOutputTypeCountClientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ClientWhereInput;
 };
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -539,6 +648,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     createdAt?: boolean;
     updatedAt?: boolean;
     bankAccounts?: boolean | Prisma.User$bankAccountsArgs<ExtArgs>;
+    clients?: boolean | Prisma.User$clientsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -592,6 +702,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "companyName" | "pib" | "mbr" | "activityCode" | "address" | "city" | "municipality" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>;
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bankAccounts?: boolean | Prisma.User$bankAccountsArgs<ExtArgs>;
+    clients?: boolean | Prisma.User$clientsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
@@ -600,6 +711,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     name: "User";
     objects: {
         bankAccounts: Prisma.$BankAccountPayload<ExtArgs>[];
+        clients: Prisma.$ClientPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -669,6 +781,7 @@ export interface UserDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
     bankAccounts<T extends Prisma.User$bankAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    clients<T extends Prisma.User$clientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -797,6 +910,17 @@ export type User$bankAccountsArgs<ExtArgs extends runtime.Types.Extensions.Inter
     take?: number;
     skip?: number;
     distinct?: Prisma.BankAccountScalarFieldEnum | Prisma.BankAccountScalarFieldEnum[];
+};
+export type User$clientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.ClientSelect<ExtArgs> | null;
+    omit?: Prisma.ClientOmit<ExtArgs> | null;
+    include?: Prisma.ClientInclude<ExtArgs> | null;
+    where?: Prisma.ClientWhereInput;
+    orderBy?: Prisma.ClientOrderByWithRelationInput | Prisma.ClientOrderByWithRelationInput[];
+    cursor?: Prisma.ClientWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ClientScalarFieldEnum | Prisma.ClientScalarFieldEnum[];
 };
 export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserSelect<ExtArgs> | null;

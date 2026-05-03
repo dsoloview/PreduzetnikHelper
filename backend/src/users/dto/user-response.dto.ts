@@ -8,9 +8,9 @@ export class UserResponseDto implements IUserResponse {
     email: string;
     @ApiProperty({ example: 'User' })
     name: string;
-    @ApiProperty({ example: 'My Company', required: false })
+    @ApiProperty({ example: 'My Company', nullable: true })
     companyName: string | null;
-    @ApiProperty({ example: '123456789', required: false })
+    @ApiProperty({ example: '123456789', nullable: true })
     pib: string | null;
     @ApiProperty()
     createdAt: Date;

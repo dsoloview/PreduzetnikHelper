@@ -36,5 +36,8 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get bankAccount(): Prisma.BankAccountDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get client(): Prisma.ClientDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
 }
 export declare function getPrismaClientClass(): PrismaClientConstructor;

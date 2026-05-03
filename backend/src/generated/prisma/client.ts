@@ -49,3 +49,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type BankAccount = Prisma.BankAccountModel
+/**
+ * Model Client
+ * 
+ */
+export type Client = Prisma.ClientModel
