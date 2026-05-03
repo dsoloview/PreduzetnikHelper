@@ -18,23 +18,26 @@ enum Currency {
   EUR
   USD
 }
+
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
-  name     String
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
   // Serbian business details
-  companyName  String? @map("company_name")
-  pib          String? @unique // Poreski identifikacioni broj (Tax ID)
-  mbr          String? @unique // Matični broj registracije
-  activityCode String? @map("activity_code") // Šifra delatnosti
+  companyName  String?       @map("company_name")
+  pib          String?       @unique // Poreski identifikacioni broj (Tax ID)
+  mbr          String?       @unique // Matični broj registracije
+  activityCode String?       @map("activity_code") // Šifra delatnosti
   address      String?
   city         String?
   municipality String? // Opština — affects tax coefficient
   phone        String?
   bankAccounts BankAccount[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  clients      Client[]
+
   @@map("users")
 }
 
@@ -45,8 +48,33 @@ model BankAccount {
   accountNumber String   @map("account_number") // Format: XXX-XXXXXXXXXX-XX
   currency      Currency @default(RSD)
   isDefault     Boolean  @default(false) @map("is_default")
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
   @@map("bank_accounts")
+}
+
+enum ClientType {
+  DOMESTIC // Serbian client — taxId = PIB
+  INTERNATIONAL // Foreign client — taxId = VAT/EIN/etc
+}
+
+model Client {
+  id                 String     @id @default(uuid())
+  userId             String     @map("user_id")
+  type               ClientType @default(DOMESTIC)
+  name               String
+  email              String?
+  phone              String?
+  address            String
+  city               String
+  country            String     @default("RS") // ISO 3166-1 alpha-2
+  taxId              String     @map("tax_id") // PIB for Serbian, VAT/EIN for foreign
+  registrationNumber String     @map("registration_number") // MBR for Serbian
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+
+  @@map("clients")
 }

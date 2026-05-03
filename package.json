@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev:backend": "pnpm --filter backend dev",
+    "build:shared": "pnpm --filter @preduzetnik/shared build",
+    "dev:backend": "pnpm run build:shared && pnpm --filter backend start:dev",
     "dev:frontend": "pnpm --filter frontend dev",
-    "dev": "pnpm run --parallel dev:backend dev:frontend"
+    "dev": "pnpm run build:shared && pnpm run --parallel dev:backend dev:frontend"
   }
 }

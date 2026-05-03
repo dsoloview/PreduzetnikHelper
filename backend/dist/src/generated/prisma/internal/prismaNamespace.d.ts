@@ -159,6 +159,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export declare const ModelName: {
     readonly User: "User";
     readonly BankAccount: "BankAccount";
+    readonly Client: "Client";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -171,7 +172,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "bankAccount";
+        modelProps: "user" | "bankAccount" | "client";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -323,6 +324,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Client: {
+            payload: Prisma.$ClientPayload<ExtArgs>;
+            fields: Prisma.ClientFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ClientFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ClientFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ClientFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ClientFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                findMany: {
+                    args: Prisma.ClientFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>[];
+                };
+                create: {
+                    args: Prisma.ClientCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                createMany: {
+                    args: Prisma.ClientCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ClientCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>[];
+                };
+                delete: {
+                    args: Prisma.ClientDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                update: {
+                    args: Prisma.ClientUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ClientDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ClientUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ClientUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>[];
+                };
+                upsert: {
+                    args: Prisma.ClientUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ClientPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ClientAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateClient>;
+                };
+                groupBy: {
+                    args: Prisma.ClientGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ClientGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ClientCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ClientCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -382,6 +457,22 @@ export declare const BankAccountScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type BankAccountScalarFieldEnum = (typeof BankAccountScalarFieldEnum)[keyof typeof BankAccountScalarFieldEnum];
+export declare const ClientScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly type: "type";
+    readonly name: "name";
+    readonly email: "email";
+    readonly phone: "phone";
+    readonly address: "address";
+    readonly city: "city";
+    readonly country: "country";
+    readonly taxId: "taxId";
+    readonly registrationNumber: "registrationNumber";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -404,6 +495,8 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 export type EnumCurrencyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Currency'>;
 export type ListEnumCurrencyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Currency[]'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
+export type EnumClientTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClientType'>;
+export type ListEnumClientTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClientType[]'>;
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>;
 export type BatchPayload = {
@@ -433,6 +526,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
     user?: Prisma.UserOmit;
     bankAccount?: Prisma.BankAccountOmit;
+    client?: Prisma.ClientOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

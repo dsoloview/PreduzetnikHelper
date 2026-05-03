@@ -1,4 +1,5 @@
-export declare class UserResponseDto {
+import { IUserResponse } from "@preduzetnik/shared";
+export declare class UserResponseDto implements IUserResponse {
     id: string;
     email: string;
     name: string;

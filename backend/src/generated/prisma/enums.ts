@@ -16,3 +16,11 @@ export const Currency = {
 } as const
 
 export type Currency = (typeof Currency)[keyof typeof Currency]
+
+
+export const ClientType = {
+  DOMESTIC: 'DOMESTIC',
+  INTERNATIONAL: 'INTERNATIONAL'
+} as const
+
+export type ClientType = (typeof ClientType)[keyof typeof ClientType]

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.ClientScalarFieldEnum = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -46,7 +46,8 @@ exports.JsonNull = runtime.JsonNull;
 exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
     User: 'User',
-    BankAccount: 'BankAccount'
+    BankAccount: 'BankAccount',
+    Client: 'Client'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -77,6 +78,21 @@ exports.BankAccountScalarFieldEnum = {
     accountNumber: 'accountNumber',
     currency: 'currency',
     isDefault: 'isDefault',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.ClientScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    type: 'type',
+    name: 'name',
+    email: 'email',
+    phone: 'phone',
+    address: 'address',
+    city: 'city',
+    country: 'country',
+    taxId: 'taxId',
+    registrationNumber: 'registrationNumber',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
