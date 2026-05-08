@@ -11,7 +11,7 @@ App for Serbian **paušalac (sole proprietor)**. Invoices, KPO book, income limi
 ## Tech Stack
 - **Monorepo**: pnpm workspaces (`backend/`, `frontend/`, `shared/`)
 - **Backend**: NestJS, Prisma, PostgreSQL, Swagger, class-validator, Passport + JWT
-- **Frontend**: React 18+, Vite, shadcn/ui, Tailwind, TanStack Query, React Router, React Hook Form + Zod
+- **Frontend**: React 19+, Vite, shadcn/ui, Tailwind, TanStack Query, React Router, React Hook Form + Zod
 - **Shared**: TypeScript types, enums, constants (no runtime deps on NestJS/React)
 
 ## Rules

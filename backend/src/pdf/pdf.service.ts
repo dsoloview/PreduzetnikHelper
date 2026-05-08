@@ -106,4 +106,41 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
             }
         }
     }
+
+    async generateKpoPdf(kpoData: any): Promise<Buffer> {
+        if (!this.browser) {
+            throw new InternalServerErrorException('PDF generation service is not initialized');
+        }
+
+        let page: puppeteer.Page | null = null;
+
+        try {
+            const html = await this.compileTemplate('kpo', kpoData);
+
+            page = await this.browser.newPage();
+
+            await page.setContent(html, { waitUntil: 'networkidle0' });
+
+            const pdfBuffer = await page.pdf({
+                format: 'A4',
+                landscape: true,
+                printBackground: true,
+                margin: {
+                    top: '20px',
+                    bottom: '20px',
+                    left: '20px',
+                    right: '20px',
+                },
+            });
+
+            return Buffer.from(pdfBuffer);
+        } catch (error) {
+            console.error('KPO PDF generation error:', error);
+            throw new InternalServerErrorException('Failed to generate KPO PDF');
+        } finally {
+            if (page) {
+                await page.close().catch(err => console.error('Error closing page:', err));
+            }
+        }
+    }
 }

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>KPO Knjiga - {{year}}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+        .preduzetnik-info {
+            text-align: left;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        td.text-right, th.text-right {
+            text-align: right;
+        }
+        td.text-left, th.text-left {
+            text-align: left;
+        }
+        .totals-row {
+            font-weight: bold;
+            background-color: #e6e6e6;
+        }
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid #333;
+            text-align: center;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>KNJIGA O OSTVARENOM PROMETU PAUŠALNO OPOREZOVANIH OBVEZNIKA (KPO)</h1>
+        <h2>Za kalendarsku godinu: {{year}}</h2>
+    </div>
+
+    <div class="preduzetnik-info">
+        <div>
+            <p><strong>Poslovno ime:</strong> {{user.companyName}}</p>
+            <p><strong>Ime i prezime preduzetnika:</strong> {{user.name}}</p>
+            <p><strong>Sedište:</strong> {{user.address}}, {{user.city}}</p>
+        </div>
+        <div>
+            <p><strong>PIB:</strong> {{user.pib}}</p>
+            <p><strong>Matični broj:</strong> {{user.mbr}}</p>
+            <p><strong>Šifra delatnosti:</strong> {{user.activityCode}}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="2" style="width: 5%">Redni<br>broj</th>
+                <th rowspan="2" style="width: 35%">Datum i opis knjiženja<br>(broj fakture, naziv kupca)</th>
+                <th colspan="2">Iznos ostvarenog prihoda u RSD</th>
+                <th rowspan="2" style="width: 20%">Ukupan prihod<br>u RSD<br>(3 + 4)</th>
+            </tr>
+            <tr>
+                <th style="width: 20%">od prodaje<br>proizvoda</th>
+                <th style="width: 20%">od pružanja<br>usluga</th>
+            </tr>
+            <tr style="font-size: 10px; background-color: #f9f9f9;">
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each entries}}
+            <tr>
+                <td>{{this.sequenceNumber}}</td>
+                <td class="text-left">
+                    {{formatDate this.issueDate}}<br>
+                    {{this.description}}
+                </td>
+                <td class="text-right">{{formatCurrency this.productAmount}}</td>
+                <td class="text-right">{{formatCurrency this.serviceAmount}}</td>
+                <td class="text-right">{{formatCurrency this.totalAmount}}</td>
+            </tr>
+            {{/each}}
+            <tr class="totals-row">
+                <td colspan="2" class="text-right">SVEGA:</td>
+                <td class="text-right">0.00</td>
+                <td class="text-right">{{formatCurrency totalYearly}}</td>
+                <td class="text-right">{{formatCurrency totalYearly}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div>
+            <p>U _________________________</p>
+            <p>Dana: ___________________</p>
+        </div>
+        <div class="signature-line">
+            M.P. (Potpis preduzetnika)
+        </div>
+    </div>
+
+</body>
+</html>

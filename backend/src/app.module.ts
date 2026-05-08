@@ -8,9 +8,11 @@ import { ConfigModule } from "@nestjs/config";
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
+import { KpoModule } from './kpo/kpo.module';
+import { LimitsModule } from './limits/limits.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UsersModule, ClientsModule, BankAccountsModule, InvoicesModule],
+  imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UsersModule, ClientsModule, BankAccountsModule, InvoicesModule, KpoModule, LimitsModule],
   controllers: [AppController],
   providers: [AppService],
 })
