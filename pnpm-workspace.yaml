@@ -7,6 +7,7 @@ allowBuilds:
   '@prisma/engines': true
   '@scarf/scarf': true
   bcrypt: true
+  msw: true
   prisma: true
   puppeteer: true
   unrs-resolver: true
