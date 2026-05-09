@@ -11,7 +11,7 @@ App for Serbian **paušalac (sole proprietor)**. Invoices, KPO book, income limi
 ## Tech Stack
 - **Monorepo**: pnpm workspaces (`backend/`, `frontend/`, `shared/`)
 - **Backend**: NestJS, Prisma, PostgreSQL, Swagger, class-validator, Passport + JWT
-- **Frontend**: FSD, React 19+, Vite, shadcn/ui, Tailwind, TanStack Query, React Router, React Hook Form + Zod
+- **Frontend**: FSD, React 19+, Vite, shadcn/ui, Tailwind, TanStack Query, React Router, React Hook Form + Zod, i18n
 - **Shared**: TypeScript types, enums, constants (no runtime deps on NestJS/React)
 
 ## Rules
@@ -20,7 +20,7 @@ App for Serbian **paušalac (sole proprietor)**. Invoices, KPO book, income limi
 - Strict typing, no `any`
 - Conventional commits (`feat:`, `fix:`, `chore:`)
 - Backend reviews: explain **why**, suggest tests, check Swagger decorators
-- Frontend: shadcn/ui components, responsive, loading/error states
+- Frontend: shadcn/ui components, responsive, loading/error states, texts only with i18n in English, use import type for types
 
 ## Serbian Paušalac Context
 - Fixed-tax sole proprietorship, must keep **KPO book** (income ledger)
