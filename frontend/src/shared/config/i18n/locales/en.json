@@ -1,9 +1,19 @@
 {
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "invoices": "Invoices",
+    "limits": "Tax Limits",
+    "settings": "Settings"
+  },
   "app": {
     "title": "Preduzetnik Helper",
     "description": "Testing FSD, Shadcn, Shared Library, and i18n",
     "sharedTypesTest": "Shared Types Test:",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete"
   },
   "auth": {
     "login": {
@@ -29,6 +39,98 @@
       "submit": "Create Account",
       "goToLogin": "Already have an account? Login",
       "success": "Registration successful! You can now log in."
+    },
+    "logout": "Logout"
+  },
+  "clients": {
+    "subtitle": "Manage your business partners and clients.",
+    "empty": "No clients found. Start by adding one!",
+    "type": {
+      "domestic": "Domestic (Serbia)",
+      "international": "International"
+    },
+    "form": {
+      "type": "Client Type",
+      "name": "Company Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Address",
+      "city": "City",
+      "country": "Country",
+      "pib": "PIB (Tax ID)",
+      "mbr": "MBR (Registration Number)",
+      "taxId": "Tax ID / VAT",
+      "submit": "Save Client"
+    },
+    "create": {
+      "button": "Add Client",
+      "title": "Add New Client",
+      "description": "Add a new client to your list to issue invoices.",
+      "success": "Client created successfully!"
+    },
+    "edit": {
+      "title": "Edit Client",
+      "success": "Client updated successfully!"
+    },
+    "delete": {
+      "title": "Delete Client",
+      "description": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+      "button": "Delete",
+      "success": "Client deleted successfully!"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "invoices": {
+      "subtitle": "Manage your invoices and payments.",
+      "empty": "No invoices found.",
+      "status": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "paid": "Paid",
+        "cancelled": "Cancelled"
+      },
+      "table": {
+        "number": "Number",
+        "client": "Client",
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "form": {
+        "client": "Select Client",
+        "selectClient": "Choose a client...",
+        "bankAccount": "Bank Account",
+        "selectBankAccount": "Choose an account...",
+        "placeOfIssue": "Place of Issue",
+        "domesticSupply": "Domestic Supply (counts toward 8M limit)",
+        "exchangeRate": "Exchange Rate (NBS)",
+        "number": "Invoice Number",
+        "issueDate": "Issue Date",
+        "dueDate": "Due Date",
+        "currency": "Currency",
+        "items": "Invoice Items",
+        "addItem": "Add Item",
+        "description": "Description",
+        "quantity": "Qty",
+        "price": "Price",
+        "total": "Total",
+        "grandTotal": "Grand Total",
+        "noVatNotice": "Nije u sistemu PDV-a",
+        "submit": "Create Invoice"
+      },
+      "create": {
+        "button": "Create Invoice",
+        "title": "Create New Invoice",
+        "description": "Fill in the details to issue a new invoice.",
+        "success": "Invoice created successfully!"
+      },
+      "delete": {
+        "confirm": "Are you sure you want to delete this invoice?",
+        "success": "Invoice deleted successfully!"
+      }
     }
   }
 }

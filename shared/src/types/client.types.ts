@@ -1,6 +1,6 @@
 import {ClientType} from "./enums";
 
-export interface IClientResponse {
+export interface IClient {
     id: string;
     type: ClientType;
     name: string;
