@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -52,6 +51,7 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
             ...client,
             email: client.email || "",
             phone: client.phone || "",
+            postalCode: client.postalCode ?? undefined,
           }} 
         />
       </DialogContent>

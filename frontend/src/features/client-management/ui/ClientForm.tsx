@@ -2,7 +2,6 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
-import type { ClientType } from "@preduzetnik/shared";
 
 import { Input } from "@/shared/ui/input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
