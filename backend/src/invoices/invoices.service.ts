@@ -8,6 +8,7 @@ import { InvoiceResponseDto } from './dto/invoice-response.dto';
 import { ClientsService } from '../clients/clients.service';
 import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 import { PdfService } from '../pdf/pdf.service';
+import { InvoiceStatus, Currency } from '../generated/prisma/enums';
 
 @Injectable()
 export class InvoicesService {
@@ -94,7 +95,7 @@ export class InvoicesService {
             where: {
                 userId,
                 ...(filters.year && { year: filters.year }),
-                ...(filters.status && { status: filters.status as any }),
+                ...(filters.status && { status: filters.status as InvoiceStatus }),
                 ...(filters.clientId && { clientId: filters.clientId }),
             },
             include: {
@@ -152,7 +153,7 @@ export class InvoicesService {
         let exchangeRate = Number(existing.exchangeRate) || 1;
         let currency = existing.currency;
 
-        if (dto.currency) currency = dto.currency as any;
+        if (dto.currency) currency = dto.currency as Currency;
         if (dto.exchangeRate !== undefined) exchangeRate = dto.exchangeRate;
 
         // Handle items update
@@ -181,13 +182,13 @@ export class InvoicesService {
         const updated = await this.prisma.invoice.update({
             where: { id },
             data: {
-                status: dto.status as any,
+                status: dto.status as InvoiceStatus,
                 issueDate: dto.issueDate ? new Date(dto.issueDate) : undefined,
                 dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
                 placeOfIssue: dto.placeOfIssue,
                 domesticSupply: dto.domesticSupply,
                 note: dto.note,
-                currency: dto.currency as any,
+                currency: dto.currency as Currency,
                 exchangeRate: currency === 'RSD' ? null : exchangeRate,
                 totalAmount: dto.items || dto.currency || dto.exchangeRate ? totalAmount : undefined,
                 totalRsd: dto.items || dto.currency || dto.exchangeRate ? totalRsd : undefined,
@@ -226,10 +227,10 @@ export class InvoicesService {
     async generatePdf(id: string, userId: string): Promise<Buffer> {
         const invoice = await this.prisma.invoice.findUnique({
             where: { id },
-            include: { 
-                client: true, 
+            include: {
+                client: true,
                 items: true,
-                user: true,
+                user: { omit: { password: true } },
                 bankAccount: true,
             },
         });
@@ -253,8 +254,9 @@ export class InvoicesService {
         return this.pdfService.generateInvoicePdf(pdfData);
     }
 
-    // Helper to map Prisma entity to DTO
-    private mapToResponseDto(invoice: any): InvoiceResponseDto {
+    private mapToResponseDto(
+        invoice: NonNullable<Awaited<ReturnType<typeof this.prisma.invoice.findFirst<{ include: { client: true; items: true } }>>>>
+    ): InvoiceResponseDto {
         return {
             id: invoice.id,
             invoiceNumber: invoice.invoiceNumber,

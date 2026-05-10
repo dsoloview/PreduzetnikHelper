@@ -5,8 +5,10 @@ import {Public} from "./helpers/auth.helpers";
 import {RegisterDto} from "./dto/register.dto";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {AuthResponseDto} from "./dto/auth-response.dto";
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
+@Throttle({ default: { ttl: 60000, limit: 5 } })
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {

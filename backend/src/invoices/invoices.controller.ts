@@ -1,6 +1,6 @@
 import {
     Controller, Get, Post, Patch, Delete,
-    Param, Body, Query, ParseUUIDPipe, Res
+    Param, Body, Query, ParseUUIDPipe, Res, ParseIntPipe, DefaultValuePipe
 } from '@nestjs/common';
 import type { Response } from 'express';
 import {
@@ -37,7 +37,7 @@ export class InvoicesController {
     @ApiQuery({ name: 'clientId', required: false })
     async findAll(
         @CurrentUser() user: JwtPayload,
-        @Query('year') year?: number,
+        @Query('year', new DefaultValuePipe(undefined), new ParseIntPipe({ optional: true })) year?: number,
         @Query('status') status?: string,
         @Query('clientId') clientId?: string,
     ): Promise<InvoiceResponseDto[]> {
