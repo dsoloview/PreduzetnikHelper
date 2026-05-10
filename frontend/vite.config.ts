@@ -14,4 +14,12 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@preduzetnik/shared'],
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 })

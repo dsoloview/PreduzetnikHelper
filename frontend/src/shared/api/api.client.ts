@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/entities/user/model/auth.store';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
       if (isRefreshing) {
         return new Promise((resolve) => {
           refreshQueue.push((token) => {
