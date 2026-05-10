@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const user_response_dto_1 = require("./dto/user-response.dto");
 const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
 const update_user_dto_1 = require("./dto/update-user.dto");
+const change_password_dto_1 = require("./dto/change-password.dto");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -34,6 +35,9 @@ let UsersController = class UsersController {
     }
     async updateProfile(user, dto) {
         return this.usersService.updateProfile(user.userId, dto);
+    }
+    async changePassword(user, dto) {
+        return this.usersService.changePassword(user.userId, dto);
     }
 };
 exports.UsersController = UsersController;
@@ -56,6 +60,18 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.Patch)('change-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, swagger_1.ApiOperation)({ summary: 'Change current user password' }),
+    (0, swagger_1.ApiResponse)({ status: 204, description: 'Password changed successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 422, description: 'Current password is incorrect' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, change_password_dto_1.ChangePasswordDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "changePassword", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
     (0, swagger_1.ApiBearerAuth)(),

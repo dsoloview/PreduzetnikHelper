@@ -9,6 +9,7 @@ export declare class UserResponseDto implements IUserResponse {
     activityCode: string | null;
     address: string | null;
     city: string | null;
+    postalCode: string | null;
     municipality: string | null;
     phone: string | null;
     createdAt: Date;

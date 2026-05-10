@@ -122,7 +122,7 @@
         <div class="company-info">
             <h1>{{user.companyName}}</h1>
             <p><strong>Ime i prezime / Name:</strong> {{user.name}}</p>
-            <p><strong>Adresa / Address:</strong> {{user.address}}, {{user.city}}</p>
+            <p><strong>Adresa / Address:</strong> {{user.address}}, {{user.postalCode}} {{user.city}}</p>
             <p><strong>PIB / Tax ID:</strong> {{user.pib}} | <strong>MB / Reg. No:</strong> {{user.mbr}}</p>
         </div>
         <div class="invoice-details">
@@ -140,7 +140,7 @@
             <h3>Kupac / Klijent</h3>
             <p><strong>{{client.name}}</strong></p>
             <p>{{client.address}}</p>
-            <p>{{client.city}}, {{client.country}}</p>
+            <p>{{#if client.postalCode}}{{client.postalCode}} {{/if}}{{client.city}}, {{client.country}}</p>
             {{#if client.taxId}}<p><strong>PIB / Tax ID:</strong> {{client.taxId}}</p>{{/if}}
             {{#if client.registrationNumber}}<p><strong>MB / Reg. No:</strong> {{client.registrationNumber}}</p>{{/if}}
         </div>

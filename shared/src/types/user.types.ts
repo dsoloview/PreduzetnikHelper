@@ -8,6 +8,7 @@ export interface IUserResponse {
     activityCode: string | null;
     address: string | null;
     city: string | null;
+    postalCode: string | null;
     municipality: string | null;
     phone: string | null;
     createdAt: Date;
@@ -21,6 +22,7 @@ export interface IUpdateUserRequest {
     activityCode?: string;
     address?: string;
     city?: string;
+    postalCode?: string;
     municipality?: string;
     phone?: string;
 }

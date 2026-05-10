@@ -31,6 +31,7 @@ model User {
   activityCode String?       @map("activity_code") // Šifra delatnosti
   address      String?
   city         String?
+  postalCode   String?  @map("postal_code")
   municipality String? // Opština — affects tax coefficient
   phone        String?
   bankAccounts BankAccount[]
@@ -73,6 +74,7 @@ model Client {
   phone              String?
   address            String
   city               String
+  postalCode         String?    @map("postal_code")
   country            String     @default("RS") // ISO 3166-1 alpha-2
   taxId              String     @map("tax_id") // PIB for Serbian, VAT/EIN for foreign
   registrationNumber String     @map("registration_number") // MBR for Serbian

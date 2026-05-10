@@ -6,7 +6,8 @@
     "limits": "Tax Limits",
     "bankAccounts": "Bank Accounts",
     "settings": "Settings",
-    "profile": "Profile"
+    "profile": "Profile",
+    "kpo": "KPO Book"
   },
   "app": {
     "title": "Preduzetnik Helper",
@@ -58,6 +59,7 @@
       "phone": "Phone Number",
       "address": "Address",
       "city": "City",
+      "postalCode": "Postal Code",
       "country": "Country",
       "pib": "PIB (Tax ID)",
       "mbr": "MBR (Registration Number)",
@@ -223,6 +225,42 @@
       "delete": "Delete"
     }
   },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account security.",
+    "password": {
+      "title": "Change Password",
+      "description": "Update your password to keep your account secure.",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm New Password",
+      "submit": "Change Password",
+      "success": "Password changed successfully!",
+      "error": "Failed to change password.",
+      "wrongCurrent": "Current password is incorrect."
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "description": "Log out from all devices by clearing your session.",
+      "logout": "Log Out"
+    }
+  },
+  "kpo": {
+    "title": "KPO Book",
+    "subtitle": "Knjiga prihoda i rashoda — your income ledger.",
+    "downloadPdf": "Download PDF",
+    "loadError": "Failed to load KPO data.",
+    "empty": "No entries for this year.",
+    "yearlyTotal": "Total {{year}}",
+    "table": {
+      "no": "No.",
+      "date": "Date",
+      "description": "Description",
+      "products": "Products (RSD)",
+      "services": "Services (RSD)",
+      "total": "Total (RSD)"
+    }
+  },
   "profile": {
     "title": "Profile",
     "subtitle": "Manage your personal and business details used on invoices.",
@@ -246,6 +284,7 @@
       "phone": "Phone",
       "address": "Street Address",
       "city": "City",
+      "postalCode": "Postal Code",
       "municipality": "Municipality (Opština)"
     }
   }

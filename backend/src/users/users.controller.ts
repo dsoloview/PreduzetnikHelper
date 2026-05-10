@@ -1,10 +1,11 @@
-import {Body, Controller, Get, NotFoundException, Patch} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Patch} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {UserResponseDto} from "./dto/user-response.dto";
 import {CurrentUser} from "../auth/decorators/current-user.decorator";
 import type {JwtPayload} from "../auth/types/jwt-payload.type";
 import {UpdateUserDto} from "./dto/update-user.dto";
+import {ChangePasswordDto} from "./dto/change-password.dto";
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -35,6 +36,18 @@ export class UsersController {
         @Body() dto: UpdateUserDto,
     ): Promise<UserResponseDto> {
         return this.usersService.updateProfile(user.userId, dto);
+    }
+
+    @Patch('change-password')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: 'Change current user password' })
+    @ApiResponse({ status: 204, description: 'Password changed successfully' })
+    @ApiResponse({ status: 422, description: 'Current password is incorrect' })
+    async changePassword(
+        @CurrentUser() user: JwtPayload,
+        @Body() dto: ChangePasswordDto,
+    ): Promise<void> {
+        return this.usersService.changePassword(user.userId, dto);
     }
 }
 

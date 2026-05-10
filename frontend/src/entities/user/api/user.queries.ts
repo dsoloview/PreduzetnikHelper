@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "@/shared/api/user.api";
-import type { IUpdateUserRequest } from "@preduzetnik/shared";
+import type { IUpdateUserRequest, IChangePasswordRequest } from "@preduzetnik/shared";
 
 export const userKeys = {
   profile: ["user", "profile"] as const,
@@ -20,5 +20,11 @@ export const useUpdateProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.profile });
     },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: (dto: IChangePasswordRequest) => userApi.changePassword(dto),
   });
 };

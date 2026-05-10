@@ -36,6 +36,7 @@ export declare const UserScalarFieldEnum: {
     readonly activityCode: "activityCode";
     readonly address: "address";
     readonly city: "city";
+    readonly postalCode: "postalCode";
     readonly municipality: "municipality";
     readonly phone: "phone";
     readonly createdAt: "createdAt";
@@ -64,6 +65,7 @@ export declare const ClientScalarFieldEnum: {
     readonly phone: "phone";
     readonly address: "address";
     readonly city: "city";
+    readonly postalCode: "postalCode";
     readonly country: "country";
     readonly taxId: "taxId";
     readonly registrationNumber: "registrationNumber";

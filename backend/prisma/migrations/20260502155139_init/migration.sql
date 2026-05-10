@@ -13,6 +13,7 @@ CREATE TABLE "users" (
     "activity_code" TEXT,
     "address" TEXT,
     "city" TEXT,
+    "postal_code" TEXT,
     "municipality" TEXT,
     "phone" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

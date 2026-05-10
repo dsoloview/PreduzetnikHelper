@@ -35,6 +35,7 @@ export type UserMinAggregateOutputType = {
   activityCode: string | null
   address: string | null
   city: string | null
+  postalCode: string | null
   municipality: string | null
   phone: string | null
   createdAt: Date | null
@@ -52,6 +53,7 @@ export type UserMaxAggregateOutputType = {
   activityCode: string | null
   address: string | null
   city: string | null
+  postalCode: string | null
   municipality: string | null
   phone: string | null
   createdAt: Date | null
@@ -69,6 +71,7 @@ export type UserCountAggregateOutputType = {
   activityCode: number
   address: number
   city: number
+  postalCode: number
   municipality: number
   phone: number
   createdAt: number
@@ -88,6 +91,7 @@ export type UserMinAggregateInputType = {
   activityCode?: true
   address?: true
   city?: true
+  postalCode?: true
   municipality?: true
   phone?: true
   createdAt?: true
@@ -105,6 +109,7 @@ export type UserMaxAggregateInputType = {
   activityCode?: true
   address?: true
   city?: true
+  postalCode?: true
   municipality?: true
   phone?: true
   createdAt?: true
@@ -122,6 +127,7 @@ export type UserCountAggregateInputType = {
   activityCode?: true
   address?: true
   city?: true
+  postalCode?: true
   municipality?: true
   phone?: true
   createdAt?: true
@@ -212,6 +218,7 @@ export type UserGroupByOutputType = {
   activityCode: string | null
   address: string | null
   city: string | null
+  postalCode: string | null
   municipality: string | null
   phone: string | null
   createdAt: Date
@@ -250,6 +257,7 @@ export type UserWhereInput = {
   activityCode?: Prisma.StringNullableFilter<"User"> | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
   city?: Prisma.StringNullableFilter<"User"> | string | null
+  postalCode?: Prisma.StringNullableFilter<"User"> | string | null
   municipality?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -270,6 +278,7 @@ export type UserOrderByWithRelationInput = {
   activityCode?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -293,6 +302,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   activityCode?: Prisma.StringNullableFilter<"User"> | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
   city?: Prisma.StringNullableFilter<"User"> | string | null
+  postalCode?: Prisma.StringNullableFilter<"User"> | string | null
   municipality?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -313,6 +323,7 @@ export type UserOrderByWithAggregationInput = {
   activityCode?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -336,6 +347,7 @@ export type UserScalarWhereWithAggregatesInput = {
   activityCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  postalCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   municipality?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -353,6 +365,7 @@ export type UserCreateInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -373,6 +386,7 @@ export type UserUncheckedCreateInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -393,6 +407,7 @@ export type UserUpdateInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -413,6 +428,7 @@ export type UserUncheckedUpdateInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -433,6 +449,7 @@ export type UserCreateManyInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -450,6 +467,7 @@ export type UserUpdateManyMutationInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -467,6 +485,7 @@ export type UserUncheckedUpdateManyInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -484,6 +503,7 @@ export type UserCountOrderByAggregateInput = {
   activityCode?: Prisma.SortOrder
   address?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -501,6 +521,7 @@ export type UserMaxOrderByAggregateInput = {
   activityCode?: Prisma.SortOrder
   address?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -518,6 +539,7 @@ export type UserMinOrderByAggregateInput = {
   activityCode?: Prisma.SortOrder
   address?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -594,6 +616,7 @@ export type UserCreateWithoutBankAccountsInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -613,6 +636,7 @@ export type UserUncheckedCreateWithoutBankAccountsInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -648,6 +672,7 @@ export type UserUpdateWithoutBankAccountsInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -667,6 +692,7 @@ export type UserUncheckedUpdateWithoutBankAccountsInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -686,6 +712,7 @@ export type UserCreateWithoutClientsInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -705,6 +732,7 @@ export type UserUncheckedCreateWithoutClientsInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -740,6 +768,7 @@ export type UserUpdateWithoutClientsInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -759,6 +788,7 @@ export type UserUncheckedUpdateWithoutClientsInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -778,6 +808,7 @@ export type UserCreateWithoutInvoicesInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -797,6 +828,7 @@ export type UserUncheckedCreateWithoutInvoicesInput = {
   activityCode?: string | null
   address?: string | null
   city?: string | null
+  postalCode?: string | null
   municipality?: string | null
   phone?: string | null
   createdAt?: Date | string
@@ -832,6 +864,7 @@ export type UserUpdateWithoutInvoicesInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -851,6 +884,7 @@ export type UserUncheckedUpdateWithoutInvoicesInput = {
   activityCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -919,6 +953,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   activityCode?: boolean
   address?: boolean
   city?: boolean
+  postalCode?: boolean
   municipality?: boolean
   phone?: boolean
   createdAt?: boolean
@@ -940,6 +975,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   activityCode?: boolean
   address?: boolean
   city?: boolean
+  postalCode?: boolean
   municipality?: boolean
   phone?: boolean
   createdAt?: boolean
@@ -957,6 +993,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   activityCode?: boolean
   address?: boolean
   city?: boolean
+  postalCode?: boolean
   municipality?: boolean
   phone?: boolean
   createdAt?: boolean
@@ -974,13 +1011,14 @@ export type UserSelectScalar = {
   activityCode?: boolean
   address?: boolean
   city?: boolean
+  postalCode?: boolean
   municipality?: boolean
   phone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "companyName" | "pib" | "mbr" | "activityCode" | "address" | "city" | "municipality" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "companyName" | "pib" | "mbr" | "activityCode" | "address" | "city" | "postalCode" | "municipality" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bankAccounts?: boolean | Prisma.User$bankAccountsArgs<ExtArgs>
   clients?: boolean | Prisma.User$clientsArgs<ExtArgs>
@@ -1008,6 +1046,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     activityCode: string | null
     address: string | null
     city: string | null
+    postalCode: string | null
     municipality: string | null
     phone: string | null
     createdAt: Date
@@ -1448,6 +1487,7 @@ export interface UserFieldRefs {
   readonly activityCode: Prisma.FieldRef<"User", 'String'>
   readonly address: Prisma.FieldRef<"User", 'String'>
   readonly city: Prisma.FieldRef<"User", 'String'>
+  readonly postalCode: Prisma.FieldRef<"User", 'String'>
   readonly municipality: Prisma.FieldRef<"User", 'String'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>

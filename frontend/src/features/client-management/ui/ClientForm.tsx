@@ -16,6 +16,7 @@ const clientSchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
+  postalCode: z.string().optional(),
   country: z.string().min(1, "Country is required"),
   taxId: z.string().min(1, "Tax ID is required"), // PIB for SRB
   registrationNumber: z.string().min(1, "Registration number is required"), // MBR for SRB
@@ -41,6 +42,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
       phone: "",
       address: "",
       city: "",
+      postalCode: "",
       country: "RS",
       taxId: "",
       registrationNumber: "",
@@ -148,7 +150,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Controller
             name="city"
             control={form.control}
@@ -157,6 +159,16 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
                 <FieldLabel>{t("clients.form.city")}</FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+          <Controller
+            name="postalCode"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>{t("clients.form.postalCode")}</FieldLabel>
+                <Input {...field} />
               </Field>
             )}
           />

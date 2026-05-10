@@ -21,6 +21,7 @@ class UserResponseDto {
     activityCode;
     address;
     city;
+    postalCode;
     municipality;
     phone;
     createdAt;
@@ -62,6 +63,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Beograd', nullable: true }),
     __metadata("design:type", Object)
 ], UserResponseDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '11000', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "postalCode", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Serbia', nullable: true }),
     __metadata("design:type", Object)

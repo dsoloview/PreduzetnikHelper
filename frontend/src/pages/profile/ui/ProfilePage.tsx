@@ -21,6 +21,7 @@ const profileSchema = z.object({
   activityCode: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
+  postalCode: z.string().optional(),
   municipality: z.string().optional(),
   phone: z.string().optional(),
 });
@@ -42,6 +43,7 @@ export const ProfilePage = () => {
       activityCode: "",
       address: "",
       city: "",
+      postalCode: "",
       municipality: "",
       phone: "",
     },
@@ -57,6 +59,7 @@ export const ProfilePage = () => {
         activityCode: profile.activityCode ?? "",
         address: profile.address ?? "",
         city: profile.city ?? "",
+        postalCode: profile.postalCode ?? "",
         municipality: profile.municipality ?? "",
         phone: profile.phone ?? "",
       });
@@ -151,10 +154,14 @@ export const ProfilePage = () => {
               <Label htmlFor="address">{t("profile.fields.address")}</Label>
               <Input id="address" {...form.register("address")} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="grid gap-1.5">
                 <Label htmlFor="city">{t("profile.fields.city")}</Label>
                 <Input id="city" {...form.register("city")} />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="postalCode">{t("profile.fields.postalCode")}</Label>
+                <Input id="postalCode" {...form.register("postalCode")} />
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="municipality">{t("profile.fields.municipality")}</Label>

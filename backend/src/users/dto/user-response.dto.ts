@@ -20,6 +20,8 @@ export class UserResponseDto implements IUserResponse {
     address: string | null;
     @ApiProperty({ example: 'Beograd', nullable: true })
     city: string | null;
+    @ApiProperty({ example: '11000', nullable: true })
+    postalCode: string | null;
     @ApiProperty({ example: 'Serbia', nullable: true })
     municipality: string | null;
     @ApiProperty({ example: '+381612345678', nullable: true })
