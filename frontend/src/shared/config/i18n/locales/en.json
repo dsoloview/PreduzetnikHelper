@@ -91,6 +91,13 @@
   "invoices": {
     "subtitle": "Manage your invoices and payments.",
     "empty": "No invoices found.",
+    "noResults": "No invoices match your filters.",
+    "filter": {
+      "search": "Search by client or number...",
+      "all": "All",
+      "clearFilters": "Clear filters"
+    },
+    "total": "Total: {{amount}} RSD",
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -153,14 +160,31 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your business activity.",
+    "stats": {
+      "revenue": "Revenue This Year",
+      "revenueSub": "Paid & sent in {{year}}",
+      "paid": "Paid Invoices",
+      "pending": "Pending",
+      "clients": "Active Clients",
+      "invoices": "invoices",
+      "unique": "unique"
+    },
     "limits": {
       "title": "Tax Limits",
       "viewAll": "View details"
+    },
+    "breakdown": {
+      "title": "Invoice Status Breakdown"
     },
     "invoices": {
       "title": "Recent Invoices",
       "viewAll": "View all",
       "empty": "No invoices yet."
+    },
+    "clients": {
+      "title": "Top Clients",
+      "viewAll": "View all",
+      "empty": "No client data yet."
     }
   },
   "limits": {
