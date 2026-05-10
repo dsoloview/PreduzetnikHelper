@@ -13,22 +13,23 @@ import {
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { CreateInvoiceForm } from "./CreateInvoiceForm";
-import type { InvoiceFormValues } from "./CreateInvoiceForm";
 import { useCreateInvoice } from "@/entities/invoice/api/invoice.queries";
+import type { ICreateInvoiceRequest } from "@preduzetnik/shared";
 
 export const CreateInvoiceDialog = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { mutate, isPending } = useCreateInvoice();
 
-  const onSubmit = (data: InvoiceFormValues) => {
+  const onSubmit = (data: ICreateInvoiceRequest) => {
     mutate(data, {
       onSuccess: () => {
         toast.success(t("invoices.create.success", { defaultValue: "Invoice created successfully!" }));
         setOpen(false);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Failed to create invoice");
+      onError: (error: unknown) => {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        toast.error(axiosError.response?.data?.message || "Failed to create invoice");
       },
     });
   };

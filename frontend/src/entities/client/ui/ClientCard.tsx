@@ -34,7 +34,7 @@ export const ClientCard = ({ client, onClick }: ClientCardProps) => {
             <div className="space-y-1">
               <CardTitle className="text-lg font-bold">{client.name}</CardTitle>
               <span className="text-xs px-2 py-1 rounded bg-secondary text-secondary-foreground">
-                {client.type}
+                {t(`clients.type.${client.type.toLowerCase()}`)}
               </span>
             </div>
             

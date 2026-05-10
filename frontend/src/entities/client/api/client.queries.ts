@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { clientApi } from "@/shared/api/client.api";
-import type { ICreateClientRequest } from "@preduzetnik/shared";
+import type { IUpdateClientRequest } from "@preduzetnik/shared";
 
 export const clientKeys = {
   all: ["clients"] as const,
@@ -37,7 +37,7 @@ export const useCreateClient = () => {
 export const useUpdateClient = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: Partial<ICreateClientRequest>) => clientApi.update(id, data),
+    mutationFn: (data: IUpdateClientRequest) => clientApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(id) });

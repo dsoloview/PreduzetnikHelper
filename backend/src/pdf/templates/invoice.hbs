@@ -8,15 +8,16 @@
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color: #333;
             margin: 0;
-            padding: 20px;
-            font-size: 14px;
+            padding: 14px;
+            font-size: 12px;
         }
+        p { margin: 2px 0; }
         .header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
+            margin-bottom: 14px;
             border-bottom: 2px solid #333;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
         .company-info {
             width: 50%;
@@ -28,33 +29,39 @@
         h1 {
             color: #2c3e50;
             margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 28px;
+            margin-bottom: 3px;
+            font-size: 20px;
+        }
+        h2 {
+            margin: 2px 0;
+            font-size: 14px;
         }
         .details-section {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
+            margin-bottom: 14px;
         }
         .client-info {
             width: 45%;
-            padding: 15px;
+            padding: 8px 10px;
             background: #f9f9f9;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         .client-info h3 {
             margin-top: 0;
+            margin-bottom: 4px;
+            font-size: 12px;
             color: #2c3e50;
             border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
+            padding-bottom: 3px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 12px;
         }
         th, td {
-            padding: 12px;
+            padding: 6px 8px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -62,23 +69,24 @@
             background-color: #2c3e50;
             color: white;
             font-weight: bold;
+            font-size: 11px;
         }
         td.text-right, th.text-right {
             text-align: right;
         }
         .totals {
-            width: 50%;
+            width: 45%;
             float: right;
-            margin-bottom: 40px;
+            margin-bottom: 14px;
         }
         .totals-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #eee;
         }
         .totals-row.grand-total {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             border-bottom: 2px solid #333;
             border-top: 2px solid #333;
@@ -87,22 +95,23 @@
             clear: both;
         }
         .footer {
-            margin-top: 50px;
-            padding-top: 20px;
+            margin-top: 16px;
+            padding-top: 8px;
             border-top: 1px solid #ccc;
-            font-size: 12px;
+            font-size: 10px;
             color: #777;
             text-align: center;
         }
         .note {
-            margin-top: 30px;
-            padding: 15px;
+            margin-top: 10px;
+            padding: 8px 10px;
             background-color: #f0f7fb;
             border-left: 4px solid #3498db;
         }
         .pdv-note {
             font-weight: bold;
-            margin-top: 20px;
+            margin-top: 10px;
+            font-size: 11px;
             font-style: italic;
         }
     </style>
@@ -112,17 +121,17 @@
     <div class="header">
         <div class="company-info">
             <h1>{{user.companyName}}</h1>
-            <p><strong>Ime i prezime:</strong> {{user.name}}</p>
-            <p><strong>Adresa:</strong> {{user.address}}, {{user.city}}</p>
-            <p><strong>PIB:</strong> {{user.pib}} | <strong>MB:</strong> {{user.mbr}}</p>
+            <p><strong>Ime i prezime / Name:</strong> {{user.name}}</p>
+            <p><strong>Adresa / Address:</strong> {{user.address}}, {{user.city}}</p>
+            <p><strong>PIB / Tax ID:</strong> {{user.pib}} | <strong>MB / Reg. No:</strong> {{user.mbr}}</p>
         </div>
         <div class="invoice-details">
-            <h1 style="color: #7f8c8d;">FAKTURA</h1>
-            <h2>Br. {{displayNumber}}</h2>
-            <p><strong>Mesto izdavanja:</strong> {{placeOfIssue}}</p>
-            <p><strong>Datum izdavanja:</strong> {{formatDate issueDate}}</p>
-            <p><strong>Datum prometa:</strong> {{formatDate issueDate}}</p>
-            <p><strong>Rok plaćanja:</strong> {{formatDate dueDate}}</p>
+            <h1 style="color: #7f8c8d;">FAKTURA / INVOICE</h1>
+            <h2>Br. / No. {{displayNumber}}</h2>
+            <p><strong>Mesto izdavanja / Place of Issue:</strong> {{placeOfIssue}}</p>
+            <p><strong>Datum izdavanja / Issue Date:</strong> {{formatDate issueDate}}</p>
+            <p><strong>Datum prometa / Supply Date:</strong> {{formatDate issueDate}}</p>
+            <p><strong>Rok plaćanja / Due Date:</strong> {{formatDate dueDate}}</p>
         </div>
     </div>
 
@@ -137,21 +146,23 @@
         </div>
         
         <div class="client-info">
-            <h3>Uplate izvršiti na:</h3>
-            <p><strong>Banka:</strong> {{bankAccount.bankName}}</p>
-            <p><strong>Broj računa:</strong> {{bankAccount.accountNumber}}</p>
-            <p><strong>Valuta:</strong> {{currency}}</p>
+            <h3>Uplate izvršiti na / Payment to:</h3>
+            <p><strong>Banka / Bank:</strong> {{bankAccount.bankName}}</p>
+            <p><strong>Broj računa / Account No:</strong> {{bankAccount.accountNumber}}</p>
+            {{#if bankAccount.swiftCode}}<p><strong>SWIFT / BIC:</strong> {{bankAccount.swiftCode}}</p>{{/if}}
+            {{#if bankAccount.iban}}<p><strong>IBAN:</strong> {{bankAccount.iban}}</p>{{/if}}
+            <p><strong>Valuta / Currency:</strong> {{currency}}</p>
         </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>R.br.</th>
-                <th>Opis usluge</th>
-                <th class="text-right">Količina</th>
-                <th class="text-right">Cena ({{currency}})</th>
-                <th class="text-right">Ukupno ({{currency}})</th>
+                <th>R.br. / No.</th>
+                <th>Opis usluge / Description</th>
+                <th class="text-right">Količina / Qty</th>
+                <th class="text-right">Cena / Unit Price ({{currency}})</th>
+                <th class="text-right">Ukupno / Total ({{currency}})</th>
             </tr>
         </thead>
         <tbody>
@@ -169,40 +180,41 @@
 
     <div class="totals">
         <div class="totals-row">
-            <span>Osnovica:</span>
+            <span>Osnovica / Base:</span>
             <span>{{formatCurrency totalAmount}} {{currency}}</span>
         </div>
         <div class="totals-row">
-            <span>PDV (0%):</span>
+            <span>PDV / VAT (0%):</span>
             <span>0.00 {{currency}}</span>
         </div>
         <div class="totals-row grand-total">
-            <span>Za uplatu:</span>
+            <span>Za uplatu / Total Due:</span>
             <span>{{formatCurrency totalAmount}} {{currency}}</span>
         </div>
         
         {{#if exchangeRate}}
         <div class="totals-row" style="color: #777; font-size: 12px; margin-top: 10px;">
-            <span>Protivvrednost (za KPO):</span>
-            <span>{{formatCurrency totalRsd}} RSD (Kurs: {{exchangeRate}})</span>
+            <span>Protivvrednost / RSD equivalent (KPO):</span>
+            <span>{{formatCurrency totalRsd}} RSD (Kurs / Rate: {{exchangeRate}})</span>
         </div>
         {{/if}}
     </div>
     <div class="clear"></div>
 
     <div class="pdv-note">
-        Preduzetnik nije u sistemu PDV-a prema članu 33. Zakona o PDV-u.
+        Preduzetnik nije u sistemu PDV-a prema članu 33. Zakona o PDV-u.<br>
+        <span style="font-weight: normal; font-style: normal;">Not subject to VAT per Article 33 of the VAT Law.</span>
     </div>
 
     {{#if note}}
     <div class="note">
-        <strong>Napomena:</strong><br>
+        <strong>Napomena / Note:</strong><br>
         {{note}}
     </div>
     {{/if}}
 
     <div class="footer">
-        Faktura je validna bez pečata i potpisa.<br>
+        Faktura je validna bez pečata i potpisa. / This invoice is valid without stamp and signature.<br>
         Generisano pomoću PreduzetnikHelper aplikacije.
     </div>
 

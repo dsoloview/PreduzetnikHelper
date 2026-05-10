@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInvoices } from "@/entities/invoice/api/invoice.queries";
 import { CreateInvoiceDialog } from "@/features/invoice-management/ui/CreateInvoiceDialog";
@@ -9,22 +10,48 @@ import { format } from "date-fns";
 import { invoiceApi } from "@/shared/api/invoice.api";
 import { useDeleteInvoice } from "@/entities/invoice/api/invoice.queries";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 
 export const InvoicesPage = () => {
   const { t } = useTranslation();
   const { data: invoices, isLoading } = useInvoices();
-  const { mutate: deleteInvoice } = useDeleteInvoice();
+  const { mutate: deleteInvoice, isPending: isDeleting } = useDeleteInvoice();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  const handleDownload = (id: string) => {
-    window.open(invoiceApi.getDownloadUrl(id), "_blank");
+  const handleDownload = async (id: string, displayNumber: string) => {
+    setDownloadingId(id);
+    try {
+      await invoiceApi.downloadPdf(id, `invoice-${displayNumber}.pdf`);
+    } catch {
+      toast.error("Failed to download PDF");
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm(t("invoices.delete.confirm", { defaultValue: "Are you sure?" }))) {
-      deleteInvoice(id, {
-        onSuccess: () => toast.success(t("invoices.delete.success")),
-      });
-    }
+  const handleDeleteConfirm = () => {
+    if (!deleteId) return;
+    deleteInvoice(deleteId, {
+      onSuccess: () => {
+        toast.success(t("invoices.delete.success", { defaultValue: "Invoice deleted." }));
+        setDeleteId(null);
+      },
+      onError: (error: unknown) => {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        toast.error(axiosError.response?.data?.message || "Failed to delete invoice");
+        setDeleteId(null);
+      },
+    });
   };
 
   return (
@@ -73,10 +100,15 @@ export const InvoicesPage = () => {
                     <InvoiceStatusBadge status={invoice.status} />
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleDownload(invoice.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={downloadingId === invoice.id}
+                      onClick={() => handleDownload(invoice.id, invoice.displayNumber)}
+                    >
                       <FileDown className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(invoice.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(invoice.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </TableCell>
@@ -86,6 +118,28 @@ export const InvoicesPage = () => {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("invoices.delete.title", { defaultValue: "Delete Invoice" })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("invoices.delete.description", { defaultValue: "This action cannot be undone. The invoice will be permanently deleted." })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>{t("app.cancel", { defaultValue: "Cancel" })}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "..." : t("invoices.delete.button", { defaultValue: "Delete" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
+

@@ -1,5 +1,5 @@
 import { apiClient } from "./api.client";
-import type { IClient, ICreateClientRequest } from "@preduzetnik/shared";
+import type { IClient, ICreateClientRequest, IUpdateClientRequest } from "@preduzetnik/shared";
 
 export const clientApi = {
   getAll: async (): Promise<IClient[]> => {
@@ -14,7 +14,7 @@ export const clientApi = {
     const response = await apiClient.post<IClient>('/clients', data);
     return response.data;
   },
-  update: async (id: string, data: Partial<ICreateClientRequest>): Promise<IClient> => {
+  update: async (id: string, data: IUpdateClientRequest): Promise<IClient> => {
     const response = await apiClient.patch<IClient>(`/clients/${id}`, data);
     return response.data;
   },
@@ -22,3 +22,4 @@ export const clientApi = {
     await apiClient.delete(`/clients/${id}`);
   },
 };
+
