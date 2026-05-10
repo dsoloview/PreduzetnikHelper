@@ -17,6 +17,12 @@ class UserResponseDto {
     name;
     companyName;
     pib;
+    mbr;
+    activityCode;
+    address;
+    city;
+    municipality;
+    phone;
     createdAt;
 }
 exports.UserResponseDto = UserResponseDto;
@@ -41,7 +47,31 @@ __decorate([
     __metadata("design:type", Object)
 ], UserResponseDto.prototype, "pib", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ example: '123456789', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "mbr", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '6201', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "activityCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123 Main St', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Beograd', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Serbia', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "municipality", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+381612345678', nullable: true }),
+    __metadata("design:type", Object)
+], UserResponseDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2023-01-01T00:00:00.000Z' }),
     __metadata("design:type", Date)
 ], UserResponseDto.prototype, "createdAt", void 0);
 //# sourceMappingURL=user-response.dto.js.map

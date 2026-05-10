@@ -12,6 +12,18 @@ export class UserResponseDto implements IUserResponse {
     companyName: string | null;
     @ApiProperty({ example: '123456789', nullable: true })
     pib: string | null;
-    @ApiProperty()
+    @ApiProperty({ example: '123456789', nullable: true })
+    mbr: string | null;
+    @ApiProperty({ example: '6201', nullable: true })
+    activityCode: string | null;
+    @ApiProperty({ example: '123 Main St', nullable: true })
+    address: string | null;
+    @ApiProperty({ example: 'Beograd', nullable: true })
+    city: string | null;
+    @ApiProperty({ example: 'Serbia', nullable: true })
+    municipality: string | null;
+    @ApiProperty({ example: '+381612345678', nullable: true })
+    phone: string | null;
+    @ApiProperty({ example: '2023-01-01T00:00:00.000Z' })
     createdAt: Date;
 }

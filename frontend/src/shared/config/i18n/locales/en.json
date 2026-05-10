@@ -5,7 +5,8 @@
     "invoices": "Invoices",
     "limits": "Tax Limits",
     "bankAccounts": "Bank Accounts",
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profile"
   },
   "app": {
     "title": "Preduzetnik Helper",
@@ -220,6 +221,32 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal and business details used on invoices.",
+    "save": "Save Changes",
+    "saveSuccess": "Profile updated successfully!",
+    "saveError": "Failed to update profile.",
+    "sections": {
+      "account": "Account",
+      "accountDesc": "Your login and display name.",
+      "business": "Business Details",
+      "businessDesc": "Used on PDF invoices (PIB, MBR, company name).",
+      "address": "Address"
+    },
+    "fields": {
+      "name": "Full Name",
+      "email": "Email",
+      "companyName": "Company Name",
+      "pib": "PIB (Tax ID)",
+      "mbr": "MBR (Registration No.)",
+      "activityCode": "Activity Code (Šifra delatnosti)",
+      "phone": "Phone",
+      "address": "Street Address",
+      "city": "City",
+      "municipality": "Municipality (Opština)"
     }
   }
 }
