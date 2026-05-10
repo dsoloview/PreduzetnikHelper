@@ -17,6 +17,8 @@ export class ClientResponseDto implements IClient {
     address: string;
     @ApiProperty({example: 'city'})
     city: string;
+    @ApiProperty({example: '11000', nullable: true})
+    postalCode: string | null;
     @ApiProperty({example: 'country'})
     country: string;
     @ApiProperty({example: '123456789'})

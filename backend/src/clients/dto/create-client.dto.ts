@@ -1,7 +1,7 @@
 import type {ClientType} from "@preduzetnik/shared";
 import {CLIENT_TYPES, ICreateClientRequest} from "@preduzetnik/shared";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber} from "class-validator";
+import {IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString} from "class-validator";
 
 export class CreateClientDto implements ICreateClientRequest {
     @ApiProperty({ enum: CLIENT_TYPES })
@@ -24,6 +24,10 @@ export class CreateClientDto implements ICreateClientRequest {
     @ApiProperty({ example: 'city' })
     @IsNotEmpty()
     city: string;
+    @ApiProperty({ example: '11000', required: false })
+    @IsOptional()
+    @IsString()
+    postalCode?: string;
     @ApiProperty({ example: 'country' })
     @IsNotEmpty()
     country: string;

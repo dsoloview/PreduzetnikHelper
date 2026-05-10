@@ -7,6 +7,8 @@ import { InvoicesPage } from "@/pages/invoices/ui/InvoicesPage";
 import { BankAccountsPage } from "@/pages/bank-accounts/ui/BankAccountsPage";
 import { LimitsPage } from "@/pages/limits/ui/LimitsPage";
 import { ProfilePage } from "@/pages/profile/ui/ProfilePage";
+import { KpoPage } from "@/pages/kpo/ui/KpoPage";
+import { SettingsPage } from "@/pages/settings/ui/SettingsPage";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { MainLayout } from "@/widgets/layout/ui/MainLayout";
 
@@ -62,6 +64,14 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "kpo",
+        element: <KpoPage />,
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
       },
     ],
   },

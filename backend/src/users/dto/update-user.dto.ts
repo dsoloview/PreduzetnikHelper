@@ -9,6 +9,7 @@ export class UpdateUserDto implements IUpdateUserRequest {
     @IsOptional() @IsString() activityCode?: string;
     @IsOptional() @IsString() address?: string;
     @IsOptional() @IsString() city?: string;
+    @IsOptional() @IsString() postalCode?: string;
     @IsOptional() @IsString() municipality?: string;
     @IsOptional() @IsString() phone?: string;
 }

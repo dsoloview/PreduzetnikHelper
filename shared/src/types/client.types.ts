@@ -8,6 +8,7 @@ export interface IClient {
     phone: string | null;
     address: string;
     city: string;
+    postalCode?: string | null;
     country: string;
     taxId: string;
     registrationNumber: string;
@@ -21,6 +22,7 @@ export interface ICreateClientRequest {
     phone?: string;
     address: string;
     city: string;
+    postalCode?: string;
     country: string;
     taxId: string;
     registrationNumber: string;

@@ -2,6 +2,7 @@ import { User, Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserResponseDto } from "./dto/user-response.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -19,5 +20,6 @@ export declare class UsersService {
         data: Prisma.UserUpdateInput;
     }): Promise<User>;
     updateProfile(userId: string, dto: UpdateUserDto): Promise<UserResponseDto>;
+    changePassword(userId: string, dto: ChangePasswordDto): Promise<void>;
     deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User>;
 }

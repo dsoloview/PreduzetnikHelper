@@ -11,6 +11,7 @@ CREATE TABLE "clients" (
     "phone" TEXT,
     "address" TEXT NOT NULL,
     "city" TEXT NOT NULL,
+    "postal_code" TEXT,
     "country" TEXT NOT NULL DEFAULT 'RS',
     "tax_id" TEXT NOT NULL,
     "registration_number" TEXT NOT NULL,

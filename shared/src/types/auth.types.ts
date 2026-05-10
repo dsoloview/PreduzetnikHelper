@@ -10,3 +10,7 @@ export interface IRegisterRequest {
 export interface IAuthResponse {
     accessToken: string;
 }
+export interface IChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}
