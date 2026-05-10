@@ -18,6 +18,7 @@ const users_service_1 = require("./users.service");
 const swagger_1 = require("@nestjs/swagger");
 const user_response_dto_1 = require("./dto/user-response.dto");
 const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
+const update_user_dto_1 = require("./dto/update-user.dto");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -31,6 +32,9 @@ let UsersController = class UsersController {
         const { password, ...profile } = user;
         return profile;
     }
+    async updateProfile(user, dto) {
+        return this.usersService.updateProfile(user.userId, dto);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -42,6 +46,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "profile", null);
+__decorate([
+    (0, common_1.Patch)('profile'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update current user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: user_response_dto_1.UserResponseDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateProfile", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
     (0, swagger_1.ApiBearerAuth)(),

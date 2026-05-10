@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, TrendingUp, Settings, Landmark } from "lucide-react";
+import { LayoutDashboard, Users, FileText, TrendingUp, Settings, Landmark, UserCircle } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +38,21 @@ export const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t space-y-1">
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              isActive
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            )
+          }
+        >
+          <UserCircle className="size-4" />
+          {t("nav.profile")}
+        </NavLink>
         <NavLink
           to="/settings"
           className={({ isActive }) =>

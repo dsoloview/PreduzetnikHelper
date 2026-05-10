@@ -83,7 +83,7 @@ describe('AuthService', () => {
 
       (usersServiceMock.user as jest.Mock).mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed_new');
-      (usersServiceMock.createUser as jest.Mock).mockResolvedValue({ id: '2', name: 'Dima', ...dto });
+      (usersServiceMock.createUser as jest.Mock).mockResolvedValue({ id: '2', ...dto });
 
       const result = await service.register(dto);
 

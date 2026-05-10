@@ -1,5 +1,7 @@
 import { User, Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserResponseDto } from "./dto/user-response.dto";
 export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -16,5 +18,6 @@ export declare class UsersService {
         where: Prisma.UserWhereUniqueInput;
         data: Prisma.UserUpdateInput;
     }): Promise<User>;
+    updateProfile(userId: string, dto: UpdateUserDto): Promise<UserResponseDto>;
     deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User>;
 }

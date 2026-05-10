@@ -44,6 +44,11 @@ let UsersService = class UsersService {
             where,
         });
     }
+    async updateProfile(userId, dto) {
+        const updated = await this.prisma.user.update({ where: { id: userId }, data: dto });
+        const { password, ...profile } = updated;
+        return profile;
+    }
     async deleteUser(where) {
         return this.prisma.user.delete({
             where,
