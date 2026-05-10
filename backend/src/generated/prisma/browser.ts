@@ -38,6 +38,11 @@ export type Client = Prisma.ClientModel
  */
 export type Invoice = Prisma.InvoiceModel
 /**
+ * Model RefreshToken
+ * 
+ */
+export type RefreshToken = Prisma.RefreshTokenModel
+/**
  * Model InvoiceItem
  * 
  */

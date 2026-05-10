@@ -18,7 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: (config: Record<string, unknown>) => {
-        const required = ['DATABASE_URL', 'JWT_SECRET'];
+        const required = ['DATABASE_URL', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
         for (const key of required) {
           if (!config[key]) {
             throw new Error(`Missing required environment variable: ${key}`);

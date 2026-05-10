@@ -12,6 +12,10 @@ import { SettingsPage } from "@/pages/settings/ui/SettingsPage";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { MainLayout } from "@/widgets/layout/ui/MainLayout";
 
+window.addEventListener('auth:unauthorized', () => {
+  useAuthStore.getState().clearToken();
+});
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   

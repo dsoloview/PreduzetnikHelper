@@ -34,11 +34,12 @@ model User {
   postalCode   String?  @map("postal_code")
   municipality String? // Opština — affects tax coefficient
   phone        String?
-  bankAccounts BankAccount[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  clients      Client[]
-  invoices     Invoice[]
+  bankAccounts   BankAccount[]
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  clients        Client[]
+  invoices       Invoice[]
+  refreshTokens  RefreshToken[]
 
   @@map("users")
 }
@@ -121,6 +122,20 @@ model Invoice {
 
   @@unique([userId, invoiceNumber, year]) // 1/2026 unique per user
   @@map("invoices")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  jti         String   @unique
+  userId      String   @map("user_id")
+  hashedToken String   @map("hashed_token")
+  expiresAt   DateTime @map("expires_at")
+  userAgent   String?  @map("user_agent")
+  ip          String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
 }
 
 model InvoiceItem {

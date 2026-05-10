@@ -1,7 +1,9 @@
 import axios from 'axios';
+import { useAuthStore } from '@/entities/user/model/auth.store';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,8 +11,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    // Read directly from localStorage to avoid circular dependency with auth store
-    const token = localStorage.getItem('preduzetnik_access_token');
+    const token = useAuthStore.getState().accessToken;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -19,15 +20,45 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+let isRefreshing = false;
+let refreshQueue: Array<(token: string) => void> = [];
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // If 401 Unauthorized, we might want to trigger a logout
-    if (error.response?.status === 401) {
-      localStorage.removeItem('preduzetnik_access_token');
-      // Redirect to login (handled smoothly by routing or auth store listeners)
-      window.dispatchEvent(new Event('auth:unauthorized'));
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshQueue.push((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(apiClient(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await apiClient.post<{ accessToken: string }>('/auth/refresh');
+        const newToken = response.data.accessToken;
+        useAuthStore.getState().setToken(newToken);
+        refreshQueue.forEach((cb) => cb(newToken));
+        refreshQueue = [];
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return apiClient(originalRequest);
+      } catch {
+        refreshQueue = [];
+        useAuthStore.getState().clearToken();
+        window.dispatchEvent(new Event('auth:unauthorized'));
+        return Promise.reject(error);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(error);
   }
 );

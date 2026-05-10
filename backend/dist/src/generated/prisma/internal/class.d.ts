@@ -42,6 +42,9 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get invoice(): Prisma.InvoiceDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get refreshToken(): Prisma.RefreshTokenDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get invoiceItem(): Prisma.InvoiceItemDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;

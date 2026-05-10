@@ -55,6 +55,7 @@ export const ModelName = {
   BankAccount: 'BankAccount',
   Client: 'Client',
   Invoice: 'Invoice',
+  RefreshToken: 'RefreshToken',
   InvoiceItem: 'InvoiceItem'
 } as const
 
@@ -153,6 +154,20 @@ export const InvoiceScalarFieldEnum = {
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
+
+
+export const RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  jti: 'jti',
+  userId: 'userId',
+  hashedToken: 'hashedToken',
+  expiresAt: 'expiresAt',
+  userAgent: 'userAgent',
+  ip: 'ip',
+  createdAt: 'createdAt'
+} as const
+
+export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
 export const InvoiceItemScalarFieldEnum = {

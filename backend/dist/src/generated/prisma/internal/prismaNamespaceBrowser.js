@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.InvoiceItemScalarFieldEnum = exports.InvoiceScalarFieldEnum = exports.ClientScalarFieldEnum = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.InvoiceItemScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.InvoiceScalarFieldEnum = exports.ClientScalarFieldEnum = exports.BankAccountScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -49,6 +49,7 @@ exports.ModelName = {
     BankAccount: 'BankAccount',
     Client: 'Client',
     Invoice: 'Invoice',
+    RefreshToken: 'RefreshToken',
     InvoiceItem: 'InvoiceItem'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
@@ -121,6 +122,16 @@ exports.InvoiceScalarFieldEnum = {
     bankAccountId: 'bankAccountId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+exports.RefreshTokenScalarFieldEnum = {
+    id: 'id',
+    jti: 'jti',
+    userId: 'userId',
+    hashedToken: 'hashedToken',
+    expiresAt: 'expiresAt',
+    userAgent: 'userAgent',
+    ip: 'ip',
+    createdAt: 'createdAt'
 };
 exports.InvoiceItemScalarFieldEnum = {
     id: 'id',
