@@ -92,7 +92,9 @@
       "draft": "Draft",
       "sent": "Sent",
       "paid": "Paid",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "updateSuccess": "Invoice status updated.",
+      "updateError": "Failed to update status."
     },
     "table": {
       "number": "Number",
@@ -129,6 +131,13 @@
       "title": "Create New Invoice",
       "description": "Fill in the details to issue a new invoice.",
       "success": "Invoice created successfully!"
+    },
+    "edit": {
+      "title": "Edit Invoice",
+      "description": "Only DRAFT invoices can be edited.",
+      "submit": "Save Changes",
+      "success": "Invoice updated successfully!",
+      "error": "Failed to update invoice."
     },
     "delete": {
       "title": "Delete Invoice",

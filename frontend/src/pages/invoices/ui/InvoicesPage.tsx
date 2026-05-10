@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInvoices } from "@/entities/invoice/api/invoice.queries";
 import { CreateInvoiceDialog } from "@/features/invoice-management/ui/CreateInvoiceDialog";
-import { InvoiceStatusBadge } from "@/entities/invoice/ui/InvoiceStatusBadge";
+import { InvoiceStatusSelect } from "@/entities/invoice/ui/InvoiceStatusSelect";
+import { EditInvoiceDialog } from "@/features/invoice-management/ui/EditInvoiceDialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Button } from "@/shared/ui/button";
 import { FileDown, Trash2 } from "lucide-react";
@@ -97,9 +98,12 @@ export const InvoicesPage = () => {
                   <TableCell>{format(new Date(invoice.issueDate), "dd.MM.yyyy")}</TableCell>
                   <TableCell>{invoice.totalAmount.toLocaleString()} {invoice.currency}</TableCell>
                   <TableCell>
-                    <InvoiceStatusBadge status={invoice.status} />
+                    <InvoiceStatusSelect invoiceId={invoice.id} status={invoice.status} />
                   </TableCell>
                   <TableCell className="text-right space-x-2">
+                    {invoice.status === "DRAFT" && (
+                      <EditInvoiceDialog invoice={invoice} />
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -108,9 +112,11 @@ export const InvoicesPage = () => {
                     >
                       <FileDown className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(invoice.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    {invoice.status === "DRAFT" && (
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(invoice.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

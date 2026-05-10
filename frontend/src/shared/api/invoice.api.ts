@@ -1,5 +1,5 @@
 import { apiClient } from "./api.client";
-import type { IInvoiceResponse, ICreateInvoiceRequest } from "@preduzetnik/shared";
+import type { IInvoiceResponse, ICreateInvoiceRequest, IUpdateInvoiceRequest, InvoiceStatus } from "@preduzetnik/shared";
 
 export const invoiceApi = {
   getAll: async (): Promise<IInvoiceResponse[]> => {
@@ -14,6 +14,16 @@ export const invoiceApi = {
     const response = await apiClient.post<IInvoiceResponse>('/invoices', data);
     return response.data;
   },
+  update: async (id: string, dto: IUpdateInvoiceRequest): Promise<IInvoiceResponse> => {
+    const response = await apiClient.patch<IInvoiceResponse>(`/invoices/${id}`, dto);
+    return response.data;
+  },
+
+  updateStatus: async (id: string, status: InvoiceStatus): Promise<IInvoiceResponse> => {
+    const response = await apiClient.patch<IInvoiceResponse>(`/invoices/${id}`, { status });
+    return response.data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/invoices/${id}`);
   },
