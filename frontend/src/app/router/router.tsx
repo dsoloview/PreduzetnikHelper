@@ -5,6 +5,7 @@ import { DashboardPage } from "@/pages/dashboard/ui/DashboardPage";
 import { ClientsPage } from "@/pages/clients/ui/ClientsPage";
 import { InvoicesPage } from "@/pages/invoices/ui/InvoicesPage";
 import { BankAccountsPage } from "@/pages/bank-accounts/ui/BankAccountsPage";
+import { LimitsPage } from "@/pages/limits/ui/LimitsPage";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { MainLayout } from "@/widgets/layout/ui/MainLayout";
 
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: "bank-accounts",
         element: <BankAccountsPage />,
+      },
+      {
+        path: "limits",
+        element: <LimitsPage />,
       },
     ],
   },

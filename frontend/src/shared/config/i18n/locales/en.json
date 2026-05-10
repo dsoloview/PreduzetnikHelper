@@ -138,6 +138,40 @@
       "success": "Invoice deleted successfully!"
     }
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your business activity.",
+    "limits": {
+      "title": "Tax Limits",
+      "viewAll": "View details"
+    },
+    "invoices": {
+      "title": "Recent Invoices",
+      "viewAll": "View all",
+      "empty": "No invoices yet."
+    }
+  },
+  "limits": {
+    "subtitle": "Track your 6M paušal and 8M VAT thresholds.",
+    "loadError": "Failed to load limits.",
+    "used": "Used",
+    "current": "Current",
+    "limit": "Limit",
+    "remaining": "Remaining",
+    "exceeded": "Limit exceeded!",
+    "pausal": {
+      "title": "Paušal Limit (6M RSD)",
+      "description": "Annual income limit for fixed-tax sole proprietors. Resets every calendar year."
+    },
+    "vat": {
+      "title": "VAT Registration Limit (8M RSD)",
+      "description": "Domestic supply revenue over the last 365 days. Exceeding requires VAT registration."
+    },
+    "info": {
+      "pausal": "Paušal limit: 6,000,000 RSD per calendar year (all invoices, any currency converted to RSD).",
+      "vat": "VAT limit: 8,000,000 RSD over rolling 365 days (domestic supply invoices only)."
+    }
+  },
   "bankAccounts": {
     "subtitle": "Manage your bank accounts for invoicing.",
     "empty": "No bank accounts yet. Add one to start issuing invoices.",
