@@ -51,7 +51,13 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
         });
     }
 
+    private static readonly ALLOWED_TEMPLATES = ['invoice', 'kpo'] as const;
+
     private async compileTemplate(templateName: string, data: any): Promise<string> {
+        if (!(PdfService.ALLOWED_TEMPLATES as readonly string[]).includes(templateName)) {
+            throw new InternalServerErrorException('Unknown PDF template');
+        }
+
         try {
             let template = this.compiledTemplates.get(templateName);
 

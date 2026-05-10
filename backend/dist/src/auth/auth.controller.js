@@ -20,6 +20,7 @@ const auth_helpers_1 = require("./helpers/auth.helpers");
 const register_dto_1 = require("./dto/register.dto");
 const swagger_1 = require("@nestjs/swagger");
 const auth_response_dto_1 = require("./dto/auth-response.dto");
+const throttler_1 = require("@nestjs/throttler");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -55,6 +56,7 @@ __decorate([
 ], AuthController.prototype, "register", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('Auth'),
+    (0, throttler_1.Throttle)({ default: { ttl: 60000, limit: 5 } }),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

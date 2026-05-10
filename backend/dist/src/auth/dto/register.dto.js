@@ -24,9 +24,12 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', minLength: 6 }),
+    (0, swagger_1.ApiProperty)({ example: 'Password1', minLength: 8 }),
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.Matches)(/^(?=.*[A-Z])(?=.*\d).+$/, {
+        message: 'Password must contain at least 1 uppercase letter and 1 digit',
+    }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 __decorate([

@@ -113,8 +113,8 @@ model Invoice {
   note           String?
   bankAccountId  String        @map("bank_account_id")
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  client         Client        @relation(fields: [clientId], references: [id])
-  bankAccount    BankAccount   @relation(fields: [bankAccountId], references: [id])
+  client         Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  bankAccount    BankAccount   @relation(fields: [bankAccountId], references: [id], onDelete: Restrict)
   items          InvoiceItem[]
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")

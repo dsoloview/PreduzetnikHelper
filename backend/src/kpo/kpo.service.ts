@@ -55,7 +55,8 @@ export class KpoService {
         
         // We also need user details for the PDF header
         const user = await this.prisma.user.findUnique({
-            where: { id: userId }
+            where: { id: userId },
+            omit: { password: true },
         });
 
         const pdfData = {
