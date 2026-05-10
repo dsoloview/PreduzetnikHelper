@@ -86,32 +86,42 @@ let AuthService = class AuthService {
         }
         return this.createTokenPair(createdUser, meta);
     }
-    async refresh(rawRefreshToken, meta) {
-        const record = await this.prisma.refreshToken.findMany({
-            where: { expiresAt: { gt: new Date() } },
+    async refresh(cookieToken, meta) {
+        const { jti, rawToken } = this.parseTokenCookie(cookieToken);
+        const record = await this.prisma.refreshToken.findUnique({
+            where: { jti },
             include: { user: true },
         });
-        let matched;
-        for (const r of record) {
-            if (await bcrypt.compare(rawRefreshToken, r.hashedToken)) {
-                matched = r;
-                break;
-            }
-        }
-        if (!matched) {
+        if (!record || record.expiresAt < new Date()) {
             throw new common_1.UnauthorizedException('Invalid or expired refresh token');
         }
-        await this.prisma.refreshToken.delete({ where: { id: matched.id } });
-        return this.createTokenPair(matched.user, meta);
+        if (!await bcrypt.compare(rawToken, record.hashedToken)) {
+            await this.prisma.refreshToken.deleteMany({ where: { userId: record.userId } });
+            throw new common_1.UnauthorizedException('Invalid or expired refresh token');
+        }
+        await this.prisma.refreshToken.delete({ where: { jti } });
+        return this.createTokenPair(record.user, meta);
     }
-    async logout(rawRefreshToken) {
-        const records = await this.prisma.refreshToken.findMany();
-        for (const r of records) {
-            if (await bcrypt.compare(rawRefreshToken, r.hashedToken)) {
-                await this.prisma.refreshToken.delete({ where: { id: r.id } });
-                return;
+    async logout(cookieToken) {
+        try {
+            const { jti, rawToken } = this.parseTokenCookie(cookieToken);
+            const record = await this.prisma.refreshToken.findUnique({ where: { jti } });
+            if (record && await bcrypt.compare(rawToken, record.hashedToken)) {
+                await this.prisma.refreshToken.delete({ where: { jti } });
             }
         }
+        catch {
+        }
+    }
+    parseTokenCookie(cookieToken) {
+        const dotIndex = cookieToken.indexOf('.');
+        if (dotIndex === -1) {
+            throw new common_1.UnauthorizedException('Invalid token format');
+        }
+        return {
+            jti: cookieToken.substring(0, dotIndex),
+            rawToken: cookieToken.substring(dotIndex + 1),
+        };
     }
     async logoutAll(userId) {
         await this.prisma.refreshToken.deleteMany({ where: { userId } });
@@ -134,7 +144,7 @@ let AuthService = class AuthService {
             },
         });
         const accessToken = this.jwtService.sign({ username: user.name, sub: user.id });
-        return { accessToken, refreshToken: rawToken };
+        return { accessToken, refreshToken: `${jti}.${rawToken}` };
     }
 };
 exports.AuthService = AuthService;
