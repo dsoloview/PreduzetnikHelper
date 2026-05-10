@@ -45,50 +45,104 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
 const users_service_1 = require("../users/users.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto = __importStar(require("crypto"));
 let AuthService = class AuthService {
     jwtService;
     usersService;
-    constructor(jwtService, usersService) {
+    prisma;
+    config;
+    constructor(jwtService, usersService, prisma, config) {
         this.jwtService = jwtService;
         this.usersService = usersService;
+        this.prisma = prisma;
+        this.config = config;
     }
-    async login(loginDto) {
+    async login(loginDto, meta) {
         const user = await this.usersService.user({ email: loginDto.email });
         if (!user) {
-            throw new common_1.UnprocessableEntityException("Invalid credentials");
+            throw new common_1.UnprocessableEntityException('Invalid credentials');
         }
         if (!await bcrypt.compare(loginDto.password, user.password)) {
-            throw new common_1.UnprocessableEntityException("Invalid credentials");
+            throw new common_1.UnprocessableEntityException('Invalid credentials');
         }
-        return this.createAccessToken(user);
+        return this.createTokenPair(user, meta);
     }
-    async register(registerDto) {
+    async register(registerDto, meta) {
         const existingUser = await this.usersService.user({ email: registerDto.email });
         if (existingUser) {
-            throw new common_1.UnprocessableEntityException("Email already exists");
+            throw new common_1.UnprocessableEntityException('Email already exists');
         }
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         const createdUser = await this.usersService.createUser({
             ...registerDto,
-            password: hashedPassword
+            password: hashedPassword,
         });
         if (!createdUser) {
-            throw new common_1.UnprocessableEntityException("Failed to create user");
+            throw new common_1.UnprocessableEntityException('Failed to create user');
         }
-        return this.createAccessToken(createdUser);
+        return this.createTokenPair(createdUser, meta);
     }
-    createAccessToken(user) {
-        return {
-            accessToken: this.jwtService.sign({ username: user.name, sub: user.id }),
-        };
+    async refresh(rawRefreshToken, meta) {
+        const record = await this.prisma.refreshToken.findMany({
+            where: { expiresAt: { gt: new Date() } },
+            include: { user: true },
+        });
+        let matched;
+        for (const r of record) {
+            if (await bcrypt.compare(rawRefreshToken, r.hashedToken)) {
+                matched = r;
+                break;
+            }
+        }
+        if (!matched) {
+            throw new common_1.UnauthorizedException('Invalid or expired refresh token');
+        }
+        await this.prisma.refreshToken.delete({ where: { id: matched.id } });
+        return this.createTokenPair(matched.user, meta);
+    }
+    async logout(rawRefreshToken) {
+        const records = await this.prisma.refreshToken.findMany();
+        for (const r of records) {
+            if (await bcrypt.compare(rawRefreshToken, r.hashedToken)) {
+                await this.prisma.refreshToken.delete({ where: { id: r.id } });
+                return;
+            }
+        }
+    }
+    async logoutAll(userId) {
+        await this.prisma.refreshToken.deleteMany({ where: { userId } });
+    }
+    async createTokenPair(user, meta) {
+        const jti = crypto.randomUUID();
+        const rawToken = crypto.randomBytes(64).toString('hex');
+        const hashedToken = await bcrypt.hash(rawToken, 10);
+        const expiresInDays = this.config.get('REFRESH_TOKEN_EXPIRES_DAYS', 30);
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+        await this.prisma.refreshToken.create({
+            data: {
+                jti,
+                userId: user.id,
+                hashedToken,
+                expiresAt,
+                userAgent: meta.userAgent,
+                ip: meta.ip,
+            },
+        });
+        const accessToken = this.jwtService.sign({ username: user.name, sub: user.id });
+        return { accessToken, refreshToken: rawToken };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService,
-        users_service_1.UsersService])
+        users_service_1.UsersService,
+        prisma_service_1.PrismaService,
+        config_1.ConfigService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

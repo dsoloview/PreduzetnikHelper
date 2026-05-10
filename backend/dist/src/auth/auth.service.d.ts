@@ -1,13 +1,32 @@
-import { JwtService } from "@nestjs/jwt";
-import { UsersService } from "../users/users.service";
-import { LoginDto } from "./dto/login.dto";
-import { RegisterDto } from "./dto/register.dto";
-import { AuthResponseDto } from "./dto/auth-response.dto";
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+export interface TokenPair {
+    accessToken: string;
+    refreshToken: string;
+}
 export declare class AuthService {
     private jwtService;
     private usersService;
-    constructor(jwtService: JwtService, usersService: UsersService);
-    login(loginDto: LoginDto): Promise<AuthResponseDto>;
-    register(registerDto: RegisterDto): Promise<AuthResponseDto>;
-    private createAccessToken;
+    private prisma;
+    private config;
+    constructor(jwtService: JwtService, usersService: UsersService, prisma: PrismaService, config: ConfigService);
+    login(loginDto: LoginDto, meta: {
+        ip?: string;
+        userAgent?: string;
+    }): Promise<TokenPair>;
+    register(registerDto: RegisterDto, meta: {
+        ip?: string;
+        userAgent?: string;
+    }): Promise<TokenPair>;
+    refresh(rawRefreshToken: string, meta: {
+        ip?: string;
+        userAgent?: string;
+    }): Promise<TokenPair>;
+    logout(rawRefreshToken: string): Promise<void>;
+    logoutAll(userId: string): Promise<void>;
+    private createTokenPair;
 }

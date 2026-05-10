@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
+const STORAGE_KEY = 'preduzetnik_access_token';
+
 interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
   setToken: (token: string) => void;
-  logout: () => void;
+  clearToken: () => void;
 }
-
-const STORAGE_KEY = 'preduzetnik_access_token';
 
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: localStorage.getItem(STORAGE_KEY),
@@ -18,13 +18,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ accessToken: token, isAuthenticated: true });
   },
 
-  logout: () => {
+  clearToken: () => {
     localStorage.removeItem(STORAGE_KEY);
     set({ accessToken: null, isAuthenticated: false });
   },
 }));
-
-// Listen to the custom event emitted by our Axios interceptor on 401
-window.addEventListener('auth:unauthorized', () => {
-  useAuthStore.getState().logout();
-});

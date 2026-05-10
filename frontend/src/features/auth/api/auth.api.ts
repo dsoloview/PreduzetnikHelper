@@ -6,7 +6,15 @@ export const authApi = {
     const response = await apiClient.post<IAuthResponse>('/auth/login', data);
     return response.data;
   },
-  register: async (data: IRegisterRequest): Promise<void> => {
-    await apiClient.post('/auth/register', data);
+  register: async (data: IRegisterRequest): Promise<IAuthResponse> => {
+    const response = await apiClient.post<IAuthResponse>('/auth/register', data);
+    return response.data;
+  },
+  refresh: async (): Promise<IAuthResponse> => {
+    const response = await apiClient.post<IAuthResponse>('/auth/refresh', {}, { withCredentials: true });
+    return response.data;
+  },
+  logout: async (): Promise<void> => {
+    await apiClient.post('/auth/logout', {}, { withCredentials: true });
   },
 };

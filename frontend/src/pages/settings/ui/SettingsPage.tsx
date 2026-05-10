@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { useChangePassword } from "@/entities/user/api/user.queries";
-import { useAuthStore } from "@/entities/user/model/auth.store";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
@@ -27,7 +26,6 @@ type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 
 export const SettingsPage = () => {
   const { t } = useTranslation();
-  const logout = useAuthStore((state) => state.logout);
   const { mutate, isPending } = useChangePassword();
 
   const form = useForm<ChangePasswordFormValues>({

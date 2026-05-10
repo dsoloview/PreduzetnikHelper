@@ -12,15 +12,17 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
 
 import { authApi } from "../api/auth.api";
+import { useAuthStore } from "@/entities/user/model/auth.store";
 
 export const RegisterForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const setToken = useAuthStore((state) => state.setToken);
 
   const registerSchema = z.object({
     name: z.string().min(1, t("auth.login.errors.required")),
     email: z.string().min(1, t("auth.login.errors.required")).email(t("auth.login.errors.email")),
-    password: z.string().min(6, t("auth.login.errors.passwordMin")),
+    password: z.string().min(8, t("auth.login.errors.passwordMin")),
   });
 
   type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -36,9 +38,10 @@ export const RegisterForm = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: authApi.register,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setToken(data.accessToken);
       toast.success(t("auth.register.success"));
-      navigate("/login");
+      navigate("/");
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || error.message;

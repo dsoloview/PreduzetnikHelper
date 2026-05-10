@@ -15,6 +15,7 @@ export declare const ModelName: {
     readonly BankAccount: "BankAccount";
     readonly Client: "Client";
     readonly Invoice: "Invoice";
+    readonly RefreshToken: "RefreshToken";
     readonly InvoiceItem: "InvoiceItem";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -94,6 +95,17 @@ export declare const InvoiceScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum];
+export declare const RefreshTokenScalarFieldEnum: {
+    readonly id: "id";
+    readonly jti: "jti";
+    readonly userId: "userId";
+    readonly hashedToken: "hashedToken";
+    readonly expiresAt: "expiresAt";
+    readonly userAgent: "userAgent";
+    readonly ip: "ip";
+    readonly createdAt: "createdAt";
+};
+export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum];
 export declare const InvoiceItemScalarFieldEnum: {
     readonly id: "id";
     readonly invoiceId: "invoiceId";

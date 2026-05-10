@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { useProfile } from "@/entities/user/api/user.queries";
+import { authApi } from "@/features/auth/api/auth.api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +17,17 @@ import { LogOut, UserCircle } from "lucide-react";
 
 export const Header = () => {
   const { t } = useTranslation();
-  const logout = useAuthStore((state) => state.logout);
+  const clearToken = useAuthStore((state) => state.clearToken);
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      clearToken();
+      navigate('/login');
+    }
+  };
   const { data: profile } = useProfile();
 
   const initials = profile?.name?.[0]?.toUpperCase() ?? "U";
@@ -47,7 +57,7 @@ export const Header = () => {
               <span>{t("nav.profile")}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout} className="text-destructive">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               <span>{t("auth.logout")}</span>
             </DropdownMenuItem>
