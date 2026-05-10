@@ -4,6 +4,7 @@
     "clients": "Clients",
     "invoices": "Invoices",
     "limits": "Tax Limits",
+    "bankAccounts": "Bank Accounts",
     "settings": "Settings"
   },
   "app": {
@@ -82,55 +83,100 @@
       "edit": "Edit",
       "delete": "Delete"
     },
-    "invoices": {
-      "subtitle": "Manage your invoices and payments.",
-      "empty": "No invoices found.",
-      "status": {
-        "draft": "Draft",
-        "sent": "Sent",
-        "paid": "Paid",
-        "cancelled": "Cancelled"
-      },
-      "table": {
-        "number": "Number",
-        "client": "Client",
-        "date": "Date",
-        "amount": "Amount",
-        "status": "Status",
-        "actions": "Actions"
-      },
-      "form": {
-        "client": "Select Client",
-        "selectClient": "Choose a client...",
-        "bankAccount": "Bank Account",
-        "selectBankAccount": "Choose an account...",
-        "placeOfIssue": "Place of Issue",
-        "domesticSupply": "Domestic Supply (counts toward 8M limit)",
-        "exchangeRate": "Exchange Rate (NBS)",
-        "number": "Invoice Number",
-        "issueDate": "Issue Date",
-        "dueDate": "Due Date",
-        "currency": "Currency",
-        "items": "Invoice Items",
-        "addItem": "Add Item",
-        "description": "Description",
-        "quantity": "Qty",
-        "price": "Price",
-        "total": "Total",
-        "grandTotal": "Grand Total",
-        "noVatNotice": "Nije u sistemu PDV-a",
-        "submit": "Create Invoice"
-      },
-      "create": {
-        "button": "Create Invoice",
-        "title": "Create New Invoice",
-        "description": "Fill in the details to issue a new invoice.",
-        "success": "Invoice created successfully!"
-      },
-      "delete": {
-        "confirm": "Are you sure you want to delete this invoice?",
-        "success": "Invoice deleted successfully!"
-      }
+    "loadError": "Failed to load clients."
+  },
+  "invoices": {
+    "subtitle": "Manage your invoices and payments.",
+    "empty": "No invoices found.",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "number": "Number",
+      "client": "Client",
+      "date": "Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "client": "Select Client",
+      "selectClient": "Choose a client...",
+      "bankAccount": "Bank Account",
+      "selectBankAccount": "Choose an account...",
+      "placeOfIssue": "Place of Issue",
+      "domesticSupply": "Domestic Supply (counts toward 8M limit)",
+      "exchangeRate": "Exchange Rate (NBS)",
+      "number": "Invoice Number",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
+      "currency": "Currency",
+      "items": "Invoice Items",
+      "addItem": "Add Item",
+      "description": "Description",
+      "quantity": "Qty",
+      "price": "Price",
+      "total": "Total",
+      "grandTotal": "Grand Total",
+      "noVatNotice": "Nije u sistemu PDV-a",
+      "submit": "Create Invoice"
+    },
+    "create": {
+      "button": "Create Invoice",
+      "title": "Create New Invoice",
+      "description": "Fill in the details to issue a new invoice.",
+      "success": "Invoice created successfully!"
+    },
+    "delete": {
+      "title": "Delete Invoice",
+      "description": "This action cannot be undone. The invoice will be permanently deleted.",
+      "button": "Delete",
+      "confirm": "Are you sure you want to delete this invoice?",
+      "success": "Invoice deleted successfully!"
+    }
+  },
+  "bankAccounts": {
+    "subtitle": "Manage your bank accounts for invoicing.",
+    "empty": "No bank accounts yet. Add one to start issuing invoices.",
+    "loadError": "Failed to load bank accounts.",
+    "default": "Default",
+    "currency": {
+      "rsd": "RSD",
+      "eur": "EUR",
+      "usd": "USD"
+    },
+    "form": {
+      "bankName": "Bank Name",
+      "accountNumber": "Account Number",
+      "accountNumberHint": "Format: XXX-XXXXXXXXXX-XX",
+      "swiftCode": "SWIFT / BIC",
+      "iban": "IBAN",
+      "currency": "Currency",
+      "isDefault": "Set as default account",
+      "submit": "Save Account"
+    },
+    "create": {
+      "button": "Add Bank Account",
+      "title": "Add Bank Account",
+      "description": "Add a new bank account to use on invoices.",
+      "success": "Bank account added successfully!"
+    },
+    "edit": {
+      "title": "Edit Bank Account",
+      "success": "Bank account updated successfully!"
+    },
+    "delete": {
+      "title": "Delete Bank Account",
+      "description": "Are you sure you want to delete {{bankName}} ({{accountNumber}})? This action cannot be undone.",
+      "button": "Delete",
+      "success": "Bank account deleted successfully!"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
     }
   }
 }

@@ -41,6 +41,9 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{t("clients.edit.title")}</DialogTitle>
+          <DialogDescription>
+            {t("clients.edit.description", { defaultValue: "Update the client's information." })}
+          </DialogDescription>
         </DialogHeader>
         <ClientForm 
           onSubmit={onSubmit} 

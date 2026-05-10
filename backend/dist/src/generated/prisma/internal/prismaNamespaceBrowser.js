@@ -78,6 +78,8 @@ exports.BankAccountScalarFieldEnum = {
     userId: 'userId',
     bankName: 'bankName',
     accountNumber: 'accountNumber',
+    swiftCode: 'swiftCode',
+    iban: 'iban',
     currency: 'currency',
     isDefault: 'isDefault',
     createdAt: 'createdAt',

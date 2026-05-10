@@ -47,6 +47,8 @@ model BankAccount {
   userId        String    @map("user_id")
   bankName      String    @map("bank_name")
   accountNumber String    @map("account_number") // Format: XXX-XXXXXXXXXX-XX
+  swiftCode     String?   @map("swift_code")
+  iban          String?
   currency      Currency  @default(RSD)
   isDefault     Boolean   @default(false) @map("is_default")
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)

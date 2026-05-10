@@ -18,7 +18,7 @@ const clientSchema = z.object({
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
   taxId: z.string().min(1, "Tax ID is required"), // PIB for SRB
-  registrationNumber: z.string().optional(), // MBR for SRB
+  registrationNumber: z.string().min(1, "Registration number is required"), // MBR for SRB
 });
 
 export type ClientFormValues = z.infer<typeof clientSchema>;

@@ -27,6 +27,8 @@ CREATE TABLE "bank_accounts" (
     "user_id" TEXT NOT NULL,
     "bank_name" TEXT NOT NULL,
     "account_number" TEXT NOT NULL,
+    "swift_code" TEXT,
+    "iban" TEXT,
     "currency" "Currency" NOT NULL DEFAULT 'RSD',
     "is_default" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
