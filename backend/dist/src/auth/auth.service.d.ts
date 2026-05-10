@@ -22,11 +22,12 @@ export declare class AuthService {
         ip?: string;
         userAgent?: string;
     }): Promise<TokenPair>;
-    refresh(rawRefreshToken: string, meta: {
+    refresh(cookieToken: string, meta: {
         ip?: string;
         userAgent?: string;
     }): Promise<TokenPair>;
-    logout(rawRefreshToken: string): Promise<void>;
+    logout(cookieToken: string): Promise<void>;
+    private parseTokenCookie;
     logoutAll(userId: string): Promise<void>;
     private createTokenPair;
 }

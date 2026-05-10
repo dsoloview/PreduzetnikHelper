@@ -31,13 +31,6 @@ export class InvoicesService {
         const issueDate = new Date(dto.issueDate);
         const year = issueDate.getFullYear();
 
-        // Get next invoice number for this user and year
-        const lastInvoice = await this.prisma.invoice.findFirst({
-            where: { userId, year },
-            orderBy: { invoiceNumber: 'desc' },
-        });
-        const invoiceNumber = (lastInvoice?.invoiceNumber ?? 0) + 1;
-
         // Determine domestic supply
         const domesticSupply = dto.domesticSupply ?? (client.type === 'DOMESTIC');
 
@@ -56,36 +49,44 @@ export class InvoicesService {
         }));
 
         const totalAmount = itemsWithTotals.reduce((sum, item) => sum + item.total, 0);
-        const totalRsd = dto.currency && dto.currency !== 'RSD' 
-            ? totalAmount * exchangeRate 
+        const totalRsd = dto.currency && dto.currency !== 'RSD'
+            ? totalAmount * exchangeRate
             : totalAmount;
 
-        // Nested create
-        const invoice = await this.prisma.invoice.create({
-            data: {
-                userId,
-                clientId: dto.clientId,
-                bankAccountId: dto.bankAccountId,
-                invoiceNumber,
-                year,
-                issueDate,
-                dueDate: new Date(dto.dueDate),
-                placeOfIssue: dto.placeOfIssue,
-                domesticSupply,
-                currency: dto.currency || 'RSD',
-                exchangeRate: dto.currency === 'RSD' ? null : dto.exchangeRate,
-                totalAmount,
-                totalRsd,
-                note: dto.note,
-                items: {
-                    create: itemsWithTotals,
+        // Serializable transaction prevents race condition on invoice number generation
+        const invoice = await this.prisma.$transaction(async (tx) => {
+            const lastInvoice = await tx.invoice.findFirst({
+                where: { userId, year },
+                orderBy: { invoiceNumber: 'desc' },
+            });
+            const invoiceNumber = (lastInvoice?.invoiceNumber ?? 0) + 1;
+
+            return tx.invoice.create({
+                data: {
+                    userId,
+                    clientId: dto.clientId,
+                    bankAccountId: dto.bankAccountId,
+                    invoiceNumber,
+                    year,
+                    issueDate,
+                    dueDate: new Date(dto.dueDate),
+                    placeOfIssue: dto.placeOfIssue,
+                    domesticSupply,
+                    currency: dto.currency || 'RSD',
+                    exchangeRate: dto.currency === 'RSD' ? null : dto.exchangeRate,
+                    totalAmount,
+                    totalRsd,
+                    note: dto.note,
+                    items: {
+                        create: itemsWithTotals,
+                    },
                 },
-            },
-            include: {
-                client: true,
-                items: true,
-            },
-        });
+                include: {
+                    client: true,
+                    items: true,
+                },
+            });
+        }, { isolationLevel: 'Serializable' });
 
         return this.mapToResponseDto(invoice);
     }
