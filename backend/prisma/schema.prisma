@@ -138,6 +138,17 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+model ExchangeRate {
+  id           String   @id @default(uuid())
+  currencyCode String   @map("currency_code") // "EUR", "USD"
+  date         DateTime @db.Date              // rate date (no time)
+  middleRate   Decimal  @map("middle_rate")   // NBS middle rate (srednji kurs)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([currencyCode, date])
+  @@map("exchange_rates")
+}
+
 model InvoiceItem {
   id          String  @id @default(uuid())
   invoiceId   String  @map("invoice_id")
