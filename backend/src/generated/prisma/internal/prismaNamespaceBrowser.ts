@@ -56,6 +56,7 @@ export const ModelName = {
   Client: 'Client',
   Invoice: 'Invoice',
   RefreshToken: 'RefreshToken',
+  ExchangeRate: 'ExchangeRate',
   InvoiceItem: 'InvoiceItem'
 } as const
 
@@ -168,6 +169,17 @@ export const RefreshTokenScalarFieldEnum = {
 } as const
 
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
+export const ExchangeRateScalarFieldEnum = {
+  id: 'id',
+  currencyCode: 'currencyCode',
+  date: 'date',
+  middleRate: 'middleRate',
+  createdAt: 'createdAt'
+} as const
+
+export type ExchangeRateScalarFieldEnum = (typeof ExchangeRateScalarFieldEnum)[keyof typeof ExchangeRateScalarFieldEnum]
 
 
 export const InvoiceItemScalarFieldEnum = {

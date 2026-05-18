@@ -11,7 +11,9 @@ import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
 import { KpoModule } from './kpo/kpo.module';
 import { LimitsModule } from './limits/limits.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
+import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { APP_GUARD } from '@nestjs/core';
     InvoicesModule,
     KpoModule,
     LimitsModule,
+    ScheduleModule.forRoot(),
+    ExchangeRatesModule,
   ],
   controllers: [AppController],
   providers: [

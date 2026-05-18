@@ -43,6 +43,11 @@ export type Invoice = Prisma.InvoiceModel
  */
 export type RefreshToken = Prisma.RefreshTokenModel
 /**
+ * Model ExchangeRate
+ * 
+ */
+export type ExchangeRate = Prisma.ExchangeRateModel
+/**
  * Model InvoiceItem
  * 
  */
