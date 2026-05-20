@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
@@ -58,6 +58,10 @@ export class KpoService {
             where: { id: userId },
             omit: { password: true },
         });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
 
         const pdfData = {
             ...kpoData,
