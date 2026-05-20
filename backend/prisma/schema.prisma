@@ -20,26 +20,26 @@ enum Currency {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String
-  name         String
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String
   // Serbian business details
-  companyName  String?       @map("company_name")
-  pib          String?       @unique // Poreski identifikacioni broj (Tax ID)
-  mbr          String?       @unique // Matični broj registracije
-  activityCode String?       @map("activity_code") // Šifra delatnosti
-  address      String?
-  city         String?
-  postalCode   String?  @map("postal_code")
-  municipality String? // Opština — affects tax coefficient
-  phone        String?
-  bankAccounts   BankAccount[]
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  clients        Client[]
-  invoices       Invoice[]
-  refreshTokens  RefreshToken[]
+  companyName   String?        @map("company_name")
+  pib           String?
+  mbr           String?
+  activityCode  String?        @map("activity_code") // Šifra delatnosti
+  address       String?
+  city          String?
+  postalCode    String?        @map("postal_code")
+  municipality  String? // Opština — affects tax coefficient
+  phone         String?
+  bankAccounts  BankAccount[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  clients       Client[]
+  invoices      Invoice[]
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
@@ -141,8 +141,8 @@ model RefreshToken {
 model ExchangeRate {
   id           String   @id @default(uuid())
   currencyCode String   @map("currency_code") // "EUR", "USD"
-  date         DateTime @db.Date              // rate date (no time)
-  middleRate   Decimal  @map("middle_rate")   // NBS middle rate (srednji kurs)
+  date         DateTime @db.Date // rate date (no time)
+  middleRate   Decimal  @map("middle_rate") // NBS middle rate (srednji kurs)
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@unique([currencyCode, date])
