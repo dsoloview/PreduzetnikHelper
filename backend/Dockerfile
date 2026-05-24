@@ -1,5 +1,6 @@
 FROM node:22-alpine AS base
 RUN corepack enable && corepack prepare pnpm@latest --activate
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 WORKDIR /app
 
 # ─── Install dependencies ────────────────────────────────────────────────────
@@ -43,4 +44,4 @@ WORKDIR /app/backend
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=prisma/schema.prisma && node dist/src/main"]
