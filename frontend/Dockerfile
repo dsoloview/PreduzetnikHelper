@@ -30,5 +30,6 @@ FROM nginx:1.27-alpine AS runner
 COPY --from=build-frontend /app/frontend/dist /usr/share/nginx/html
 COPY frontend/nginx.conf /etc/nginx/templates/default.conf.template
 ENV BACKEND_URL=http://backend:3000
+ENV PORT=80
 
 EXPOSE 80
