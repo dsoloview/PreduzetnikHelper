@@ -1,6 +1,9 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { TrendingUp, CheckCircle, Clock, Users } from "lucide-react";
+
 import { Card, CardContent } from "@/shared/ui/card";
+import { Skeleton } from "@/shared/ui/skeleton";
 import type { IInvoiceResponse } from "@preduzetnik/shared";
 
 interface DashboardStatsRowProps {
@@ -24,30 +27,37 @@ export const DashboardStatsRow = ({ invoices, isLoading }: DashboardStatsRowProp
     return { totalRsd, paid, pending, uniqueClients };
   })();
 
-  const items = [
+  const valuePlaceholder = <Skeleton className="h-7 w-24" />;
+
+  const items: ReadonlyArray<{
+    label: string;
+    value: ReactNode;
+    icon: typeof TrendingUp;
+    sub: string;
+  }> = [
     {
       label: t("dashboard.stats.revenue"),
       value: isLoading
-        ? "..."
+        ? valuePlaceholder
         : `${(stats?.totalRsd ?? 0).toLocaleString("sr-RS", { maximumFractionDigits: 0 })} RSD`,
       icon: TrendingUp,
       sub: t("dashboard.stats.revenueSub", { year: currentYear }),
     },
     {
       label: t("dashboard.stats.paid"),
-      value: isLoading ? "..." : String(stats?.paid ?? 0),
+      value: isLoading ? valuePlaceholder : String(stats?.paid ?? 0),
       icon: CheckCircle,
       sub: t("dashboard.stats.invoices"),
     },
     {
       label: t("dashboard.stats.pending"),
-      value: isLoading ? "..." : String(stats?.pending ?? 0),
+      value: isLoading ? valuePlaceholder : String(stats?.pending ?? 0),
       icon: Clock,
       sub: t("dashboard.stats.invoices"),
     },
     {
       label: t("dashboard.stats.clients"),
-      value: isLoading ? "..." : String(stats?.uniqueClients ?? 0),
+      value: isLoading ? valuePlaceholder : String(stats?.uniqueClients ?? 0),
       icon: Users,
       sub: t("dashboard.stats.unique"),
     },
@@ -61,7 +71,7 @@ export const DashboardStatsRow = ({ invoices, isLoading }: DashboardStatsRowProp
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="text-2xl font-bold mt-1">{value}</p>
+                <div className="text-2xl font-bold mt-1">{value}</div>
                 <p className="text-xs text-muted-foreground mt-1">{sub}</p>
               </div>
               <Icon className="size-5 text-muted-foreground mt-1" />

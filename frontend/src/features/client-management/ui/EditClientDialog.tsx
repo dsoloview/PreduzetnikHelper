@@ -11,6 +11,7 @@ import {
 import { ClientForm } from "./ClientForm";
 import type { ClientFormValues } from "./ClientForm";
 import { useUpdateClient } from "@/entities/client/api/client.queries";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 import type { IClient } from "@preduzetnik/shared";
 
 interface EditClientDialogProps {
@@ -29,8 +30,8 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
         toast.success(t("clients.edit.success"));
         onOpenChange(false);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Failed to update client");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Failed to update client"));
       },
     });
   };

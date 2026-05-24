@@ -9,6 +9,7 @@ import { useProfile, useUpdateProfile } from "@/entities/user/api/user.queries";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
+import { Spinner } from "@/shared/ui/spinner";
 import { Label } from "@/shared/ui/label";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Separator } from "@/shared/ui/separator";
@@ -175,7 +176,8 @@ export const ProfilePage = () => {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={isPending}>
-            {isPending ? "..." : t("profile.save")}
+            {isPending && <Spinner className="mr-2" />}
+            {t("profile.save")}
           </Button>
         </div>
       </form>

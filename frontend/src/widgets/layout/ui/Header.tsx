@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { useProfile } from "@/entities/user/api/user.queries";
 import { authApi } from "@/features/auth/api/auth.api";
@@ -13,12 +13,33 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
-import { LogOut, UserCircle } from "lucide-react";
+import { Menu, LogOut, UserCircle } from "lucide-react";
 
-export const Header = () => {
+/**
+ * Maps a pathname to the matching i18n key used to render the page title
+ * in the header. The first matching entry wins, so order from most specific
+ * to least specific.
+ */
+const ROUTE_TITLE_KEYS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/^\/clients/, "nav.clients"],
+  [/^\/invoices/, "nav.invoices"],
+  [/^\/limits/, "nav.limits"],
+  [/^\/bank-accounts/, "nav.bankAccounts"],
+  [/^\/kpo/, "nav.kpo"],
+  [/^\/profile/, "nav.profile"],
+  [/^\/settings/, "nav.settings"],
+  [/^\/$/, "nav.dashboard"],
+];
+
+interface HeaderProps {
+  onOpenSidebar: () => void;
+}
+
+export const Header = ({ onOpenSidebar }: HeaderProps) => {
   const { t } = useTranslation();
   const clearToken = useAuthStore((state) => state.clearToken);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -31,10 +52,24 @@ export const Header = () => {
   const { data: profile } = useProfile();
 
   const initials = profile?.name?.[0]?.toUpperCase() ?? "U";
+  const titleKey = ROUTE_TITLE_KEYS.find(([re]) => re.test(location.pathname))?.[1];
 
   return (
-    <header className="h-16 border-b bg-background flex items-center justify-between px-8">
-      <div className="flex-1" />
+    <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-8 gap-4">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onOpenSidebar}
+          aria-label={t("app.openMenu")}
+        >
+          <Menu className="size-5" />
+        </Button>
+        {titleKey && (
+          <h1 className="text-lg font-semibold truncate">{t(titleKey)}</h1>
+        )}
+      </div>
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -47,8 +82,14 @@ export const Header = () => {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{profile?.name ?? "..."}</p>
-                <p className="text-xs leading-none text-muted-foreground">{profile?.email ?? ""}</p>
+                {profile ? (
+                  <>
+                    <p className="text-sm font-medium leading-none">{profile.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{profile.email}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("app.loading")}…</p>
+                )}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

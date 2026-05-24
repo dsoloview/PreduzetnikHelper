@@ -13,6 +13,8 @@ import {
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
 import { useDeleteBankAccount } from "@/entities/bank-account/api/bank-account.queries";
+import { Spinner } from "@/shared/ui/spinner";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 interface DeleteBankAccountDialogProps {
   account: IBankAccount;
@@ -30,9 +32,8 @@ export const DeleteBankAccountDialog = ({ account, open, onOpenChange }: DeleteB
         toast.success(t("bankAccounts.delete.success"));
         onOpenChange(false);
       },
-      onError: (error: unknown) => {
-        const axiosError = error as { response?: { data?: { message?: string } } };
-        toast.error(axiosError.response?.data?.message || "Failed to delete bank account");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Failed to delete bank account"));
       },
     });
   };
@@ -58,7 +59,8 @@ export const DeleteBankAccountDialog = ({ account, open, onOpenChange }: DeleteB
             disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isPending ? "..." : t("bankAccounts.delete.button")}
+            {isPending && <Spinner className="mr-2" />}
+            {t("bankAccounts.delete.button")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
