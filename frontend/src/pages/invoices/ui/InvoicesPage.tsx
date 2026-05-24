@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
+import { Spinner } from "@/shared/ui/spinner";
 import { FileDown, Trash2, X } from "lucide-react";
 import { format } from "date-fns";
 import { invoiceApi } from "@/shared/api/invoice.api";
@@ -53,6 +54,19 @@ export const InvoicesPage = () => {
     () => filtered.reduce((sum, inv) => sum + inv.totalRsd, 0),
     [filtered],
   );
+
+  /**
+   * Per-currency totals across the filtered set. Skips RSD (already shown
+   * separately as the RSD-equivalent grand total).
+   */
+  const foreignTotals = useMemo(() => {
+    const byCurrency = new Map<string, number>();
+    for (const inv of filtered) {
+      if (inv.currency === "RSD") continue;
+      byCurrency.set(inv.currency, (byCurrency.get(inv.currency) ?? 0) + inv.totalAmount);
+    }
+    return Array.from(byCurrency.entries());
+  }, [filtered]);
 
   const hasFilters = !!statusFilter || !!search.trim();
 
@@ -189,8 +203,13 @@ export const InvoicesPage = () => {
                       size="icon"
                       disabled={downloadingId === invoice.id}
                       onClick={() => handleDownload(invoice.id, invoice.displayNumber)}
+                      aria-label={t("invoices.table.actions")}
                     >
-                      <FileDown className="h-4 w-4" />
+                      {downloadingId === invoice.id ? (
+                        <Spinner className="h-4 w-4" />
+                      ) : (
+                        <FileDown className="h-4 w-4" />
+                      )}
                     </Button>
                     {invoice.status === "DRAFT" && (
                       <Button variant="ghost" size="icon" onClick={() => setDeleteId(invoice.id)}>
@@ -205,9 +224,21 @@ export const InvoicesPage = () => {
         </Table>
       </div>
 
-      {/* Total row */}
+      {/* Totals row */}
       {!isLoading && filtered.length > 0 && (
-        <div className="flex justify-end">
+        <div className="flex justify-end flex-wrap gap-2">
+          {foreignTotals.map(([currency, amount]) => (
+            <Badge
+              key={currency}
+              variant="outline"
+              className="text-sm px-4 py-1.5 font-mono text-muted-foreground"
+            >
+              {t("invoices.totalForeign", {
+                amount: amount.toLocaleString("sr-RS", { maximumFractionDigits: 2 }),
+                currency,
+              })}
+            </Badge>
+          ))}
           <Badge variant="outline" className="text-sm px-4 py-1.5 font-mono">
             {t("invoices.total", {
               amount: totalRsd.toLocaleString("sr-RS", { maximumFractionDigits: 0 }),
@@ -231,7 +262,8 @@ export const InvoicesPage = () => {
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "..." : t("invoices.delete.button")}
+              {isDeleting && <Spinner className="mr-2" />}
+              {t("invoices.delete.button")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

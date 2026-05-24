@@ -8,8 +8,11 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { PasswordInput } from "@/shared/ui/password-input";
+import { Spinner } from "@/shared/ui/spinner";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 import { authApi } from "../api/auth.api";
 import { useAuthStore } from "@/entities/user/model/auth.store";
@@ -21,7 +24,7 @@ export const LoginForm = () => {
 
   const loginSchema = z.object({
     email: z.string().min(1, t("auth.login.errors.required")).email(t("auth.login.errors.email")),
-    password: z.string().min(6, t("auth.login.errors.passwordMin")),
+    password: z.string().min(8, t("auth.login.errors.passwordMin")),
   });
 
   type LoginFormValues = z.infer<typeof loginSchema>;
@@ -41,9 +44,8 @@ export const LoginForm = () => {
       toast.success(t("auth.login.success", { defaultValue: "Successfully logged in!" }));
       navigate("/");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 
@@ -85,10 +87,9 @@ export const LoginForm = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="password">{t("auth.login.password")}</FieldLabel>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id="password"
-                    type="password"
                     aria-invalid={fieldState.invalid}
                     disabled={isPending}
                   />
@@ -100,7 +101,8 @@ export const LoginForm = () => {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "..." : t("auth.login.submit")}
+            {isPending && <Spinner className="mr-2" />}
+            {t("auth.login.submit")}
           </Button>
           <Button
             type="button"

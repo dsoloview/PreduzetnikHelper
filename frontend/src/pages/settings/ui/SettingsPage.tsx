@@ -6,8 +6,9 @@ import { toast } from "sonner";
 
 import { useChangePassword } from "@/entities/user/api/user.queries";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { Button } from "@/shared/ui/button";
+import { Spinner } from "@/shared/ui/spinner";
 import { Label } from "@/shared/ui/label";
 
 const changePasswordSchema = z
@@ -73,9 +74,8 @@ export const SettingsPage = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid gap-1.5">
               <Label htmlFor="currentPassword">{t("settings.password.current")}</Label>
-              <Input
+              <PasswordInput
                 id="currentPassword"
-                type="password"
                 {...form.register("currentPassword")}
               />
               {form.formState.errors.currentPassword && (
@@ -86,9 +86,8 @@ export const SettingsPage = () => {
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="newPassword">{t("settings.password.new")}</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 {...form.register("newPassword")}
               />
               {form.formState.errors.newPassword && (
@@ -99,9 +98,8 @@ export const SettingsPage = () => {
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="confirmPassword">{t("settings.password.confirm")}</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 {...form.register("confirmPassword")}
               />
               {form.formState.errors.confirmPassword && (
@@ -111,7 +109,8 @@ export const SettingsPage = () => {
               )}
             </div>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "..." : t("settings.password.submit")}
+              {isPending && <Spinner className="mr-2" />}
+              {t("settings.password.submit")}
             </Button>
           </form>
         </CardContent>

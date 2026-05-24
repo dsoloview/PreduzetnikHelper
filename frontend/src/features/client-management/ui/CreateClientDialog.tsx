@@ -15,6 +15,7 @@ import { Button } from "@/shared/ui/button";
 import { ClientForm } from "./ClientForm";
 import type { ClientFormValues } from "./ClientForm";
 import { useCreateClient } from "@/entities/client/api/client.queries";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 export const CreateClientDialog = () => {
   const { t } = useTranslation();
@@ -27,8 +28,8 @@ export const CreateClientDialog = () => {
         toast.success(t("clients.create.success", { defaultValue: "Client created successfully!" }));
         setOpen(false);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Failed to create client");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Failed to create client"));
       },
     });
   };

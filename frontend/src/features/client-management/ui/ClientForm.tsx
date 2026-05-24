@@ -7,6 +7,7 @@ import { Input } from "@/shared/ui/input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Button } from "@/shared/ui/button";
+import { Spinner } from "@/shared/ui/spinner";
 
 const clientSchema = z.object({
   type: z.enum(["DOMESTIC", "INTERNATIONAL"]),
@@ -186,7 +187,8 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
       </FieldGroup>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "..." : t("clients.form.submit")}
+        {isLoading && <Spinner className="mr-2" />}
+        {t("clients.form.submit")}
       </Button>
     </form>
   );

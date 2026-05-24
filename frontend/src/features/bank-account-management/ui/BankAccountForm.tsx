@@ -9,7 +9,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Button } from "@/shared/ui/button";
-import { Label } from "@/shared/ui/label";
+import { Spinner } from "@/shared/ui/spinner";
 
 const bankAccountSchema = z.object({
   bankName: z.string().min(1, "Bank name is required"),
@@ -135,22 +135,23 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
           name="isDefault"
           control={form.control}
           render={({ field }) => (
-            <div className="flex items-center gap-2">
+            <Field orientation="horizontal">
               <Checkbox
                 id="isDefault"
                 checked={field.value ?? false}
                 onCheckedChange={field.onChange}
               />
-              <Label htmlFor="isDefault" className="cursor-pointer">
+              <FieldLabel htmlFor="isDefault" className="cursor-pointer">
                 {t("bankAccounts.form.isDefault")}
-              </Label>
-            </div>
+              </FieldLabel>
+            </Field>
           )}
         />
       </FieldGroup>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "..." : t("bankAccounts.form.submit")}
+        {isLoading && <Spinner className="mr-2" />}
+        {t("bankAccounts.form.submit")}
       </Button>
     </form>
   );

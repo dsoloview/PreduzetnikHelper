@@ -8,8 +8,11 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { PasswordInput } from "@/shared/ui/password-input";
+import { Spinner } from "@/shared/ui/spinner";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 import { authApi } from "../api/auth.api";
 import { useAuthStore } from "@/entities/user/model/auth.store";
@@ -43,9 +46,8 @@ export const RegisterForm = () => {
       toast.success(t("auth.register.success"));
       navigate("/");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || error.message;
-      toast.error(message);
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 
@@ -105,10 +107,9 @@ export const RegisterForm = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="password">{t("auth.register.password")}</FieldLabel>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id="password"
-                    type="password"
                     aria-invalid={fieldState.invalid}
                     disabled={isPending}
                   />
@@ -120,7 +121,8 @@ export const RegisterForm = () => {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "..." : t("auth.register.submit")}
+            {isPending && <Spinner className="mr-2" />}
+            {t("auth.register.submit")}
           </Button>
           <Button
             type="button"

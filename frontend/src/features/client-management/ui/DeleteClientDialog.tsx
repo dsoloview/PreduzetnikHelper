@@ -12,6 +12,8 @@ import {
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
 import { useDeleteClient } from "@/entities/client/api/client.queries";
+import { Spinner } from "@/shared/ui/spinner";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 import type { IClient } from "@preduzetnik/shared";
 
 interface DeleteClientDialogProps {
@@ -30,8 +32,8 @@ export const DeleteClientDialog = ({ client, open, onOpenChange }: DeleteClientD
         toast.success(t("clients.delete.success"));
         onOpenChange(false);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Failed to delete client");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Failed to delete client"));
       },
     });
   };
@@ -52,7 +54,8 @@ export const DeleteClientDialog = ({ client, open, onOpenChange }: DeleteClientD
             disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isPending ? "..." : t("clients.delete.button")}
+            {isPending && <Spinner className="mr-2" />}
+            {t("clients.delete.button")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

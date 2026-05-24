@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useKpo } from "@/entities/kpo/api/kpo.queries";
 import { kpoApi } from "@/shared/api/kpo.api";
 import { Button } from "@/shared/ui/button";
+import { Spinner } from "@/shared/ui/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -37,9 +38,13 @@ export const KpoPage = () => {
           <h1 className="text-2xl font-bold tracking-tight">{t("kpo.title")}</h1>
           <p className="text-muted-foreground text-sm mt-1">{t("kpo.subtitle")}</p>
         </div>
-        <Button variant="outline" disabled={downloading || isLoading} onClick={handleDownload}>
-          <FileDown className="mr-2 size-4" />
-          {downloading ? "..." : t("kpo.downloadPdf")}
+        <Button
+          variant="outline"
+          disabled={downloading || isLoading || !data || data.entries.length === 0}
+          onClick={handleDownload}
+        >
+          {downloading ? <Spinner className="mr-2" /> : <FileDown className="mr-2 size-4" />}
+          {t("kpo.downloadPdf")}
         </Button>
       </div>
 

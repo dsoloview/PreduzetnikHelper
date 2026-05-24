@@ -16,7 +16,12 @@
     "getStarted": "Get Started",
     "cancel": "Cancel",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "loading": "Loading",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "auth": {
     "login": {
@@ -28,7 +33,7 @@
       "errors": {
         "required": "This field is required",
         "email": "Please enter a valid email address",
-        "passwordMin": "Password must be at least 6 characters"
+        "passwordMin": "Password must be at least 8 characters"
       },
       "goToRegister": "Don't have an account? Register",
       "success": "Successfully logged in!"
@@ -98,6 +103,9 @@
       "clearFilters": "Clear filters"
     },
     "total": "Total: {{amount}} RSD",
+    "totalForeign": "({{amount}} {{currency}})",
+    "totalLabel": "Total",
+    "totalsTitle": "Totals",
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -120,7 +128,8 @@
       "bankAccount": "Bank Account",
       "selectBankAccount": "Choose an account...",
       "placeOfIssue": "Place of Issue",
-      "domesticSupply": "Domestic Supply (counts toward 8M limit)",
+      "domesticSupply": "Domestic Supply",
+      "domesticSupplyHint": "Counts toward the 8M RSD VAT registration threshold.",
       "exchangeRate": "Exchange Rate (NBS)",
       "number": "Invoice Number",
       "issueDate": "Issue Date",
@@ -134,7 +143,21 @@
       "total": "Total",
       "grandTotal": "Grand Total",
       "noVatNotice": "Nije u sistemu PDV-a",
-      "submit": "Create Invoice"
+      "submit": "Create Invoice",
+      "pickDate": "Pick a date",
+      "note": "Note",
+      "notePlaceholder": "Optional note shown on the invoice...",
+      "errors": {
+        "clientRequired": "Client is required",
+        "bankAccountRequired": "Bank account is required",
+        "placeOfIssueRequired": "Place of issue is required",
+        "itemDescription": "Description is required",
+        "itemQuantity": "Quantity must be greater than 0",
+        "itemPrice": "Price must be at least 0",
+        "itemsMin": "At least one item is required",
+        "exchangeRateRequired": "Exchange rate is required for foreign currency",
+        "dueDateAfterIssue": "Due date cannot be earlier than issue date"
+      }
     },
     "create": {
       "button": "Create Invoice",
