@@ -1,4 +1,5 @@
 import { Controller, Get, Query, Res, ParseIntPipe } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { KpoService } from './kpo.service';
@@ -23,6 +24,7 @@ export class KpoController {
     }
 
     @Get('pdf')
+    @Throttle({ default: { ttl: 60000, limit: 5 } })
     @ApiOperation({ summary: 'Generate PDF of KPO book for a specific year' })
     @ApiQuery({ name: 'year', required: true, type: Number })
     @ApiResponse({ status: 200, description: 'PDF file generated successfully' })

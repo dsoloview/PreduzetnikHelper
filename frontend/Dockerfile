@@ -28,6 +28,7 @@ RUN pnpm --filter frontend build
 
 FROM nginx:1.27-alpine AS runner
 COPY --from=build-frontend /app/frontend/dist /usr/share/nginx/html
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/templates/default.conf.template
+ENV BACKEND_URL=http://backend:3000
 
 EXPOSE 80
