@@ -1,7 +1,7 @@
 import {ApiPropertyOptional} from '@nestjs/swagger';
 import {
     IsDateString, IsOptional, IsBoolean,
-    IsEnum, IsNumber, IsString, ValidateNested, ArrayMinSize,
+    IsEnum, IsNumber, IsString, IsUUID, ValidateNested, ArrayMinSize,
 } from 'class-validator';
 import {Type} from 'class-transformer';
 import {IUpdateInvoiceRequest} from '@preduzetnik/shared';
@@ -9,6 +9,16 @@ import type {InvoiceStatus, Currency} from '@preduzetnik/shared';
 import {CreateInvoiceItemDto} from './create-invoice-item.dto';
 
 export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
+    @ApiPropertyOptional({example: 'uuid'})
+    @IsOptional()
+    @IsUUID()
+    clientId?: string;
+
+    @ApiPropertyOptional({example: 'uuid'})
+    @IsOptional()
+    @IsUUID()
+    bankAccountId?: string;
+
     @ApiPropertyOptional({enum: ['DRAFT', 'SENT', 'PAID', 'CANCELLED']})
     @IsOptional()
     @IsEnum(['DRAFT', 'SENT', 'PAID', 'CANCELLED'])

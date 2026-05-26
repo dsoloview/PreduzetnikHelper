@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/input";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { Spinner } from "@/shared/ui/spinner";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 
@@ -67,7 +68,7 @@ export const LoginForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">{t("auth.login.email")}</FieldLabel>
+                  <FieldLabel htmlFor="email">{t("auth.login.email")}<RequiredMark /></FieldLabel>
                   <Input
                     {...field}
                     id="email"
@@ -86,7 +87,7 @@ export const LoginForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">{t("auth.login.password")}</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("auth.login.password")}<RequiredMark /></FieldLabel>
                   <PasswordInput
                     {...field}
                     id="password"

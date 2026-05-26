@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
 import type { InvoiceStatus } from "@preduzetnik/shared";
+import { ProfileCompletenessAlert } from "@/widgets/profile-completeness/ui/ProfileCompletenessAlert";
 
 const ALL_STATUSES: InvoiceStatus[] = ["DRAFT", "SENT", "PAID", "CANCELLED"];
 
@@ -105,6 +106,8 @@ export const InvoicesPage = () => {
         </div>
         <CreateInvoiceDialog />
       </div>
+
+      <ProfileCompletenessAlert />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">

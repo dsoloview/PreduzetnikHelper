@@ -62,6 +62,8 @@ export interface ICreateInvoiceRequest {
 }
 
 export interface IUpdateInvoiceRequest {
+  clientId?: string;
+  bankAccountId?: string;
   status?: InvoiceStatus;
   issueDate?: string;
   dueDate?: string;

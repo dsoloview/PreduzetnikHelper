@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { IncompleteDot } from "@/shared/ui/incomplete-dot";
+import { useProfile } from "@/entities/user/api/user.queries";
+import { isMissingProfileDetails } from "@/entities/user/lib/profile-completeness";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, labelKey: "nav.dashboard" },
@@ -31,6 +34,8 @@ interface SidebarProps {
 
 export const Sidebar = ({ open, onClose }: SidebarProps) => {
   const { t } = useTranslation();
+  const { data: profile } = useProfile();
+  const showDot = !!profile && isMissingProfileDetails(profile);
 
   return (
     <>
@@ -72,6 +77,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
             <NavLink key={item.to} to={item.to} className={({ isActive }) => linkClass(isActive)}>
               <item.icon className="size-4" />
               {t(item.labelKey)}
+              {item.to === "/" && showDot && <IncompleteDot />}
             </NavLink>
           ))}
         </nav>
@@ -80,6 +86,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           <NavLink to="/profile" className={({ isActive }) => linkClass(isActive)}>
             <UserCircle className="size-4" />
             {t("nav.profile")}
+            {showDot && <IncompleteDot />}
           </NavLink>
           <NavLink to="/settings" className={({ isActive }) => linkClass(isActive)}>
             <Settings className="size-4" />

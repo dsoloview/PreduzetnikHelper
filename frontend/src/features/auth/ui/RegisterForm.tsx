@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/input";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { Spinner } from "@/shared/ui/spinner";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 
@@ -69,7 +70,7 @@ export const RegisterForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="name">{t("auth.register.name")}</FieldLabel>
+                  <FieldLabel htmlFor="name">{t("auth.register.name")}<RequiredMark /></FieldLabel>
                   <Input
                     {...field}
                     id="name"
@@ -87,7 +88,7 @@ export const RegisterForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">{t("auth.register.email")}</FieldLabel>
+                  <FieldLabel htmlFor="email">{t("auth.register.email")}<RequiredMark /></FieldLabel>
                   <Input
                     {...field}
                     id="email"
@@ -106,7 +107,7 @@ export const RegisterForm = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">{t("auth.register.password")}</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("auth.register.password")}<RequiredMark /></FieldLabel>
                   <PasswordInput
                     {...field}
                     id="password"
