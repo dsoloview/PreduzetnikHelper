@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -16,6 +16,7 @@ import { Calendar } from "@/shared/ui/calendar";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Spinner } from "@/shared/ui/spinner";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { cn } from "@/shared/lib/utils";
 
 import { useClients } from "@/entities/client/api/client.queries";
@@ -85,6 +86,11 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
 
   const today = useMemo(() => new Date(), []);
 
+  const defaultAccount = useMemo(
+    () => bankAccounts?.find((a) => a.isDefault) ?? bankAccounts?.[0],
+    [bankAccounts],
+  );
+
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -104,8 +110,28 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
     name: "items",
   });
 
+  const watchedBankAccountId = form.watch("bankAccountId");
   const watchedItems = form.watch("items");
   const currency = form.watch("currency");
+
+  // Auto-select default (or first) bank account once the list loads
+  useEffect(() => {
+    if (!defaultAccount) return;
+    if (defaultValues?.bankAccountId) return;
+    if (form.getValues("bankAccountId")) return;
+    form.setValue("bankAccountId", defaultAccount.id, { shouldValidate: false });
+    form.setValue("currency", defaultAccount.currency, { shouldValidate: false });
+  }, [defaultAccount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync currency when the user picks a different bank account
+  useEffect(() => {
+    if (!watchedBankAccountId) return;
+    const account = bankAccounts?.find((a) => a.id === watchedBankAccountId);
+    if (account) {
+      form.setValue("currency", account.currency, { shouldValidate: false });
+    }
+  }, [watchedBankAccountId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const totalAmount = watchedItems.reduce(
     (acc, item) => acc + ((item?.quantity ?? 0) * (item?.unitPrice ?? 0)),
     0,
@@ -137,7 +163,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("invoices.form.client")}</FieldLabel>
+                <FieldLabel>{t("invoices.form.client")}<RequiredMark /></FieldLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder={t("invoices.form.selectClient")} />
@@ -160,7 +186,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("invoices.form.bankAccount")}</FieldLabel>
+                <FieldLabel>{t("invoices.form.bankAccount")}<RequiredMark /></FieldLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder={t("invoices.form.selectBankAccount")} />
@@ -168,7 +194,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                   <SelectContent>
                     {bankAccounts?.map((account) => (
                       <SelectItem key={account.id} value={account.id}>
-                        {account.bankName} ({account.accountNumber})
+                        {account.bankName} · {account.currency} ({account.accountNumber})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -183,7 +209,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("invoices.form.placeOfIssue")}</FieldLabel>
+                <FieldLabel>{t("invoices.form.placeOfIssue")}<RequiredMark /></FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -198,7 +224,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>{t("invoices.form.issueDate")}</FieldLabel>
+                  <FieldLabel>{t("invoices.form.issueDate")}<RequiredMark /></FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -226,7 +252,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>{t("invoices.form.dueDate")}</FieldLabel>
+                  <FieldLabel>{t("invoices.form.dueDate")}<RequiredMark /></FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -277,7 +303,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>{t("invoices.form.exchangeRate")}</FieldLabel>
+                    <FieldLabel>{t("invoices.form.exchangeRate")}<RequiredMark /></FieldLabel>
                     <Input
                       type="number"
                       step="0.0001"
@@ -338,9 +364,15 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40%]">{t("invoices.form.description")}</TableHead>
-              <TableHead className="w-[15%]">{t("invoices.form.quantity")}</TableHead>
-              <TableHead className="w-[20%]">{t("invoices.form.price")}</TableHead>
+              <TableHead className="w-[40%]">
+                {t("invoices.form.description")}<RequiredMark />
+              </TableHead>
+              <TableHead className="w-[15%]">
+                {t("invoices.form.quantity")}<RequiredMark />
+              </TableHead>
+              <TableHead className="w-[20%]">
+                {t("invoices.form.price")}<RequiredMark />
+              </TableHead>
               <TableHead className="w-[20%]">{t("invoices.form.total")}</TableHead>
               <TableHead className="w-[5%]"></TableHead>
             </TableRow>

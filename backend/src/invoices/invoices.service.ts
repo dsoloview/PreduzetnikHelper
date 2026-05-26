@@ -142,10 +142,24 @@ export class InvoicesService {
             throw new ForbiddenException('Access denied');
         }
 
-        // Only DRAFT invoices can be updated, unless we are just updating the status
-        const isOnlyStatusUpdate = Object.keys(dto).length === 1 && dto.status !== undefined;
+        // Only DRAFT invoices can be updated, unless we are just updating the status.
+        // NOTE: with `ValidationPipe({ transform: true })`, class-transformer
+        // populates every declared field on the DTO instance (unset ones as
+        // `undefined`), so we must compare *defined* keys, not all keys.
+        const definedKeys = Object.entries(dto)
+            .filter(([, v]) => v !== undefined)
+            .map(([k]) => k);
+        const isOnlyStatusUpdate = definedKeys.length === 1 && definedKeys[0] === 'status';
         if (existing.status !== 'DRAFT' && !isOnlyStatusUpdate) {
             throw new BadRequestException('Only DRAFT invoices can be edited');
+        }
+
+        // Validate new client / bank account ownership if provided
+        if (dto.clientId) {
+            await this.clientsService.findOne(dto.clientId, userId);
+        }
+        if (dto.bankAccountId) {
+            await this.bankAccountsService.findOne(dto.bankAccountId, userId);
         }
 
         // If items are provided, we need to recalculate totals
@@ -183,6 +197,8 @@ export class InvoicesService {
         const updated = await this.prisma.invoice.update({
             where: { id },
             data: {
+                clientId: dto.clientId,
+                bankAccountId: dto.bankAccountId,
                 status: dto.status as InvoiceStatus,
                 issueDate: dto.issueDate ? new Date(dto.issueDate) : undefined,
                 dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,

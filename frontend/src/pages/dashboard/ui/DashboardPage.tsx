@@ -6,6 +6,7 @@ import { LimitCard } from "@/entities/limits/ui/LimitCard";
 import { Button } from "@/shared/ui/button";
 import { ArrowRight } from "lucide-react";
 import { DashboardStatsRow } from "@/widgets/dashboard/ui/DashboardStatsRow";
+import { ProfileCompletenessAlert } from "@/widgets/profile-completeness/ui/ProfileCompletenessAlert";
 import { InvoiceStatusBreakdown } from "@/entities/invoice/ui/InvoiceStatusBreakdown";
 import { RecentInvoicesList } from "@/entities/invoice/ui/RecentInvoicesList";
 import { TopClientsList } from "@/entities/client/ui/TopClientsList";
@@ -21,6 +22,8 @@ export const DashboardPage = () => {
         <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.title")}</h1>
         <p className="text-muted-foreground">{t("dashboard.subtitle")}</p>
       </div>
+
+      <ProfileCompletenessAlert />
 
       <DashboardStatsRow invoices={invoices} isLoading={invoicesLoading} />
 

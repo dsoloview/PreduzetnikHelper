@@ -8,6 +8,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
+import { RequiredMark } from "@/shared/ui/required-mark";
 
 const clientSchema = z.object({
   type: z.enum(["DOMESTIC", "INTERNATIONAL"]),
@@ -20,6 +21,18 @@ const clientSchema = z.object({
   country: z.string().min(1, "Country is required"),
   taxId: z.string().min(1, "Tax ID is required"), // PIB for SRB
   registrationNumber: z.string().min(1, "Registration number is required"), // MBR for SRB
+});
+
+/**
+ * Backend validators like `@IsOptional() @IsPhoneNumber()` treat an empty string
+ * as a present value and fail validation. Convert empty optional strings to
+ * undefined so the field is omitted from the request payload.
+ */
+const stripEmptyOptionals = (data: ClientFormValues): ClientFormValues => ({
+  ...data,
+  email: data.email?.trim() ? data.email.trim() : undefined,
+  phone: data.phone?.trim() ? data.phone.trim() : undefined,
+  postalCode: data.postalCode?.trim() ? data.postalCode.trim() : undefined,
 });
 
 export type ClientFormValues = z.infer<typeof clientSchema>;
@@ -52,8 +65,10 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
 
   const clientType = form.watch("type");
 
+  const handleSubmit = form.handleSubmit((data) => onSubmit(stripEmptyOptionals(data)));
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <FieldGroup>
         <Controller
           name="type"
@@ -78,8 +93,8 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
           name="name"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("clients.form.name")}</FieldLabel>
+            <Field aria-required data-invalid={fieldState.invalid}>
+              <FieldLabel>{t("clients.form.name")}<RequiredMark /></FieldLabel>
               <Input {...field} aria-invalid={fieldState.invalid} />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -94,6 +109,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>
                   {clientType === "DOMESTIC" ? t("clients.form.pib") : t("clients.form.taxId")}
+                  <RequiredMark />
                 </FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -105,7 +121,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.mbr")}</FieldLabel>
+                <FieldLabel>{t("clients.form.mbr")}<RequiredMark /></FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -131,7 +147,11 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>{t("clients.form.phone")}</FieldLabel>
-                <Input {...field} aria-invalid={fieldState.invalid} />
+                <Input
+                  {...field}
+                  placeholder={t("clients.form.phoneHint")}
+                  aria-invalid={fieldState.invalid}
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -143,7 +163,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("clients.form.address")}</FieldLabel>
+              <FieldLabel>{t("clients.form.address")}<RequiredMark /></FieldLabel>
               <Input {...field} aria-invalid={fieldState.invalid} />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -156,7 +176,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.city")}</FieldLabel>
+                <FieldLabel>{t("clients.form.city")}<RequiredMark /></FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -177,7 +197,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.country")}</FieldLabel>
+                <FieldLabel>{t("clients.form.country")}<RequiredMark /></FieldLabel>
                 <Input {...field} aria-invalid={fieldState.invalid} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>

@@ -10,6 +10,7 @@ import { PasswordInput } from "@/shared/ui/password-input";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 import { Label } from "@/shared/ui/label";
+import { RequiredMark } from "@/shared/ui/required-mark";
 
 const changePasswordSchema = z
   .object({
@@ -73,7 +74,7 @@ export const SettingsPage = () => {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid gap-1.5">
-              <Label htmlFor="currentPassword">{t("settings.password.current")}</Label>
+              <Label htmlFor="currentPassword">{t("settings.password.current")}<RequiredMark /></Label>
               <PasswordInput
                 id="currentPassword"
                 {...form.register("currentPassword")}
@@ -85,7 +86,7 @@ export const SettingsPage = () => {
               )}
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="newPassword">{t("settings.password.new")}</Label>
+              <Label htmlFor="newPassword">{t("settings.password.new")}<RequiredMark /></Label>
               <PasswordInput
                 id="newPassword"
                 {...form.register("newPassword")}
@@ -97,7 +98,7 @@ export const SettingsPage = () => {
               )}
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="confirmPassword">{t("settings.password.confirm")}</Label>
+              <Label htmlFor="confirmPassword">{t("settings.password.confirm")}<RequiredMark /></Label>
               <PasswordInput
                 id="confirmPassword"
                 {...form.register("confirmPassword")}

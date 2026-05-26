@@ -62,6 +62,7 @@
       "name": "Company Name",
       "email": "Email Address",
       "phone": "Phone Number",
+      "phoneHint": "+381641234567",
       "address": "Address",
       "city": "City",
       "postalCode": "Postal Code",
@@ -307,6 +308,11 @@
       "services": "Services (RSD)",
       "total": "Total (RSD)"
     }
+  },
+  "profileCompleteness": {
+    "title": "Complete your business profile",
+    "description": "Company name, PIB, MBR, street address, and city are required to generate valid invoices.",
+    "action": "Go to Profile"
   },
   "profile": {
     "title": "Profile",

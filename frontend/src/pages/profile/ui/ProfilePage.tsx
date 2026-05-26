@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 import { Label } from "@/shared/ui/label";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Separator } from "@/shared/ui/separator";
 
@@ -102,7 +103,7 @@ export const ProfilePage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-1.5">
-              <Label htmlFor="name">{t("profile.fields.name")}</Label>
+              <Label htmlFor="name">{t("profile.fields.name")}<RequiredMark /></Label>
               <Input id="name" {...form.register("name")} />
               {form.formState.errors.name && (
                 <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>

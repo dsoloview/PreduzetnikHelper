@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
+import { RequiredMark } from "@/shared/ui/required-mark";
 
 const bankAccountSchema = z.object({
   bankName: z.string().min(1, "Bank name is required"),
@@ -21,6 +22,13 @@ const bankAccountSchema = z.object({
 });
 
 export type BankAccountFormValues = z.infer<typeof bankAccountSchema>;
+
+/** Convert empty optional strings to undefined so they are omitted from the request. */
+const stripEmptyOptionals = (data: BankAccountFormValues): BankAccountFormValues => ({
+  ...data,
+  swiftCode: data.swiftCode?.trim() ? data.swiftCode.trim() : undefined,
+  iban: data.iban?.trim() ? data.iban.trim() : undefined,
+});
 
 interface BankAccountFormProps {
   onSubmit: (data: BankAccountFormValues) => void;
@@ -44,15 +52,17 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
     },
   });
 
+  const handleSubmit = form.handleSubmit((data) => onSubmit(stripEmptyOptionals(data)));
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <FieldGroup>
         <Controller
           name="bankName"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("bankAccounts.form.bankName")}</FieldLabel>
+              <FieldLabel>{t("bankAccounts.form.bankName")}<RequiredMark /></FieldLabel>
               <Input {...field} aria-invalid={fieldState.invalid} />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -64,7 +74,7 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("bankAccounts.form.accountNumber")}</FieldLabel>
+              <FieldLabel>{t("bankAccounts.form.accountNumber")}<RequiredMark /></FieldLabel>
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
@@ -113,7 +123,7 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
           control={form.control}
           render={({ field }) => (
             <Field>
-              <FieldLabel>{t("bankAccounts.form.currency")}</FieldLabel>
+              <FieldLabel>{t("bankAccounts.form.currency")}<RequiredMark /></FieldLabel>
               <Select
                 onValueChange={(val) => field.onChange(val as Currency)}
                 value={field.value}

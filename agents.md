@@ -27,3 +27,4 @@ App for Serbian **paušalac (sole proprietor)**. Invoices, KPO book, income limi
 - Annual income limit: **6,000,000 RSD**
 - Not VAT registered → invoices state "Nije u sistemu PDV-a"
 - Invoice numbering: sequential/year (e.g. `1/2026`)
+- Only shadcn UI components. Create own if you can't find available shadcn https://ui.shadcn.com/docs/components
