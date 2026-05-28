@@ -3,6 +3,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
 
+// Simple HTML escape for KPO description to prevent XSS
+const escapeHtml = (unsafe: string): string => {
+    return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 @Injectable()
 export class KpoService {
     constructor(
@@ -36,7 +46,7 @@ export class KpoService {
             return {
                 sequenceNumber: index + 1,
                 issueDate: invoice.issueDate.toISOString(),
-                description: `Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`,
+                description: escapeHtml(`Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`),
                 productAmount: 0, // Assume 0 for services
                 serviceAmount: totalRsd,
                 totalAmount: totalRsd,

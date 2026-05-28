@@ -29,7 +29,11 @@ import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
         return config;
       },
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 50 }]),
+    ThrottlerModule.forRoot([
+      { name: 'default', ttl: 60000, limit: 100 },
+      { name: 'auth', ttl: 60000, limit: 10 },
+      { name: 'pdf', ttl: 60000, limit: 10 },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,

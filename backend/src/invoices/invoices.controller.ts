@@ -77,7 +77,7 @@ export class InvoicesController {
     }
 
     @Get(':id/pdf')
-    @Throttle({ default: { ttl: 60000, limit: 5 } })
+    @Throttle({ pdf: { ttl: 60000, limit: 10 } })
     @ApiOperation({ summary: 'Generate PDF for an invoice' })
     @ApiResponse({ status: 200, description: 'PDF file generated successfully' })
     async getPdf(
