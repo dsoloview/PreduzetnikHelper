@@ -24,16 +24,6 @@ import { useBankAccounts } from "@/entities/bank-account/api/bank-account.querie
 import { useProfile } from "@/entities/user/api/user.queries";
 import type { ICreateInvoiceRequest, Currency } from "@preduzetnik/shared";
 
-/**
- * Converts a number-like input value to a number, returning undefined for empty
- * inputs so that Zod's required-number validation fires instead of NaN.
- */
-const parseNumericInput = (value: string): number | undefined => {
-  if (value === "" || value === "-") return undefined;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-};
-
 const buildInvoiceSchema = (t: (key: string) => string) =>
   z
     .object({
@@ -298,24 +288,19 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               )}
             />
             {currency !== "RSD" && (
-              <Controller
-                name="exchangeRate"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>{t("invoices.form.exchangeRate")}<RequiredMark /></FieldLabel>
-                    <Input
-                      type="number"
-                      step="0.0001"
-                      inputMode="decimal"
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(parseNumericInput(e.target.value))}
-                      aria-invalid={fieldState.invalid}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
+              <Field data-invalid={!!form.formState.errors.exchangeRate}>
+                <FieldLabel>{t("invoices.form.exchangeRate")}<RequiredMark /></FieldLabel>
+                <Input
+                  inputMode="decimal"
+                  aria-invalid={!!form.formState.errors.exchangeRate}
+                  {...form.register("exchangeRate", {
+                    setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
+                  })}
+                />
+                {form.formState.errors.exchangeRate && (
+                  <FieldError errors={[form.formState.errors.exchangeRate]} />
                 )}
-              />
+              </Field>
             )}
           </div>
 
@@ -396,19 +381,12 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                     )}
                   </TableCell>
                   <TableCell>
-                    <Controller
-                      name={`items.${index}.quantity`}
-                      control={form.control}
-                      render={({ field: qField }) => (
-                        <Input
-                          type="number"
-                          step="0.01"
-                          inputMode="decimal"
-                          value={Number.isFinite(qField.value) ? qField.value : ""}
-                          onChange={(e) => qField.onChange(parseNumericInput(e.target.value))}
-                          aria-invalid={!!itemErrors?.quantity}
-                        />
-                      )}
+                    <Input
+                      inputMode="decimal"
+                      aria-invalid={!!itemErrors?.quantity}
+                      {...form.register(`items.${index}.quantity`, {
+                        setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
+                      })}
                     />
                     {itemErrors?.quantity?.message && (
                       <p className="mt-1 text-xs text-destructive">
@@ -417,19 +395,12 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                     )}
                   </TableCell>
                   <TableCell>
-                    <Controller
-                      name={`items.${index}.unitPrice`}
-                      control={form.control}
-                      render={({ field: pField }) => (
-                        <Input
-                          type="number"
-                          step="0.01"
-                          inputMode="decimal"
-                          value={Number.isFinite(pField.value) ? pField.value : ""}
-                          onChange={(e) => pField.onChange(parseNumericInput(e.target.value))}
-                          aria-invalid={!!itemErrors?.unitPrice}
-                        />
-                      )}
+                    <Input
+                      inputMode="decimal"
+                      aria-invalid={!!itemErrors?.unitPrice}
+                      {...form.register(`items.${index}.unitPrice`, {
+                        setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
+                      })}
                     />
                     {itemErrors?.unitPrice?.message && (
                       <p className="mt-1 text-xs text-destructive">
