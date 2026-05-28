@@ -12,10 +12,24 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.use(cookieParser());
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'none'"],
+          scriptSrc: ["'none'"],
+          objectSrc: ["'none'"],
+          frameAncestors: ["'none'"],
+        },
+      },
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   app.enableCors({
     origin: configService.get('CORS_ORIGIN', 'http://localhost:5173'),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

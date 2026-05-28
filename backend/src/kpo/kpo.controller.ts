@@ -24,7 +24,7 @@ export class KpoController {
     }
 
     @Get('pdf')
-    @Throttle({ default: { ttl: 60000, limit: 5 } })
+    @Throttle({ pdf: { ttl: 60000, limit: 10 } })
     @ApiOperation({ summary: 'Generate PDF of KPO book for a specific year' })
     @ApiQuery({ name: 'year', required: true, type: Number })
     @ApiResponse({ status: 200, description: 'PDF file generated successfully' })

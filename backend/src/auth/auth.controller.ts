@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 const REFRESH_COOKIE = 'refreshToken';
 
 @ApiTags('Auth')
-@Throttle({ default: { ttl: 60000, limit: 5 } })
+@Throttle({ auth: { ttl: 60000, limit: 10 } })
 @Controller('auth')
 export class AuthController {
     constructor(
