@@ -202,19 +202,6 @@ src/
 
 ---
 
-## Security
-
-- Passwords hashed with **bcrypt**
-- Refresh tokens stored as **hashed values** in DB with JTI rotation
-- Access tokens kept **in memory only** (not localStorage)
-- Refresh token in **HttpOnly, SameSite=Strict cookie**
-- **Helmet** with strict CSP for the API
-- **Rate limiting** on auth endpoints
-- PDF templates sanitized with **DOMPurify** (prevents XSS via invoice data)
-- CORS restricted to configured origin and allowed methods only
-
----
-
 ## License
 
 MIT © [Dmitrii Solovev](https://github.com/dsoloview)
