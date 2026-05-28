@@ -1,6 +1,9 @@
 {
   "name": "preduzetnik-helper",
   "version": "1.0.0",
+  "description": "Business management tool for Serbian paušalac (flat-rate sole proprietors)",
+  "author": "Dmitrii Solovev",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build:shared": "pnpm --filter @preduzetnik/shared build",

@@ -12,8 +12,8 @@ coverage
 .env.*
 !.env.example
 
-# Prisma generated client
-/generated/prisma
+# Prisma generated client (output path: src/generated/prisma)
+src/generated/
 
 # Logs
 logs

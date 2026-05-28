@@ -9,7 +9,11 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY shared/package.json ./shared/
 COPY backend/package.json ./backend/
-RUN pnpm install --frozen-lockfile
+# Prisma schema must be present before generating the client
+COPY backend/prisma ./backend/prisma
+COPY backend/prisma.config.ts ./backend/prisma.config.ts
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm --filter backend exec prisma generate --schema=prisma/schema.prisma
 
 # ─── Build shared ────────────────────────────────────────────────────────────
 
@@ -32,13 +36,15 @@ WORKDIR /app
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY shared/package.json ./shared/
 COPY backend/package.json ./backend/
+# Prisma schema must be present before generating the client
+COPY backend/prisma ./backend/prisma
+COPY backend/prisma.config.ts ./backend/prisma.config.ts
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm --filter backend exec prisma generate --schema=prisma/schema.prisma
 
 COPY --from=build-shared /app/shared/dist ./shared/dist
 COPY --from=build-backend /app/backend/dist ./backend/dist
-COPY backend/prisma ./backend/prisma
-COPY backend/prisma.config.ts ./backend/prisma.config.ts
 
 WORKDIR /app/backend
 

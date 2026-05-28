@@ -28,3 +28,8 @@ pnpm-debug.log*
 .idea
 .vscode/*
 !.vscode/extensions.json
+
+# Internal notes (untracked)
+agents.md
+SECURITY.md
+docs/
