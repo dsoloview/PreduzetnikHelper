@@ -1,7 +1,10 @@
 {
   "name": "frontend",
+  "version": "1.0.0",
+  "description": "React SPA for PreduzetnikHelper — business management tool for Serbian paušalac",
+  "author": "Dmitrii Solovev",
   "private": true,
-  "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -64,6 +64,11 @@ describe('InvoicesService', () => {
       (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: 'DOMESTIC' });
       (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'bank-1' });
 
+      // The service wraps creation in `prisma.$transaction(async tx => ...)`.
+      // The deep mock does not auto-invoke the callback, so we make it execute
+      // the callback with the mocked prisma client as the transaction client.
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prismaMock));
+
       // Mock finding the last invoice to be invoiceNumber 5
       prismaMock.invoice.findFirst.mockResolvedValue({ invoiceNumber: 5 } as any);
 

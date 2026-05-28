@@ -9,6 +9,7 @@ import { ClientsService } from '../clients/clients.service';
 import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 import { PdfService } from '../pdf/pdf.service';
 import { InvoiceStatus, Currency } from '../generated/prisma/enums';
+import type { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class InvoicesService {
@@ -172,7 +173,7 @@ export class InvoicesService {
         if (dto.exchangeRate !== undefined) exchangeRate = dto.exchangeRate;
 
         // Handle items update
-        let itemsOperation: any = undefined;
+        let itemsOperation: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput | undefined;
         if (dto.items) {
             const itemsWithTotals = dto.items.map(item => ({
                 description: item.description,
