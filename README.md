@@ -12,15 +12,23 @@
 
 ## What is this?
 
-Serbian paušalac (flat-rate entrepreneur) faces specific accounting obligations:
+**PreduzetnikHelper** is a self-hosted business management app built specifically for Serbian **paušalac** (flat-rate sole proprietors). With it you can:
 
-- **KPO Book** — a mandatory income ledger that must be maintained per legal requirements
-- **6,000,000 RSD annual limit** — exceeding it removes the flat-rate status
-- **8,000,000 RSD VAT threshold** — tracked separately for domestic supplies only
-- Invoices must state *"Nije u sistemu PDV-a"* (not VAT registered)
-- Sequential invoice numbering per year (e.g. `1/2026`, `2/2026`)
+- **Issue invoices** — create, send, and track invoices with automatic sequential numbering per year; export to PDF ready to send to clients
+- **Manage clients** — keep a directory of domestic and international clients with all required tax details
+- **Maintain the KPO book** — the mandatory income ledger is generated automatically from paid invoices and can be exported to PDF at any time
+- **Track income limits** — real-time progress bars show how close you are to the 6M RSD paušal limit and the 8M RSD VAT threshold
+- **Manage bank accounts** — store multiple accounts (RSD / EUR / USD) with SWIFT and IBAN details
 
-PreduzetnikHelper automates all of this in one place.
+### Why paušalac-specific?
+
+Serbian paušalac operates under a fixed-tax regime with strict rules:
+
+- **KPO Book** — a mandatory income ledger required by law; generated automatically from paid invoices
+- **6,000,000 RSD annual limit** — exceeding it means losing flat-rate status; tracked in real time
+- **8,000,000 RSD VAT threshold** — tracked separately; crossing it triggers mandatory VAT registration
+- **"Nije u sistemu PDV-a"** — invoices must include this statement (not VAT registered)
+- **Sequential invoice numbering** per calendar year (e.g. `1/2026`, `2/2026`)
 
 ---
 
@@ -28,16 +36,15 @@ PreduzetnikHelper automates all of this in one place.
 
 | Module | Description |
 |---|---|
-| **Auth** | JWT + HttpOnly refresh token cookie, bcrypt, token rotation |
-| **Profile** | Company info: PIB, MBR, activity code, municipality, address |
-| **Clients** | CRUD with domestic / international types, tax ID handling |
-| **Bank Accounts** | Multi-currency (RSD / EUR / USD), SWIFT, IBAN, default account |
-| **Invoices** | Full CRUD, status flow `DRAFT → SENT → PAID / CANCELLED`, auto-numbering |
-| **PDF Export** | Invoice and KPO book PDFs via PDFMake with DOMPurify sanitization |
-| **KPO Book** | Auto-generated from paid invoices, PDF export per year |
-| **Limits Tracker** | Real-time pausal (6M) and VAT (8M) thresholds with progress bars |
-| **Dashboard** | Revenue stats, limit cards, status breakdown, recent invoices, top clients |
-| **NBS Exchange Rates** | Auto-fetch official middle rates from National Bank of Serbia |
+| **Auth** | Registration & login, JWT access token + HttpOnly refresh token cookie, silent token refresh, bcrypt password hashing |
+| **Profile** | Company info: name, PIB, MBR, activity code, municipality, address |
+| **Clients** | CRUD — domestic & international clients, tax ID (PIB/VAT) handling |
+| **Bank Accounts** | Multi-currency accounts (RSD / EUR / USD), SWIFT, IBAN, default account flag |
+| **Invoices** | Full CRUD, status flow `DRAFT → SENT → PAID / CANCELLED`, auto-numbering per year |
+| **PDF Export** | Invoice and KPO book PDFs via PDFMake with DOMPurify XSS sanitization |
+| **KPO Book** | Auto-generated ledger from paid invoices, filterable by year, PDF export |
+| **Limits Tracker** | Real-time progress bars for paušal (6M RSD) and VAT (8M RSD) thresholds |
+| **Dashboard** | Revenue stats, limit cards, invoice status breakdown, recent invoices, top clients |
 | **Settings** | Change password |
 
 ---
@@ -56,7 +63,7 @@ PreduzetnikHelper/
 ### Backend
 - **NestJS 11** — modular architecture, decorators, DI
 - **Prisma 7** — type-safe ORM, PostgreSQL
-- **Passport + JWT** — access token in memory, refresh token in HttpOnly cookie
+- **Passport + JWT** — access token, refresh token in HttpOnly cookie
 - **class-validator + class-transformer** — DTO validation
 - **Helmet + Throttler** — security headers and rate limiting
 - **PDFMake + DOMPurify** — PDF generation with XSS sanitization
