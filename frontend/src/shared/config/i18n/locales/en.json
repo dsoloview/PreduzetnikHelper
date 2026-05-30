@@ -21,7 +21,13 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "theme": {
+      "toggle": "Toggle theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "auth": {
     "login": {
