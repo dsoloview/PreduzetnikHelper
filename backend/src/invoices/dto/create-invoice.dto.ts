@@ -5,6 +5,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import type {Currency} from '@preduzetnik/shared';
+import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import {ICreateInvoiceRequest} from '@preduzetnik/shared';
 import { CreateInvoiceItemDto } from './create-invoice-item.dto';
 
@@ -35,9 +36,9 @@ export class CreateInvoiceDto implements ICreateInvoiceRequest {
     @IsBoolean()
     domesticSupply?: boolean;
 
-    @ApiPropertyOptional({ enum: ['RSD', 'EUR', 'USD'], default: 'RSD' })
+    @ApiPropertyOptional({ enum: CurrencyEnum, default: CurrencyEnum.RSD })
     @IsOptional()
-    @IsEnum(['RSD', 'EUR', 'USD'])
+    @IsEnum(CurrencyEnum)
     currency?: Currency;
 
     @ApiPropertyOptional({ example: 117.5, description: 'Required if currency is not RSD' })

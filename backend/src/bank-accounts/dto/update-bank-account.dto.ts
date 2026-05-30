@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import type { Currency } from '@preduzetnik/shared';
+import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import { IUpdateBankAccountRequest } from '@preduzetnik/shared';
 
 export class UpdateBankAccountDto implements IUpdateBankAccountRequest {
@@ -24,9 +25,9 @@ export class UpdateBankAccountDto implements IUpdateBankAccountRequest {
     @IsString()
     iban?: string;
 
-    @ApiPropertyOptional({ enum: ['RSD', 'EUR', 'USD'] })
+    @ApiPropertyOptional({ enum: CurrencyEnum })
     @IsOptional()
-    @IsEnum(['RSD', 'EUR', 'USD'])
+    @IsEnum(CurrencyEnum)
     currency?: Currency;
 
     @ApiPropertyOptional({ example: true })

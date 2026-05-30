@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { Currency } from '@preduzetnik/shared';
+import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import { IBankAccount } from '@preduzetnik/shared';
 
 export class BankAccountResponseDto implements IBankAccount {
@@ -18,7 +19,7 @@ export class BankAccountResponseDto implements IBankAccount {
     @ApiPropertyOptional({ example: 'RS35160005080003520714' })
     iban?: string | null;
 
-    @ApiProperty({ enum: ['RSD', 'EUR', 'USD'] })
+    @ApiProperty({ enum: CurrencyEnum })
     currency: Currency;
 
     @ApiProperty({ example: true })

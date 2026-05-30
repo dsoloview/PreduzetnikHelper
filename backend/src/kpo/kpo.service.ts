@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
+import { InvoiceStatus } from '../generated/prisma/enums';
 
 // Simple HTML escape for KPO description to prevent XSS
 const escapeHtml = (unsafe: string): string => {
@@ -21,13 +22,12 @@ export class KpoService {
     ) {}
 
     async getKpoForYear(userId: string, year: number): Promise<IKpoResponse> {
-        // Fetch all non-CANCELLED invoices for the given year, ordered by issueDate ASC
         const invoices = await this.prisma.invoice.findMany({
             where: {
                 userId,
                 year,
                 status: {
-                    not: 'CANCELLED' // We don't include cancelled invoices in KPO
+                    not: InvoiceStatus.CANCELLED
                 }
             },
             include: {
@@ -47,7 +47,7 @@ export class KpoService {
                 sequenceNumber: index + 1,
                 issueDate: invoice.issueDate.toISOString(),
                 description: escapeHtml(`Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`),
-                productAmount: 0, // Assume 0 for services
+                productAmount: 0,
                 serviceAmount: totalRsd,
                 totalAmount: totalRsd,
             };
@@ -62,8 +62,7 @@ export class KpoService {
 
     async generateKpoPdf(userId: string, year: number): Promise<Buffer> {
         const kpoData = await this.getKpoForYear(userId, year);
-        
-        // We also need user details for the PDF header
+
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             omit: { password: true },

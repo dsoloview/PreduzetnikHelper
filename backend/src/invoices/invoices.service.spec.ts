@@ -8,6 +8,7 @@ import { createPrismaMock } from '../prisma/prisma.service.mock';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { InvoiceStatus, Currency, ClientType } from '../generated/prisma/enums';
 
 describe('InvoicesService', () => {
   let service: InvoicesService;
@@ -61,7 +62,7 @@ describe('InvoicesService', () => {
 
     it('should calculate totalAmount and totalRsd properly and auto-increment invoiceNumber', async () => {
       // Mock validations
-      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: 'DOMESTIC' });
+      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: ClientType.DOMESTIC });
       (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'bank-1' });
 
       // The service wraps creation in `prisma.$transaction(async tx => ...)`.
@@ -77,13 +78,13 @@ describe('InvoicesService', () => {
         id: 'inv-1',
         invoiceNumber: 6,
         year: 2026,
-        status: 'DRAFT',
+        status: InvoiceStatus.DRAFT,
         clientId: 'client-1',
         issueDate: new Date('2026-05-01T00:00:00Z'),
         dueDate: new Date('2026-05-15T00:00:00Z'),
         placeOfIssue: 'Belgrade',
         domesticSupply: true,
-        currency: 'RSD',
+        currency: Currency.RSD,
         exchangeRate: null,
         totalAmount: 20000,
         totalRsd: 20000,
@@ -121,12 +122,12 @@ describe('InvoicesService', () => {
     });
 
     it('should throw BadRequest if foreign currency is provided without exchangeRate', async () => {
-      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: 'FOREIGN' });
+      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: ClientType.INTERNATIONAL });
       (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'bank-1' });
 
       const dtoWithForeignCurrency = {
         ...mockDto,
-        currency: 'EUR' as any,
+        currency: Currency.EUR as any,
         // exchangeRate is missing
       };
 
@@ -139,7 +140,7 @@ describe('InvoicesService', () => {
     const invoiceId = 'inv-1';
 
     it('should throw BadRequestException if invoice is not DRAFT and trying to edit contents', async () => {
-      const existingInvoice = { id: invoiceId, userId, status: 'SENT', client: {}, items: [] };
+      const existingInvoice = { id: invoiceId, userId, status: InvoiceStatus.SENT, client: {}, items: [] };
       prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as any);
 
       const dto: UpdateInvoiceDto = { note: 'Trying to update' };
@@ -149,19 +150,19 @@ describe('InvoicesService', () => {
 
     it('should allow status-only update even if not DRAFT', async () => {
       const existingInvoice = { 
-        id: invoiceId, userId, status: 'SENT', totalAmount: 1000, totalRsd: 1000, exchangeRate: null, currency: 'RSD',
+        id: invoiceId, userId, status: InvoiceStatus.SENT, totalAmount: 1000, totalRsd: 1000, exchangeRate: null, currency: Currency.RSD,
         issueDate: new Date(), dueDate: new Date(), createdAt: new Date(),
         client: { name: 'Client' }, items: [] 
       };
       prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as any);
       
-      const updatedInvoice = { ...existingInvoice, status: 'PAID' };
+      const updatedInvoice = { ...existingInvoice, status: InvoiceStatus.PAID };
       prismaMock.invoice.update.mockResolvedValue(updatedInvoice as any);
 
-      const dto: UpdateInvoiceDto = { status: 'PAID' };
+      const dto: UpdateInvoiceDto = { status: InvoiceStatus.PAID };
 
       const result = await service.update(invoiceId, userId, dto);
-      expect(result.status).toEqual('PAID');
+      expect(result.status).toEqual(InvoiceStatus.PAID);
     });
   });
 });

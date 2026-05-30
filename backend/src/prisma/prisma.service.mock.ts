@@ -6,7 +6,6 @@ export const createPrismaMock = (): DeepMockProxy<PrismaClient> => {
   return mockDeep<PrismaClient>();
 };
 
-// We create a mock provider to inject easily in TestingModules
 export const prismaMockProvider = {
   provide: PrismaService,
   useValue: createPrismaMock(),

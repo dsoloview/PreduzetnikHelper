@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import type { Currency } from '@preduzetnik/shared';
+import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import { ICreateBankAccountRequest } from '@preduzetnik/shared';
 
 export class CreateBankAccountDto implements ICreateBankAccountRequest {
@@ -24,8 +25,8 @@ export class CreateBankAccountDto implements ICreateBankAccountRequest {
     @IsString()
     iban?: string;
 
-    @ApiProperty({ enum: ['RSD', 'EUR', 'USD'], default: 'RSD' })
-    @IsEnum(['RSD', 'EUR', 'USD'])
+    @ApiProperty({ enum: CurrencyEnum, default: CurrencyEnum.RSD })
+    @IsEnum(CurrencyEnum)
     currency: Currency;
 
     @ApiPropertyOptional({ example: true, description: 'Set as default account for invoices' })
