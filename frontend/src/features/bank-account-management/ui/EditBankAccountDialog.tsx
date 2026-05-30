@@ -33,7 +33,7 @@ export const EditBankAccountDialog = ({ account, open, onOpenChange }: EditBankA
         },
         onError: (error: unknown) => {
           const axiosError = error as { response?: { data?: { message?: string } } };
-          toast.error(axiosError.response?.data?.message || "Failed to update bank account");
+          toast.error(axiosError.response?.data?.message || t("errors.updateBankAccountFailed"));
         },
       },
     );

@@ -29,7 +29,7 @@ export const CreateBankAccountDialog = () => {
       },
       onError: (error: unknown) => {
         const axiosError = error as { response?: { data?: { message?: string } } };
-        toast.error(axiosError.response?.data?.message || "Failed to add bank account");
+        toast.error(axiosError.response?.data?.message || t("errors.createBankAccountFailed"));
       },
     });
   };

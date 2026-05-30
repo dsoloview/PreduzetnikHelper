@@ -12,7 +12,7 @@ export const ClientsPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t("nav.clients")}</h1>
-          <p className="text-muted-foreground">{t("clients.subtitle", { defaultValue: "Manage your business partners and clients." })}</p>
+          <p className="text-muted-foreground">{t("clients.subtitle")}</p>
         </div>
         <CreateClientDialog />
       </div>
@@ -25,11 +25,11 @@ export const ClientsPage = () => {
         </div>
       ) : error ? (
         <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <p className="text-destructive">{t("clients.loadError", { defaultValue: "Failed to load clients." })}</p>
+          <p className="text-destructive">{t("clients.loadError")}</p>
         </div>
       ) : clients?.length === 0 ? (
         <div className="text-center py-24 border-2 border-dashed rounded-lg space-y-4">
-          <p className="text-muted-foreground">{t("clients.empty", { defaultValue: "No clients found. Start by adding one!" })}</p>
+          <p className="text-muted-foreground">{t("clients.empty")}</p>
           <CreateClientDialog />
         </div>
       ) : (

@@ -24,12 +24,12 @@ export const CreateInvoiceDialog = () => {
   const onSubmit = (data: ICreateInvoiceRequest) => {
     mutate(data, {
       onSuccess: () => {
-        toast.success(t("invoices.create.success", { defaultValue: "Invoice created successfully!" }));
+        toast.success(t("invoices.create.success"));
         setOpen(false);
       },
       onError: (error: unknown) => {
         const axiosError = error as { response?: { data?: { message?: string } } };
-        toast.error(axiosError.response?.data?.message || "Failed to create invoice");
+        toast.error(axiosError.response?.data?.message || t("errors.createInvoiceFailed"));
       },
     });
   };
@@ -39,14 +39,14 @@ export const CreateInvoiceDialog = () => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="size-4" />
-          {t("invoices.create.button", { defaultValue: "Create Invoice" })}
+          {t("invoices.create.button")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("invoices.create.title", { defaultValue: "Create New Invoice" })}</DialogTitle>
+          <DialogTitle>{t("invoices.create.title")}</DialogTitle>
           <DialogDescription>
-            {t("invoices.create.description", { defaultValue: "Fill in the details to issue a new invoice." })}
+            {t("invoices.create.description")}
           </DialogDescription>
         </DialogHeader>
         <CreateInvoiceForm onSubmit={onSubmit} isLoading={isPending} />

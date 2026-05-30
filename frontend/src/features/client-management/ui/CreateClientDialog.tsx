@@ -25,11 +25,11 @@ export const CreateClientDialog = () => {
   const onSubmit = (data: ClientFormValues) => {
     mutate(data, {
       onSuccess: () => {
-        toast.success(t("clients.create.success", { defaultValue: "Client created successfully!" }));
+        toast.success(t("clients.create.success"));
         setOpen(false);
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, "Failed to create client"));
+        toast.error(getApiErrorMessage(error, t("errors.createClientFailed")));
       },
     });
   };
@@ -39,14 +39,14 @@ export const CreateClientDialog = () => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="size-4" />
-          {t("clients.create.button", { defaultValue: "Add Client" })}
+          {t("clients.create.button")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{t("clients.create.title", { defaultValue: "Add New Client" })}</DialogTitle>
+          <DialogTitle>{t("clients.create.title")}</DialogTitle>
           <DialogDescription>
-            {t("clients.create.description", { defaultValue: "Add a new client to your list to issue invoices." })}
+            {t("clients.create.description")}
           </DialogDescription>
         </DialogHeader>
         <ClientForm onSubmit={onSubmit} isLoading={isPending} />

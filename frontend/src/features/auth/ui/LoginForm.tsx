@@ -42,7 +42,7 @@ export const LoginForm = () => {
     mutationFn: authApi.login,
     onSuccess: (data) => {
       setToken(data.accessToken);
-      toast.success(t("auth.login.success", { defaultValue: "Successfully logged in!" }));
+      toast.success(t("auth.login.success"));
       navigate("/");
     },
     onError: (error) => {
@@ -73,7 +73,7 @@ export const LoginForm = () => {
                     {...field}
                     id="email"
                     type="email"
-                    placeholder="user@example.com"
+                    placeholder={t("auth.login.emailPlaceholder")}
                     aria-invalid={fieldState.invalid}
                     disabled={isPending}
                   />
