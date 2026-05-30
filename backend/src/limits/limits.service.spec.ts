@@ -93,4 +93,41 @@ describe('LimitsService', () => {
     expect(result.vatLimit.percentage).toEqual(101.25);
     expect(result.vatLimit.isExceeded).toBe(true);
   });
+
+  it('should return zero current and full remaining when no invoices exist', async () => {
+    prismaMock.invoice.findMany.mockResolvedValueOnce([]);
+    prismaMock.invoice.findMany.mockResolvedValueOnce([]);
+
+    const result = await service.getLimits('user-1');
+
+    expect(result.pausalLimit.current).toEqual(0);
+    expect(result.pausalLimit.remaining).toEqual(6000000);
+    expect(result.pausalLimit.percentage).toEqual(0);
+    expect(result.pausalLimit.isExceeded).toBe(false);
+
+    expect(result.vatLimit.current).toEqual(0);
+    expect(result.vatLimit.remaining).toEqual(8000000);
+    expect(result.vatLimit.percentage).toEqual(0);
+    expect(result.vatLimit.isExceeded).toBe(false);
+  });
+
+  it('should not exceed when current is exactly at the limit', async () => {
+    prismaMock.invoice.findMany.mockResolvedValueOnce([
+      { totalRsd: 6000000 },
+    ] as unknown as Invoice[]);
+
+    prismaMock.invoice.findMany.mockResolvedValueOnce([
+      { totalRsd: 8000000 },
+    ] as unknown as Invoice[]);
+
+    const result = await service.getLimits('user-1');
+
+    expect(result.pausalLimit.isExceeded).toBe(false);
+    expect(result.pausalLimit.remaining).toEqual(0);
+    expect(result.pausalLimit.percentage).toEqual(100);
+
+    expect(result.vatLimit.isExceeded).toBe(false);
+    expect(result.vatLimit.remaining).toEqual(0);
+    expect(result.vatLimit.percentage).toEqual(100);
+  });
 });
