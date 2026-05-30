@@ -3,16 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
 import { InvoiceStatus } from '../generated/prisma/enums';
-
-// Simple HTML escape for KPO description to prevent XSS
-const escapeHtml = (unsafe: string): string => {
-    return unsafe
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-};
+import { escapeHtml } from '../common/utils';
 
 @Injectable()
 export class KpoService {

@@ -3,6 +3,7 @@ import { LimitsService } from './limits.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../prisma/prisma.service.mock';
 import { InvoiceStatus } from '../generated/prisma/enums';
+import type { Invoice } from '../generated/prisma/client';
 
 describe('LimitsService', () => {
   let service: LimitsService;
@@ -32,11 +33,11 @@ describe('LimitsService', () => {
     prismaMock.invoice.findMany.mockResolvedValueOnce([
       { totalRsd: 1000000 },
       { totalRsd: 500000 },
-    ] as any);
+    ] as unknown as Invoice[]);
 
     prismaMock.invoice.findMany.mockResolvedValueOnce([
       { totalRsd: 1000000 }, // Assuming the 500k one was foreign and filtered out by Prisma where clause
-    ] as any);
+    ] as unknown as Invoice[]);
 
     const result = await service.getLimits('user-1');
 
@@ -74,11 +75,11 @@ describe('LimitsService', () => {
   it('should indicate exceeded status when thresholds are crossed', async () => {
     prismaMock.invoice.findMany.mockResolvedValueOnce([
       { totalRsd: 6500000 },
-    ] as any);
+    ] as unknown as Invoice[]);
 
     prismaMock.invoice.findMany.mockResolvedValueOnce([
       { totalRsd: 8100000 },
-    ] as any);
+    ] as unknown as Invoice[]);
 
     const result = await service.getLimits('user-1');
 

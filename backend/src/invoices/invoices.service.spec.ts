@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InvoicesService } from './invoices.service';
 import { PrismaService } from '../prisma/prisma.service';
+import type { Invoice, Client } from '../generated/prisma/client';
 import { ClientsService } from '../clients/clients.service';
 import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 import { PdfService } from '../pdf/pdf.service';
@@ -97,7 +98,7 @@ describe('InvoicesService', () => {
         ],
       };
       
-      prismaMock.invoice.create.mockResolvedValue(createdInvoice as any);
+      prismaMock.invoice.create.mockResolvedValue(createdInvoice as unknown as Invoice);
 
       const result = await service.create(userId, mockDto);
 
@@ -127,7 +128,7 @@ describe('InvoicesService', () => {
 
       const dtoWithForeignCurrency = {
         ...mockDto,
-        currency: Currency.EUR as any,
+        currency: Currency.EUR,
         // exchangeRate is missing
       };
 
@@ -141,7 +142,7 @@ describe('InvoicesService', () => {
 
     it('should throw BadRequestException if invoice is not DRAFT and trying to edit contents', async () => {
       const existingInvoice = { id: invoiceId, userId, status: InvoiceStatus.SENT, client: {}, items: [] };
-      prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as any);
+      prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as unknown as Invoice);
 
       const dto: UpdateInvoiceDto = { note: 'Trying to update' };
 
@@ -154,10 +155,10 @@ describe('InvoicesService', () => {
         issueDate: new Date(), dueDate: new Date(), createdAt: new Date(),
         client: { name: 'Client' }, items: [] 
       };
-      prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as any);
+      prismaMock.invoice.findUnique.mockResolvedValue(existingInvoice as unknown as Invoice);
       
       const updatedInvoice = { ...existingInvoice, status: InvoiceStatus.PAID };
-      prismaMock.invoice.update.mockResolvedValue(updatedInvoice as any);
+      prismaMock.invoice.update.mockResolvedValue(updatedInvoice as unknown as Invoice);
 
       const dto: UpdateInvoiceDto = { status: InvoiceStatus.PAID };
 

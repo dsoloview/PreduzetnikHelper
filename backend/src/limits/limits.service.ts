@@ -7,6 +7,7 @@ import { InvoiceStatus } from '../generated/prisma/enums';
 export class LimitsService {
     private readonly PAUSAL_LIMIT = 6000000;
     private readonly VAT_LIMIT = 8000000;
+    private readonly ROLLING_WINDOW_DAYS = 365;
 
     constructor(private prisma: PrismaService) {}
 
@@ -15,7 +16,7 @@ export class LimitsService {
         const currentYear = today.getFullYear();
 
         const date365DaysAgo = new Date(today);
-        date365DaysAgo.setDate(today.getDate() - 365);
+        date365DaysAgo.setDate(today.getDate() - this.ROLLING_WINDOW_DAYS);
 
         const pausalInvoices = await this.prisma.invoice.findMany({
             where: {

@@ -40,7 +40,7 @@ export class InvoicesController {
     async findAll(
         @CurrentUser() user: JwtPayload,
         @Query('year', new DefaultValuePipe(undefined), new ParseIntPipe({ optional: true })) year?: number,
-        @Query('status') status?: string,
+        @Query('status') status?: InvoiceStatus,
         @Query('clientId') clientId?: string,
     ): Promise<InvoiceResponseDto[]> {
         return this.invoicesService.findAll(user.userId, { year, status, clientId });
