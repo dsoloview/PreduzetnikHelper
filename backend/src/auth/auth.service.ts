@@ -72,12 +72,10 @@ export class AuthService {
         }
 
         if (!await bcrypt.compare(rawToken, record.hashedToken)) {
-            // Possible token theft — invalidate all sessions for this user
             await this.prisma.refreshToken.deleteMany({ where: { userId: record.userId } });
             throw new UnauthorizedException('Invalid or expired refresh token');
         }
 
-        // Rotate: delete old, issue new
         await this.prisma.refreshToken.delete({ where: { jti } });
         return this.createTokenPair(record.user, meta);
     }
@@ -89,9 +87,7 @@ export class AuthService {
             if (record && await bcrypt.compare(rawToken, record.hashedToken)) {
                 await this.prisma.refreshToken.delete({ where: { jti } });
             }
-        } catch {
-            // Invalid token format — ignore
-        }
+        } catch {}
     }
 
     private parseTokenCookie(cookieToken: string): { jti: string; rawToken: string } {

@@ -13,6 +13,7 @@ import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { InvoiceResponseDto } from './dto/invoice-response.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
+import { InvoiceStatus } from '../generated/prisma/enums';
 
 @ApiTags('Invoices')
 @ApiBearerAuth()
@@ -34,7 +35,7 @@ export class InvoicesController {
     @ApiOperation({ summary: 'Get all invoices for current user' })
     @ApiResponse({ status: 200, type: [InvoiceResponseDto] })
     @ApiQuery({ name: 'year', required: false, type: Number })
-    @ApiQuery({ name: 'status', required: false, enum: ['DRAFT', 'SENT', 'PAID', 'CANCELLED'] })
+    @ApiQuery({ name: 'status', required: false, enum: InvoiceStatus })
     @ApiQuery({ name: 'clientId', required: false })
     async findAll(
         @CurrentUser() user: JwtPayload,

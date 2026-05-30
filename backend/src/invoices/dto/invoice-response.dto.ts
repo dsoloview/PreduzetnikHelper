@@ -1,6 +1,7 @@
 import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
 import {IInvoiceResponse, IInvoiceItemResponse} from '@preduzetnik/shared';
 import type {InvoiceStatus, Currency} from '@preduzetnik/shared';
+import { InvoiceStatus as InvoiceStatusEnum, Currency as CurrencyEnum } from '../../generated/prisma/enums';
 
 export class InvoiceItemResponseDto implements IInvoiceItemResponse {
     @ApiProperty()
@@ -9,13 +10,13 @@ export class InvoiceItemResponseDto implements IInvoiceItemResponse {
     @ApiProperty({example: 'Web development services'})
     description: string;
 
-    @ApiProperty({example: 1})
+    @ApiProperty({example: 1.5})
     quantity: number;
 
-    @ApiProperty({example: 1500})
+    @ApiProperty({example: 150050})
     unitPrice: number;
 
-    @ApiProperty({example: 1500})
+    @ApiProperty({example: 225075})
     total: number;
 }
 
@@ -32,7 +33,7 @@ export class InvoiceResponseDto implements IInvoiceResponse {
     @ApiProperty({example: '1/2026'})
     displayNumber: string;
 
-    @ApiProperty({enum: ['DRAFT', 'SENT', 'PAID', 'CANCELLED']})
+    @ApiProperty({enum: InvoiceStatusEnum})
     status: InvoiceStatus;
 
     @ApiProperty()
@@ -53,16 +54,16 @@ export class InvoiceResponseDto implements IInvoiceResponse {
     @ApiProperty({example: true})
     domesticSupply: boolean;
 
-    @ApiProperty({enum: ['RSD', 'EUR', 'USD']})
+    @ApiProperty({enum: CurrencyEnum})
     currency: Currency;
 
     @ApiPropertyOptional({example: 117.5})
     exchangeRate: number | null;
 
-    @ApiProperty({example: 1500})
+    @ApiProperty({example: 150050})
     totalAmount: number;
 
-    @ApiProperty({example: 176250})
+    @ApiProperty({example: 17630875})
     totalRsd: number;
 
     @ApiPropertyOptional()

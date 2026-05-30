@@ -8,7 +8,7 @@ import { InvoiceResponseDto } from './dto/invoice-response.dto';
 import { ClientsService } from '../clients/clients.service';
 import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 import { PdfService } from '../pdf/pdf.service';
-import { InvoiceStatus, Currency } from '../generated/prisma/enums';
+import { InvoiceStatus, Currency, ClientType } from '../generated/prisma/enums';
 import type { Prisma } from '../generated/prisma/client';
 
 @Injectable()
@@ -21,27 +21,19 @@ export class InvoicesService {
     ) {}
 
     async create(userId: string, dto: CreateInvoiceDto): Promise<InvoiceResponseDto> {
-        // Validate client exists and belongs to user using ClientsService
-        // ClientsService.findOne already throws NotFoundException or ForbiddenException
         const client = await this.clientsService.findOne(dto.clientId, userId);
-
-        // Validate bank account exists and belongs to user using BankAccountsService
-        // BankAccountsService.findOne already throws NotFoundException or ForbiddenException
         const bankAccount = await this.bankAccountsService.findOne(dto.bankAccountId, userId);
 
         const issueDate = new Date(dto.issueDate);
         const year = issueDate.getFullYear();
 
-        // Determine domestic supply
-        const domesticSupply = dto.domesticSupply ?? (client.type === 'DOMESTIC');
+        const domesticSupply = dto.domesticSupply ?? (client.type === ClientType.DOMESTIC);
 
-        // Validation for exchange rate
-        if (dto.currency && dto.currency !== 'RSD' && !dto.exchangeRate) {
+        if (dto.currency && dto.currency !== Currency.RSD && !dto.exchangeRate) {
             throw new BadRequestException('Exchange rate is required for foreign currencies');
         }
-        const exchangeRate = dto.exchangeRate ?? 1; // Default 1 for RSD
+        const exchangeRate = dto.exchangeRate ?? 1;
 
-        // Calculate totals
         const itemsWithTotals = dto.items.map(item => ({
             description: item.description,
             quantity: item.quantity,
@@ -50,11 +42,10 @@ export class InvoicesService {
         }));
 
         const totalAmount = itemsWithTotals.reduce((sum, item) => sum + item.total, 0);
-        const totalRsd = dto.currency && dto.currency !== 'RSD'
+        const totalRsd = dto.currency && dto.currency !== Currency.RSD
             ? totalAmount * exchangeRate
             : totalAmount;
 
-        // Serializable transaction prevents race condition on invoice number generation
         const invoice = await this.prisma.$transaction(async (tx) => {
             const lastInvoice = await tx.invoice.findFirst({
                 where: { userId, year },
@@ -73,8 +64,8 @@ export class InvoicesService {
                     dueDate: new Date(dto.dueDate),
                     placeOfIssue: dto.placeOfIssue,
                     domesticSupply,
-                    currency: dto.currency || 'RSD',
-                    exchangeRate: dto.currency === 'RSD' ? null : dto.exchangeRate,
+                    currency: dto.currency || Currency.RSD,
+                    exchangeRate: dto.currency === Currency.RSD ? null : dto.exchangeRate,
                     totalAmount,
                     totalRsd,
                     note: dto.note,
@@ -130,7 +121,6 @@ export class InvoicesService {
     }
 
     async update(id: string, userId: string, dto: UpdateInvoiceDto): Promise<InvoiceResponseDto> {
-        // Fetch existing invoice without mapping to check status
         const existing = await this.prisma.invoice.findUnique({
             where: { id },
             include: { client: true, items: true },
@@ -143,19 +133,14 @@ export class InvoicesService {
             throw new ForbiddenException('Access denied');
         }
 
-        // Only DRAFT invoices can be updated, unless we are just updating the status.
-        // NOTE: with `ValidationPipe({ transform: true })`, class-transformer
-        // populates every declared field on the DTO instance (unset ones as
-        // `undefined`), so we must compare *defined* keys, not all keys.
         const definedKeys = Object.entries(dto)
             .filter(([, v]) => v !== undefined)
             .map(([k]) => k);
         const isOnlyStatusUpdate = definedKeys.length === 1 && definedKeys[0] === 'status';
-        if (existing.status !== 'DRAFT' && !isOnlyStatusUpdate) {
+        if (existing.status !== InvoiceStatus.DRAFT && !isOnlyStatusUpdate) {
             throw new BadRequestException('Only DRAFT invoices can be edited');
         }
 
-        // Validate new client / bank account ownership if provided
         if (dto.clientId) {
             await this.clientsService.findOne(dto.clientId, userId);
         }
@@ -163,7 +148,6 @@ export class InvoicesService {
             await this.bankAccountsService.findOne(dto.bankAccountId, userId);
         }
 
-        // If items are provided, we need to recalculate totals
         let totalAmount = Number(existing.totalAmount);
         let totalRsd = Number(existing.totalRsd);
         let exchangeRate = Number(existing.exchangeRate) || 1;
@@ -172,7 +156,6 @@ export class InvoicesService {
         if (dto.currency) currency = dto.currency as Currency;
         if (dto.exchangeRate !== undefined) exchangeRate = dto.exchangeRate;
 
-        // Handle items update
         let itemsOperation: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput | undefined;
         if (dto.items) {
             const itemsWithTotals = dto.items.map(item => ({
@@ -183,16 +166,14 @@ export class InvoicesService {
             }));
 
             totalAmount = itemsWithTotals.reduce((sum, item) => sum + item.total, 0);
-            totalRsd = currency !== 'RSD' ? totalAmount * exchangeRate : totalAmount;
+            totalRsd = currency !== Currency.RSD ? totalAmount * exchangeRate : totalAmount;
 
-            // Prisma requires deleting old items and creating new ones for a full replacement
             itemsOperation = {
                 deleteMany: {},
                 create: itemsWithTotals,
             };
         } else if (dto.currency !== undefined || dto.exchangeRate !== undefined) {
-            // Recalculate RSD if currency/exchange rate changed but items didn't
-            totalRsd = currency !== 'RSD' ? totalAmount * exchangeRate : totalAmount;
+            totalRsd = currency !== Currency.RSD ? totalAmount * exchangeRate : totalAmount;
         }
 
         const updated = await this.prisma.invoice.update({
@@ -207,7 +188,7 @@ export class InvoicesService {
                 domesticSupply: dto.domesticSupply,
                 note: dto.note,
                 currency: dto.currency as Currency,
-                exchangeRate: currency === 'RSD' ? null : exchangeRate,
+                exchangeRate: currency === Currency.RSD ? null : exchangeRate,
                 totalAmount: dto.items || dto.currency || dto.exchangeRate ? totalAmount : undefined,
                 totalRsd: dto.items || dto.currency || dto.exchangeRate ? totalRsd : undefined,
                 ...(itemsOperation ? { items: itemsOperation } : {}),
@@ -230,7 +211,7 @@ export class InvoicesService {
         if (existing.userId !== userId) {
             throw new ForbiddenException('Access denied');
         }
-        if (existing.status !== 'DRAFT') {
+        if (existing.status !== InvoiceStatus.DRAFT) {
             throw new BadRequestException('Only DRAFT invoices can be deleted');
         }
 
@@ -260,7 +241,6 @@ export class InvoicesService {
             throw new ForbiddenException('Access denied');
         }
 
-        // Format data for handlebars
         const mappedDto = this.mapToResponseDto(invoice);
         const pdfData = {
             ...mappedDto,

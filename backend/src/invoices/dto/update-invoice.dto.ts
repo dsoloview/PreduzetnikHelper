@@ -6,6 +6,7 @@ import {
 import {Type} from 'class-transformer';
 import {IUpdateInvoiceRequest} from '@preduzetnik/shared';
 import type {InvoiceStatus, Currency} from '@preduzetnik/shared';
+import { InvoiceStatus as InvoiceStatusEnum, Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import {CreateInvoiceItemDto} from './create-invoice-item.dto';
 
 export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
@@ -19,9 +20,9 @@ export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
     @IsUUID()
     bankAccountId?: string;
 
-    @ApiPropertyOptional({enum: ['DRAFT', 'SENT', 'PAID', 'CANCELLED']})
+    @ApiPropertyOptional({enum: InvoiceStatusEnum})
     @IsOptional()
-    @IsEnum(['DRAFT', 'SENT', 'PAID', 'CANCELLED'])
+    @IsEnum(InvoiceStatusEnum)
     status?: InvoiceStatus;
 
     @ApiPropertyOptional({example: '2026-05-03'})
@@ -49,9 +50,9 @@ export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
     @IsString()
     note?: string;
 
-    @ApiPropertyOptional({enum: ['RSD', 'EUR', 'USD']})
+    @ApiPropertyOptional({enum: CurrencyEnum})
     @IsOptional()
-    @IsEnum(['RSD', 'EUR', 'USD'])
+    @IsEnum(CurrencyEnum)
     currency?: Currency;
 
     @ApiPropertyOptional({example: 117.5})

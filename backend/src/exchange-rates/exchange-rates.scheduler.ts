@@ -8,7 +8,6 @@ export class ExchangeRatesScheduler {
 
     constructor(private service: ExchangeRatesService) {}
 
-    /** Fetch daily NBS rates Mon-Fri at 8:30 (NBS publishes around 8:00) */
     @Cron('0 30 8 * * 1-5')
     async fetchDailyRates() {
         this.logger.log('CRON: Fetching daily NBS exchange rates');

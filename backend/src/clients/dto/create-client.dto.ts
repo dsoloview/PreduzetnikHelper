@@ -17,10 +17,6 @@ export class CreateClientDto implements ICreateClientRequest {
     @IsOptional()
     @IsEmail()
     email?: string;
-    /**
-     * International phone number in E.164 format (with leading `+` and country code,
-     * e.g. `+381641234567`). Accepted from any country, not just Serbia.
-     */
     @ApiPropertyOptional({ example: '+381641234567', description: 'E.164 format with country code (e.g. +381641234567)' })
     @Transform(emptyToUndefined)
     @IsOptional()

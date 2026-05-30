@@ -7,12 +7,12 @@ export class CreateInvoiceItemDto implements ICreateInvoiceItemRequest {
     @IsNotEmpty()
     description: string;
 
-    @ApiProperty({ example: 1 })
+    @ApiProperty({ example: 1.5 })
     @IsNumber()
     @Min(0.01)
     quantity: number;
 
-    @ApiProperty({ example: 1500 })
+    @ApiProperty({ example: 150050 })
     @IsNumber()
     @Min(0)
     unitPrice: number;

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ILimitsResponse, ILimitStatus } from '@preduzetnik/shared';
+import { InvoiceStatus } from '../generated/prisma/enums';
 
 @Injectable()
 export class LimitsService {
@@ -12,18 +13,16 @@ export class LimitsService {
     async getLimits(userId: string): Promise<ILimitsResponse> {
         const today = new Date();
         const currentYear = today.getFullYear();
-        
-        // Calculate 365 days ago for VAT limit
+
         const date365DaysAgo = new Date(today);
         date365DaysAgo.setDate(today.getDate() - 365);
 
-        // 1. Calculate Pausal Limit (Current Year, ALL invoices)
         const pausalInvoices = await this.prisma.invoice.findMany({
             where: {
                 userId,
                 year: currentYear,
                 status: {
-                    not: 'CANCELLED'
+                    not: InvoiceStatus.CANCELLED
                 }
             },
             select: {
@@ -33,7 +32,6 @@ export class LimitsService {
 
         const pausalCurrent = pausalInvoices.reduce((sum, inv) => sum + Number(inv.totalRsd), 0);
 
-        // 2. Calculate VAT Limit (Last 365 days, DOMESTIC supply only)
         const vatInvoices = await this.prisma.invoice.findMany({
             where: {
                 userId,
@@ -42,7 +40,7 @@ export class LimitsService {
                 },
                 domesticSupply: true,
                 status: {
-                    not: 'CANCELLED'
+                    not: InvoiceStatus.CANCELLED
                 }
             },
             select: {
