@@ -1,0 +1,392 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "clients": "Клиенты",
+    "invoices": "Счета",
+    "limits": "Налоговые лимиты",
+    "bankAccounts": "Банковские счета",
+    "settings": "Настройки",
+    "profile": "Профиль",
+    "kpo": "Книга доходов"
+  },
+  "app": {
+    "title": "Preduzetnik Helper",
+    "description": "Управление бизнесом для сербских предпринимателей",
+    "sharedTypesTest": "Тест общих типов:",
+    "getStarted": "Начать",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "loading": "Загрузка",
+    "loadingAria": "Загрузка",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
+    "theme": {
+      "toggle": "Переключить тему",
+      "light": "Светлая",
+      "dark": "Тёмная",
+      "system": "Системная"
+    },
+    "navAria": "Главная навигация",
+    "language": {
+      "switch": "Сменить язык",
+      "en": "English",
+      "ru": "Русский",
+      "sr": "Српски"
+    }
+  },
+  "errors": {
+    "downloadPdfFailed": "Не удалось скачать PDF",
+    "deleteInvoiceFailed": "Не удалось удалить счёт",
+    "createInvoiceFailed": "Не удалось создать счёт",
+    "updateInvoiceFailed": "Не удалось обновить счёт",
+    "deleteClientFailed": "Не удалось удалить клиента",
+    "updateClientFailed": "Не удалось обновить клиента",
+    "createClientFailed": "Не удалось создать клиента",
+    "deleteBankAccountFailed": "Не удалось удалить счёт",
+    "updateBankAccountFailed": "Не удалось обновить счёт",
+    "createBankAccountFailed": "Не удалось создать счёт",
+    "somethingWentWrong": "Что-то пошло не так"
+  },
+  "auth": {
+    "login": {
+      "title": "Вход",
+      "description": "Введите email и пароль для доступа к аккаунту",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "password": "Пароль",
+      "submit": "Войти",
+      "errors": {
+        "required": "Это поле обязательно",
+        "email": "Введите корректный email",
+        "passwordMin": "Пароль должен быть не менее 8 символов"
+      },
+      "goToRegister": "Нет аккаунта? Зарегистрироваться",
+      "success": "Успешный вход!"
+    },
+    "register": {
+      "title": "Регистрация",
+      "description": "Создайте аккаунт для управления бизнесом",
+      "name": "Полное имя",
+      "email": "Email",
+      "password": "Пароль",
+      "submit": "Создать аккаунт",
+      "goToLogin": "Уже есть аккаунт? Войти",
+      "success": "Регистрация успешна! Теперь вы можете войти.",
+      "namePlaceholder": "Иван Иванов"
+    },
+    "logout": "Выйти"
+  },
+  "clients": {
+    "subtitle": "Управление клиентами и партнёрами.",
+    "empty": "Клиенты не найдены. Добавьте первого!",
+    "loadError": "Не удалось загрузить клиентов.",
+    "type": {
+      "domestic": "Сербский клиент",
+      "international": "Международный клиент"
+    },
+    "form": {
+      "type": "Тип клиента",
+      "name": "Название компании",
+      "email": "Email",
+      "phone": "Телефон",
+      "phoneHint": "+381641234567",
+      "address": "Адрес",
+      "city": "Город",
+      "postalCode": "Индекс",
+      "country": "Страна",
+      "pib": "ПИБ (налоговый номер)",
+      "mbr": "МБР (рег. номер)",
+      "taxId": "Налоговый номер / VAT",
+      "submit": "Сохранить клиента"
+    },
+    "create": {
+      "button": "Добавить клиента",
+      "title": "Новый клиент",
+      "description": "Добавьте клиента для выписки счетов.",
+      "success": "Клиент создан!"
+    },
+    "edit": {
+      "title": "Редактировать клиента",
+      "description": "Обновите информацию о клиенте.",
+      "success": "Клиент обновлён!"
+    },
+    "errors": {
+      "nameRequired": "Имя обязательно",
+      "addressRequired": "Адрес обязателен",
+      "cityRequired": "Город обязателен",
+      "countryRequired": "Страна обязательна",
+      "taxIdRequired": "Налоговый номер обязателен",
+      "registrationNumberRequired": "Регистрационный номер обязателен"
+    },
+    "delete": {
+      "title": "Удалить клиента",
+      "description": "Удалить {{name}}? Действие нельзя отменить.",
+      "button": "Удалить",
+      "success": "Клиент удалён!"
+    },
+    "actions": {
+      "edit": "Редактировать",
+      "delete": "Удалить"
+    }
+  },
+  "invoices": {
+    "subtitle": "Управление счетами и платежами.",
+    "empty": "Счета не найдены.",
+    "noResults": "Нет результатов по фильтру.",
+    "filter": {
+      "search": "Поиск по клиенту или номеру...",
+      "all": "Все",
+      "clearFilters": "Сбросить фильтры"
+    },
+    "total": "Итого: {{amount}} RSD",
+    "totalForeign": "({{amount}} {{currency}})",
+    "totalLabel": "Итого",
+    "totalsTitle": "Суммы",
+    "status": {
+      "draft": "Черновик",
+      "sent": "Отправлен",
+      "paid": "Оплачен",
+      "cancelled": "Отменён",
+      "updateSuccess": "Статус обновлён.",
+      "updateError": "Не удалось обновить статус."
+    },
+    "table": {
+      "number": "Номер",
+      "client": "Клиент",
+      "date": "Дата",
+      "amount": "Сумма",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "form": {
+      "client": "Клиент",
+      "selectClient": "Выберите клиента...",
+      "bankAccount": "Банковский счёт",
+      "selectBankAccount": "Выберите счёт...",
+      "placeOfIssue": "Место выдачи",
+      "domesticSupply": "Внутренний оборот",
+      "domesticSupplyHint": "Учитывается в лимите 8M RSD для регистрации НДС.",
+      "exchangeRate": "Курс НБС",
+      "number": "Номер счёта",
+      "issueDate": "Дата выдачи",
+      "dueDate": "Срок оплаты",
+      "currency": "Валюта",
+      "items": "Позиции счёта",
+      "addItem": "Добавить позицию",
+      "description": "Описание",
+      "quantity": "Кол-во",
+      "price": "Цена",
+      "total": "Сумма",
+      "grandTotal": "Всего",
+      "noVatNotice": "Није у систему ПДВ-а",
+      "submit": "Создать счёт",
+      "pickDate": "Выберите дату",
+      "note": "Примечание",
+      "notePlaceholder": "Примечание на счёте...",
+      "errors": {
+        "clientRequired": "Клиент обязателен",
+        "bankAccountRequired": "Счёт обязателен",
+        "placeOfIssueRequired": "Место выдачи обязательно",
+        "itemDescription": "Описание обязательно",
+        "itemQuantity": "Количество должно быть больше 0",
+        "itemPrice": "Цена должна быть ≥ 0",
+        "itemsMin": "Минимум одна позиция",
+        "exchangeRateRequired": "Курс обязателен для валюты",
+        "dueDateAfterIssue": "Срок оплаты не может быть раньше даты выдачи"
+      }
+    },
+    "create": {
+      "button": "Создать счёт",
+      "title": "Новый счёт",
+      "description": "Заполните данные для выписки счёта.",
+      "success": "Счёт создан!"
+    },
+    "edit": {
+      "title": "Редактировать счёт",
+      "description": "Редактировать можно только черновики.",
+      "submit": "Сохранить",
+      "success": "Счёт обновлён!",
+      "error": "Не удалось обновить счёт."
+    },
+    "delete": {
+      "title": "Удалить счёт",
+      "description": "Счёт будет удалён безвозвратно.",
+      "button": "Удалить",
+      "confirm": "Удалить этот счёт?",
+      "success": "Счёт удалён!"
+    }
+  },
+  "dashboard": {
+    "title": "Главная",
+    "subtitle": "Обзор бизнес-активности.",
+    "stats": {
+      "revenue": "Выручка за год",
+      "revenueSub": "Оплачено и отправлено в {{year}}",
+      "paid": "Оплаченных",
+      "pending": "В ожидании",
+      "clients": "Активных клиентов",
+      "invoices": "счетов",
+      "unique": "уникальных"
+    },
+    "limits": {
+      "title": "Налоговые лимиты",
+      "viewAll": "Подробнее"
+    },
+    "breakdown": {
+      "title": "Распределение по статусам"
+    },
+    "invoices": {
+      "title": "Последние счета",
+      "viewAll": "Все счета",
+      "empty": "Пока нет счетов."
+    },
+    "clients": {
+      "title": "Топ клиенты",
+      "viewAll": "Все клиенты",
+      "empty": "Нет данных."
+    }
+  },
+  "limits": {
+    "subtitle": "Отслеживание лимитов 6M и 8M RSD.",
+    "loadError": "Не удалось загрузить лимиты.",
+    "used": "Использовано",
+    "current": "Текущий",
+    "limit": "Лимит",
+    "remaining": "Осталось",
+    "exceeded": "Лимит превышен!",
+    "pausal": {
+      "title": "Лимит паушала (6M RSD)",
+      "description": "Годовой лимит дохода для фиксированного налога. Сбрасывается каждый год."
+    },
+    "vat": {
+      "title": "Лимит регистрации НДС (8M RSD)",
+      "description": "Доход от внутреннего оборота за 365 дней. Превышение требует регистрации НДС."
+    },
+    "info": {
+      "pausal": "Лимит паушала: 6,000,000 RSD в год (все счета, любая валюта в RSD).",
+      "vat": "Лимит НДС: 8,000,000 RSD за 365 дней (только внутренний оборот)."
+    }
+  },
+  "bankAccounts": {
+    "subtitle": "Управление банковскими счетами.",
+    "empty": "Нет счетов. Добавьте для выписки счетов.",
+    "loadError": "Не удалось загрузить счета.",
+    "default": "Основной",
+    "currency": {
+      "rsd": "RSD",
+      "eur": "EUR",
+      "usd": "USD"
+    },
+    "form": {
+      "bankName": "Название банка",
+      "accountNumber": "Номер счёта",
+      "accountNumberHint": "Формат: XXX-XXXXXXXXXX-XX",
+      "swiftCode": "SWIFT / BIC",
+      "swiftPlaceholder": "BKBMRS22",
+      "iban": "IBAN",
+      "ibanPlaceholder": "RS35160005080003520714",
+      "currency": "Валюта",
+      "isDefault": "Сделать основным",
+      "submit": "Сохранить счёт"
+    },
+    "errors": {
+      "bankNameRequired": "Название банка обязательно",
+      "accountNumberRequired": "Номер счёта обязателен"
+    },
+    "create": {
+      "button": "Добавить счёт",
+      "title": "Новый счёт",
+      "description": "Добавьте банковский счёт для выписки счетов.",
+      "success": "Счёт добавлен!"
+    },
+    "edit": {
+      "title": "Редактировать счёт",
+      "success": "Счёт обновлён!"
+    },
+    "delete": {
+      "title": "Удалить счёт",
+      "description": "Удалить {{bankName}} ({{accountNumber}})? Действие нельзя отменить.",
+      "button": "Удалить",
+      "success": "Счёт удалён!"
+    },
+    "actions": {
+      "edit": "Редактировать",
+      "delete": "Удалить"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "subtitle": "Управление безопасностью аккаунта.",
+    "password": {
+      "title": "Сменить пароль",
+      "description": "Обновите пароль для безопасности.",
+      "current": "Текущий пароль",
+      "new": "Новый пароль",
+      "confirm": "Подтвердите пароль",
+      "submit": "Сменить пароль",
+      "success": "Пароль изменён!",
+      "error": "Не удалось сменить пароль.",
+      "wrongCurrent": "Неверный текущий пароль."
+    },
+    "danger": {
+      "title": "Опасная зона",
+      "description": "Выйти на всех устройствах.",
+      "logout": "Выйти"
+    }
+  },
+  "kpo": {
+    "title": "Книга доходов (KPO)",
+    "subtitle": "Књига прихода и расхода — книга учёта доходов.",
+    "downloadPdf": "Скачать PDF",
+    "loadError": "Не удалось загрузить данные.",
+    "empty": "Нет записей за этот год.",
+    "yearlyTotal": "Итого {{year}}",
+    "table": {
+      "no": "№",
+      "date": "Дата",
+      "description": "Описание",
+      "products": "Товары (RSD)",
+      "services": "Услуги (RSD)",
+      "total": "Итого (RSD)"
+    }
+  },
+  "profileCompleteness": {
+    "title": "Заполните профиль компании",
+    "description": "Название, ПИБ, МБР, адрес и город нужны для выписки счетов.",
+    "action": "Перейти в профиль"
+  },
+  "profile": {
+    "title": "Профиль",
+    "subtitle": "Личные и бизнес-данные для счетов.",
+    "save": "Сохранить",
+    "saveSuccess": "Профиль обновлён!",
+    "saveError": "Не удалось обновить профиль.",
+    "sections": {
+      "account": "Аккаунт",
+      "accountDesc": "Логин и отображаемое имя.",
+      "business": "Бизнес-данные",
+      "businessDesc": "Используются на PDF счетах (ПИБ, МБР, название).",
+      "address": "Адрес"
+    },
+    "fields": {
+      "name": "Полное имя",
+      "email": "Email",
+      "companyName": "Название компании",
+      "pib": "ПИБ (налоговый номер)",
+      "mbr": "МБР (рег. номер)",
+      "activityCode": "Код деятельности (Шифра делатности)",
+      "activityCodePlaceholder": "например, 6201",
+      "phone": "Телефон",
+      "address": "Адрес",
+      "city": "Город",
+      "postalCode": "Индекс",
+      "municipality": "Община (Општина)"
+    },
+    "errors": {
+      "nameRequired": "Имя обязательно"
+    }
+  }
+}

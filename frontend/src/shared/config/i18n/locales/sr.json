@@ -1,0 +1,392 @@
+{
+  "nav": {
+    "dashboard": "Početna",
+    "clients": "Klijenti",
+    "invoices": "Fakture",
+    "limits": "Poreski limiti",
+    "bankAccounts": "Bankovni računi",
+    "settings": "Podešavanja",
+    "profile": "Profil",
+    "kpo": "KPO Knjiga"
+  },
+  "app": {
+    "title": "Preduzetnik Helper",
+    "description": "Upravljanje poslovanjem za srpske preduzetnike",
+    "sharedTypesTest": "Test zajedničkih tipova:",
+    "getStarted": "Počni",
+    "cancel": "Otkaži",
+    "save": "Sačuvaj",
+    "delete": "Obriši",
+    "loading": "Učitavanje",
+    "loadingAria": "Učitavanje",
+    "showPassword": "Prikaži lozinku",
+    "hidePassword": "Sakrij lozinku",
+    "openMenu": "Otvori meni",
+    "closeMenu": "Zatvori meni",
+    "theme": {
+      "toggle": "Promeni temu",
+      "light": "Svetla",
+      "dark": "Tamna",
+      "system": "Sistemska"
+    },
+    "navAria": "Glavna navigacija",
+    "language": {
+      "switch": "Promeni jezik",
+      "en": "English",
+      "ru": "Русский",
+      "sr": "Српски"
+    }
+  },
+  "errors": {
+    "downloadPdfFailed": "Neuspešno preuzimanje PDF-a",
+    "deleteInvoiceFailed": "Neuspešno brisanje fakture",
+    "createInvoiceFailed": "Neuspešno kreiranje fakture",
+    "updateInvoiceFailed": "Neuspešno ažuriranje fakture",
+    "deleteClientFailed": "Neuspešno brisanje klijenta",
+    "updateClientFailed": "Neuspešno ažuriranje klijenta",
+    "createClientFailed": "Neuspešno kreiranje klijenta",
+    "deleteBankAccountFailed": "Neuspešno brisanje računa",
+    "updateBankAccountFailed": "Neuspešno ažuriranje računa",
+    "createBankAccountFailed": "Neuspešno kreiranje računa",
+    "somethingWentWrong": "Nešto je pošlo po zlu"
+  },
+  "auth": {
+    "login": {
+      "title": "Prijava",
+      "description": "Unesite email i lozinku za pristup nalogu",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "password": "Lozinka",
+      "submit": "Prijavi se",
+      "errors": {
+        "required": "Ovo polje je obavezno",
+        "email": "Unesite validnu email adresu",
+        "passwordMin": "Lozinka mora imati najmanje 8 karaktera"
+      },
+      "goToRegister": "Nemate nalog? Registrujte se",
+      "success": "Uspešna prijava!"
+    },
+    "register": {
+      "title": "Registracija",
+      "description": "Kreirajte nalog za upravljanje poslovanjem",
+      "name": "Puno ime",
+      "email": "Email",
+      "password": "Lozinka",
+      "submit": "Kreiraj nalog",
+      "goToLogin": "Već imate nalog? Prijavite se",
+      "success": "Registracija uspešna! Sada se možete prijaviti.",
+      "namePlaceholder": "Petar Petrović"
+    },
+    "logout": "Odjavi se"
+  },
+  "clients": {
+    "subtitle": "Upravljanje klijentima i partnerima.",
+    "empty": "Nema klijenata. Dodajte prvog!",
+    "loadError": "Neuspešno učitavanje klijenata.",
+    "type": {
+      "domestic": "Domaći klijent",
+      "international": "Međunarodni klijent"
+    },
+    "form": {
+      "type": "Tip klijenta",
+      "name": "Naziv kompanije",
+      "email": "Email",
+      "phone": "Telefon",
+      "phoneHint": "+381641234567",
+      "address": "Adresa",
+      "city": "Grad",
+      "postalCode": "Poštanski broj",
+      "country": "Država",
+      "pib": "PIB (poreski broj)",
+      "mbr": "MBR (matični broj)",
+      "taxId": "Poreski broj / VAT",
+      "submit": "Sačuvaj klijenta"
+    },
+    "create": {
+      "button": "Dodaj klijenta",
+      "title": "Novi klijent",
+      "description": "Dodajte klijenta za izdavanje faktura.",
+      "success": "Klijent kreiran!"
+    },
+    "edit": {
+      "title": "Izmeni klijenta",
+      "description": "Ažurirajte informacije o klijentu.",
+      "success": "Klijent ažuriran!"
+    },
+    "errors": {
+      "nameRequired": "Ime je obavezno",
+      "addressRequired": "Adresa je obavezna",
+      "cityRequired": "Grad je obavezan",
+      "countryRequired": "Država je obavezna",
+      "taxIdRequired": "Poreski broj je obavezan",
+      "registrationNumberRequired": "Matični broj je obavezan"
+    },
+    "delete": {
+      "title": "Obriši klijenta",
+      "description": "Obrisati {{name}}? Radnja se ne može poništiti.",
+      "button": "Obriši",
+      "success": "Klijent obrisan!"
+    },
+    "actions": {
+      "edit": "Izmeni",
+      "delete": "Obriši"
+    }
+  },
+  "invoices": {
+    "subtitle": "Upravljanje fakturama i plaćanjima.",
+    "empty": "Nema faktura.",
+    "noResults": "Nema rezultata po filteru.",
+    "filter": {
+      "search": "Pretraga po klijentu ili broju...",
+      "all": "Sve",
+      "clearFilters": "Poništi filtere"
+    },
+    "total": "Ukupno: {{amount}} RSD",
+    "totalForeign": "({{amount}} {{currency}})",
+    "totalLabel": "Ukupno",
+    "totalsTitle": "Sumirano",
+    "status": {
+      "draft": "Nacrt",
+      "sent": "Poslato",
+      "paid": "Plaćeno",
+      "cancelled": "Otkazano",
+      "updateSuccess": "Status ažuriran.",
+      "updateError": "Neuspešno ažuriranje statusa."
+    },
+    "table": {
+      "number": "Broj",
+      "client": "Klijent",
+      "date": "Datum",
+      "amount": "Iznos",
+      "status": "Status",
+      "actions": "Akcije"
+    },
+    "form": {
+      "client": "Klijent",
+      "selectClient": "Izaberite klijenta...",
+      "bankAccount": "Bankovni račun",
+      "selectBankAccount": "Izaberite račun...",
+      "placeOfIssue": "Mesto izdavanja",
+      "domesticSupply": "Domaća isporuka",
+      "domesticSupplyHint": "Uračunava se u limit od 8M RSD za PDV registraciju.",
+      "exchangeRate": "Kurs NBS",
+      "number": "Broj fakture",
+      "issueDate": "Datum izdavanja",
+      "dueDate": "Rok plaćanja",
+      "currency": "Valuta",
+      "items": "Stavke fakture",
+      "addItem": "Dodaj stavku",
+      "description": "Opis",
+      "quantity": "Količina",
+      "price": "Cena",
+      "total": "Ukupno",
+      "grandTotal": "Sve ukupno",
+      "noVatNotice": "Nije u sistemu PDV-a",
+      "submit": "Kreiraj fakturu",
+      "pickDate": "Izaberite datum",
+      "note": "Napomena",
+      "notePlaceholder": "Napomena na fakturi...",
+      "errors": {
+        "clientRequired": "Klijent je obavezan",
+        "bankAccountRequired": "Račun je obavezan",
+        "placeOfIssueRequired": "Mesto izdavanja je obavezno",
+        "itemDescription": "Opis je obavezan",
+        "itemQuantity": "Količina mora biti veća od 0",
+        "itemPrice": "Cena mora biti ≥ 0",
+        "itemsMin": "Najmanje jedna stavka",
+        "exchangeRateRequired": "Kurs je obavezan za stranu valutu",
+        "dueDateAfterIssue": "Rok plaćanja ne može biti pre datuma izdavanja"
+      }
+    },
+    "create": {
+      "button": "Kreiraj fakturu",
+      "title": "Nova faktura",
+      "description": "Popunite podatke za izdavanje fakture.",
+      "success": "Faktura kreirana!"
+    },
+    "edit": {
+      "title": "Izmeni fakturu",
+      "description": "Moguće je izmeniti samo nacrte.",
+      "submit": "Sačuvaj",
+      "success": "Faktura ažurirana!",
+      "error": "Neuspešno ažuriranje fakture."
+    },
+    "delete": {
+      "title": "Obriši fakturu",
+      "description": "Faktura će biti trajno obrisana.",
+      "button": "Obriši",
+      "confirm": "Obrisati ovu fakturu?",
+      "success": "Faktura obrisana!"
+    }
+  },
+  "dashboard": {
+    "title": "Početna",
+    "subtitle": "Pregled poslovne aktivnosti.",
+    "stats": {
+      "revenue": "Prihod ove godine",
+      "revenueSub": "Plaćeno i poslato u {{year}}",
+      "paid": "Plaćenih",
+      "pending": "Na čekanju",
+      "clients": "Aktivnih klijenata",
+      "invoices": "faktura",
+      "unique": "jedinstvenih"
+    },
+    "limits": {
+      "title": "Poreski limiti",
+      "viewAll": "Detaljnije"
+    },
+    "breakdown": {
+      "title": "Raspodela po statusima"
+    },
+    "invoices": {
+      "title": "Poslednje fakture",
+      "viewAll": "Sve fakture",
+      "empty": "Još nema faktura."
+    },
+    "clients": {
+      "title": "Top klijenti",
+      "viewAll": "Svi klijenti",
+      "empty": "Nema podataka."
+    }
+  },
+  "limits": {
+    "subtitle": "Praćenje limita od 6M i 8M RSD.",
+    "loadError": "Neuspešno učitavanje limita.",
+    "used": "Iskorišćeno",
+    "current": "Trenutno",
+    "limit": "Limit",
+    "remaining": "Preostalo",
+    "exceeded": "Limit premašen!",
+    "pausal": {
+      "title": "Paušalni limit (6M RSD)",
+      "description": "Godišnji limit prihoda za fiksni porez. Resetuje se svake godine."
+    },
+    "vat": {
+      "title": "Limit PDV registracije (8M RSD)",
+      "description": "Prihod od domaće isporuke u poslednjih 365 dana. Premašenje zahteva PDV registraciju."
+    },
+    "info": {
+      "pausal": "Paušalni limit: 6.000.000 RSD godišnje (sve fakture, svaka valuta u RSD).",
+      "vat": "PDV limit: 8.000.000 RSD u 365 dana (samo domaća isporuka)."
+    }
+  },
+  "bankAccounts": {
+    "subtitle": "Upravljanje bankovnim računima.",
+    "empty": "Nema računa. Dodajte za izdavanje faktura.",
+    "loadError": "Neuspešno učitavanje računa.",
+    "default": "Podrazumevani",
+    "currency": {
+      "rsd": "RSD",
+      "eur": "EUR",
+      "usd": "USD"
+    },
+    "form": {
+      "bankName": "Naziv banke",
+      "accountNumber": "Broj računa",
+      "accountNumberHint": "Format: XXX-XXXXXXXXXX-XX",
+      "swiftCode": "SWIFT / BIC",
+      "swiftPlaceholder": "BKBMRS22",
+      "iban": "IBAN",
+      "ibanPlaceholder": "RS35160005080003520714",
+      "currency": "Valuta",
+      "isDefault": "Postavi kao podrazumevani",
+      "submit": "Sačuvaj račun"
+    },
+    "errors": {
+      "bankNameRequired": "Naziv banke je obavezan",
+      "accountNumberRequired": "Broj računa je obavezan"
+    },
+    "create": {
+      "button": "Dodaj račun",
+      "title": "Novi račun",
+      "description": "Dodajte bankovni račun za izdavanje faktura.",
+      "success": "Račun dodat!"
+    },
+    "edit": {
+      "title": "Izmeni račun",
+      "success": "Račun ažuriran!"
+    },
+    "delete": {
+      "title": "Obriši račun",
+      "description": "Obrisati {{bankName}} ({{accountNumber}})? Radnja se ne može poništiti.",
+      "button": "Obriši",
+      "success": "Račun obrisan!"
+    },
+    "actions": {
+      "edit": "Izmeni",
+      "delete": "Obriši"
+    }
+  },
+  "settings": {
+    "title": "Podešavanja",
+    "subtitle": "Upravljanje bezbednošću naloga.",
+    "password": {
+      "title": "Promeni lozinku",
+      "description": "Ažurirajte lozinku radi bezbednosti.",
+      "current": "Trenutna lozinka",
+      "new": "Nova lozinka",
+      "confirm": "Potvrdite lozinku",
+      "submit": "Promeni lozinku",
+      "success": "Lozinka promenjena!",
+      "error": "Neuspešna promena lozinke.",
+      "wrongCurrent": "Pogrešna trenutna lozinka."
+    },
+    "danger": {
+      "title": "Opasna zona",
+      "description": "Odjavite se sa svih uređaja.",
+      "logout": "Odjavi se"
+    }
+  },
+  "kpo": {
+    "title": "KPO Knjiga",
+    "subtitle": "Knjiga prihoda i rashoda.",
+    "downloadPdf": "Preuzmi PDF",
+    "loadError": "Neuspešno učitavanje podataka.",
+    "empty": "Nema unosa za ovu godinu.",
+    "yearlyTotal": "Ukupno {{year}}",
+    "table": {
+      "no": "Br.",
+      "date": "Datum",
+      "description": "Opis",
+      "products": "Proizvodi (RSD)",
+      "services": "Usluge (RSD)",
+      "total": "Ukupno (RSD)"
+    }
+  },
+  "profileCompleteness": {
+    "title": "Dovršite profil kompanije",
+    "description": "Naziv, PIB, MBR, adresa i grad su obavezni za izdavanje faktura.",
+    "action": "Idi na Profil"
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Lični i poslovni podaci za fakture.",
+    "save": "Sačuvaj",
+    "saveSuccess": "Profil ažuriran!",
+    "saveError": "Neuspešno ažuriranje profila.",
+    "sections": {
+      "account": "Nalog",
+      "accountDesc": "Login i ime za prikaz.",
+      "business": "Poslovni podaci",
+      "businessDesc": "Koristi se na PDF fakturama (PIB, MBR, naziv).",
+      "address": "Adresa"
+    },
+    "fields": {
+      "name": "Puno ime",
+      "email": "Email",
+      "companyName": "Naziv kompanije",
+      "pib": "PIB (poreski broj)",
+      "mbr": "MBR (matični broj)",
+      "activityCode": "Šifra delatnosti",
+      "activityCodePlaceholder": "npr. 6201",
+      "phone": "Telefon",
+      "address": "Adresa",
+      "city": "Grad",
+      "postalCode": "Poštanski broj",
+      "municipality": "Opština"
+    },
+    "errors": {
+      "nameRequired": "Ime je obavezno"
+    }
+  }
+}
