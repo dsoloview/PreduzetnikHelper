@@ -15,8 +15,8 @@ import { RequiredMark } from "@/shared/ui/required-mark";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Separator } from "@/shared/ui/separator";
 
-const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+const profileSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t("profile.errors.nameRequired")),
   companyName: z.string().optional(),
   pib: z.string().optional(),
   mbr: z.string().optional(),
@@ -28,7 +28,7 @@ const profileSchema = z.object({
   phone: z.string().optional(),
 });
 
-type ProfileFormValues = z.infer<typeof profileSchema>;
+type ProfileFormValues = z.infer<ReturnType<typeof profileSchema>>;
 
 export const ProfilePage = () => {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ export const ProfilePage = () => {
   const { mutate, isPending } = useUpdateProfile();
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema(t)),
     defaultValues: {
       name: "",
       companyName: "",
@@ -138,7 +138,7 @@ export const ProfilePage = () => {
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="activityCode">{t("profile.fields.activityCode")}</Label>
-              <Input id="activityCode" {...form.register("activityCode")} placeholder="e.g. 6201" />
+              <Input id="activityCode" {...form.register("activityCode")} placeholder={t("profile.fields.activityCodePlaceholder")} />
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="phone">{t("profile.fields.phone")}</Label>

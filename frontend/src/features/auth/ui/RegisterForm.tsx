@@ -74,7 +74,7 @@ export const RegisterForm = () => {
                   <Input
                     {...field}
                     id="name"
-                    placeholder="John Doe"
+                    placeholder={t("auth.register.namePlaceholder")}
                     aria-invalid={fieldState.invalid}
                     disabled={isPending}
                   />

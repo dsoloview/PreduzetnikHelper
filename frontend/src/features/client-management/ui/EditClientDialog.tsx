@@ -31,7 +31,7 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
         onOpenChange(false);
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, "Failed to update client"));
+        toast.error(getApiErrorMessage(error, t("errors.updateClientFailed")));
       },
     });
   };
@@ -42,7 +42,7 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
         <DialogHeader>
           <DialogTitle>{t("clients.edit.title")}</DialogTitle>
           <DialogDescription>
-            {t("clients.edit.description", { defaultValue: "Update the client's information." })}
+            {t("clients.edit.description")}
           </DialogDescription>
         </DialogHeader>
         <ClientForm 

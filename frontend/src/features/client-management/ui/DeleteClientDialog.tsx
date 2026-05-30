@@ -33,7 +33,7 @@ export const DeleteClientDialog = ({ client, open, onOpenChange }: DeleteClientD
         onOpenChange(false);
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, "Failed to delete client"));
+        toast.error(getApiErrorMessage(error, t("errors.deleteClientFailed")));
       },
     });
   };
@@ -48,7 +48,7 @@ export const DeleteClientDialog = ({ client, open, onOpenChange }: DeleteClientD
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>{t("app.cancel", { defaultValue: "Cancel" })}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>{t("app.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onDelete}
             disabled={isPending}

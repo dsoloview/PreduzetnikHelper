@@ -14,7 +14,8 @@ import {
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { Menu, LogOut, UserCircle } from "lucide-react";
-import { ThemeToggle } from "@/shared/ui/theme-toggle";
+import { ThemeSwitcher } from "@/features/theme-switcher/ui/ThemeSwitcher";
+import { LanguageSwitcher } from "@/features/language-switcher/ui/LanguageSwitcher";
 
 /**
  * Maps a pathname to the matching i18n key used to render the page title
@@ -72,7 +73,8 @@ export const Header = ({ onOpenSidebar }: HeaderProps) => {
         )}
       </div>
       <div className="flex items-center gap-4">
-        <ThemeToggle />
+        <LanguageSwitcher />
+        <ThemeSwitcher />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">

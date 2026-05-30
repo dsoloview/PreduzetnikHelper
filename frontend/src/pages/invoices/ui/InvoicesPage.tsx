@@ -76,7 +76,7 @@ export const InvoicesPage = () => {
     try {
       await invoiceApi.downloadPdf(id, `invoice-${displayNumber}.pdf`);
     } catch {
-      toast.error("Failed to download PDF");
+      toast.error(t("errors.downloadPdfFailed"));
     } finally {
       setDownloadingId(null);
     }
@@ -91,7 +91,7 @@ export const InvoicesPage = () => {
       },
       onError: (error: unknown) => {
         const axiosError = error as { response?: { data?: { message?: string } } };
-        toast.error(axiosError.response?.data?.message || "Failed to delete invoice");
+        toast.error(axiosError.response?.data?.message || t("errors.deleteInvoiceFailed"));
         setDeleteId(null);
       },
     });

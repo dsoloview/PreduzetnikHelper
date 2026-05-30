@@ -10,17 +10,17 @@ import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 import { RequiredMark } from "@/shared/ui/required-mark";
 
-const clientSchema = z.object({
+const clientSchema = (t: (key: string) => string) => z.object({
   type: z.enum(["DOMESTIC", "INTERNATIONAL"]),
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, t("clients.errors.nameRequired")),
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional().or(z.literal("")),
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
+  address: z.string().min(1, t("clients.errors.addressRequired")),
+  city: z.string().min(1, t("clients.errors.cityRequired")),
   postalCode: z.string().optional(),
-  country: z.string().min(1, "Country is required"),
-  taxId: z.string().min(1, "Tax ID is required"), // PIB for SRB
-  registrationNumber: z.string().min(1, "Registration number is required"), // MBR for SRB
+  country: z.string().min(1, t("clients.errors.countryRequired")),
+  taxId: z.string().min(1, t("clients.errors.taxIdRequired")),
+  registrationNumber: z.string().min(1, t("clients.errors.registrationNumberRequired")),
 });
 
 /**
@@ -35,7 +35,7 @@ const stripEmptyOptionals = (data: ClientFormValues): ClientFormValues => ({
   postalCode: data.postalCode?.trim() ? data.postalCode.trim() : undefined,
 });
 
-export type ClientFormValues = z.infer<typeof clientSchema>;
+export type ClientFormValues = z.infer<ReturnType<typeof clientSchema>>;
 
 interface ClientFormProps {
   onSubmit: (data: ClientFormValues) => void;
@@ -47,7 +47,7 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
   const { t } = useTranslation();
 
   const form = useForm<ClientFormValues>({
-    resolver: zodResolver(clientSchema),
+    resolver: zodResolver(clientSchema(t)),
     defaultValues: {
       type: "DOMESTIC",
       name: "",

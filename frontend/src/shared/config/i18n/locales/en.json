@@ -18,6 +18,7 @@
     "save": "Save",
     "delete": "Delete",
     "loading": "Loading",
+    "loadingAria": "Loading",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "openMenu": "Open menu",
@@ -27,13 +28,34 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "navAria": "Main navigation",
+    "language": {
+      "switch": "Change language",
+      "en": "English",
+      "ru": "Russian",
+      "sr": "Serbian"
     }
+  },
+  "errors": {
+    "downloadPdfFailed": "Failed to download PDF",
+    "deleteInvoiceFailed": "Failed to delete invoice",
+    "createInvoiceFailed": "Failed to create invoice",
+    "updateInvoiceFailed": "Failed to update invoice",
+    "deleteClientFailed": "Failed to delete client",
+    "updateClientFailed": "Failed to update client",
+    "createClientFailed": "Failed to create client",
+    "deleteBankAccountFailed": "Failed to delete bank account",
+    "updateBankAccountFailed": "Failed to update bank account",
+    "createBankAccountFailed": "Failed to create bank account",
+    "somethingWentWrong": "Something went wrong"
   },
   "auth": {
     "login": {
       "title": "Login",
       "description": "Enter your email and password to access your account",
       "email": "Email",
+      "emailPlaceholder": "user@example.com",
       "password": "Password",
       "submit": "Login",
       "errors": {
@@ -52,7 +74,8 @@
       "password": "Password",
       "submit": "Create Account",
       "goToLogin": "Already have an account? Login",
-      "success": "Registration successful! You can now log in."
+      "success": "Registration successful! You can now log in.",
+      "namePlaceholder": "John Doe"
     },
     "logout": "Logout"
   },
@@ -86,7 +109,16 @@
     },
     "edit": {
       "title": "Edit Client",
+      "description": "Update the client's information.",
       "success": "Client updated successfully!"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "addressRequired": "Address is required",
+      "cityRequired": "City is required",
+      "countryRequired": "Country is required",
+      "taxIdRequired": "Tax ID is required",
+      "registrationNumberRequired": "Registration number is required"
     },
     "delete": {
       "title": "Delete Client",
@@ -253,10 +285,16 @@
       "accountNumber": "Account Number",
       "accountNumberHint": "Format: XXX-XXXXXXXXXX-XX",
       "swiftCode": "SWIFT / BIC",
+      "swiftPlaceholder": "BKBMRS22",
       "iban": "IBAN",
+      "ibanPlaceholder": "RS35160005080003520714",
       "currency": "Currency",
       "isDefault": "Set as default account",
       "submit": "Save Account"
+    },
+    "errors": {
+      "bankNameRequired": "Bank name is required",
+      "accountNumberRequired": "Account number is required"
     },
     "create": {
       "button": "Add Bank Account",
@@ -340,11 +378,15 @@
       "pib": "PIB (Tax ID)",
       "mbr": "MBR (Registration No.)",
       "activityCode": "Activity Code (Šifra delatnosti)",
+      "activityCodePlaceholder": "e.g. 6201",
       "phone": "Phone",
       "address": "Street Address",
       "city": "City",
       "postalCode": "Postal Code",
       "municipality": "Municipality (Opština)"
+    },
+    "errors": {
+      "nameRequired": "Name is required"
     }
   }
 }

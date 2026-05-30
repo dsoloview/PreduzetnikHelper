@@ -57,7 +57,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           // Desktop: static, always visible
           "md:static md:translate-x-0 md:h-full",
         )}
-        aria-label="Main navigation"
+        aria-label={t("app.navAria")}
       >
         <div className="p-6 border-b flex items-center justify-between">
           <h2 className="text-xl font-bold tracking-tight text-primary">Preduzetnik</h2>

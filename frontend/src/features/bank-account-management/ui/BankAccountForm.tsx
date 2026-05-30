@@ -12,16 +12,16 @@ import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 import { RequiredMark } from "@/shared/ui/required-mark";
 
-const bankAccountSchema = z.object({
-  bankName: z.string().min(1, "Bank name is required"),
-  accountNumber: z.string().min(1, "Account number is required"),
+const bankAccountSchema = (t: (key: string) => string) => z.object({
+  bankName: z.string().min(1, t("bankAccounts.errors.bankNameRequired")),
+  accountNumber: z.string().min(1, t("bankAccounts.errors.accountNumberRequired")),
   swiftCode: z.string().optional().or(z.literal("")),
   iban: z.string().optional().or(z.literal("")),
   currency: z.enum(["RSD", "EUR", "USD"]),
   isDefault: z.boolean().optional(),
 });
 
-export type BankAccountFormValues = z.infer<typeof bankAccountSchema>;
+export type BankAccountFormValues = z.infer<ReturnType<typeof bankAccountSchema>>;
 
 /** Convert empty optional strings to undefined so they are omitted from the request. */
 const stripEmptyOptionals = (data: BankAccountFormValues): BankAccountFormValues => ({
@@ -40,7 +40,7 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
   const { t } = useTranslation();
 
   const form = useForm<BankAccountFormValues>({
-    resolver: zodResolver(bankAccountSchema),
+    resolver: zodResolver(bankAccountSchema(t)),
     defaultValues: {
       bankName: "",
       accountNumber: "",
@@ -95,7 +95,7 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
                 <Input
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  placeholder="BKBMRS22"
+                  placeholder={t("bankAccounts.form.swiftPlaceholder")}
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -110,7 +110,7 @@ export const BankAccountForm = ({ onSubmit, defaultValues, isLoading }: BankAcco
                 <Input
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  placeholder="RS35160005080003520714"
+                  placeholder={t("bankAccounts.form.ibanPlaceholder")}
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>

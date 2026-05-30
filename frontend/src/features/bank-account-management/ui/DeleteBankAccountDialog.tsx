@@ -33,7 +33,7 @@ export const DeleteBankAccountDialog = ({ account, open, onOpenChange }: DeleteB
         onOpenChange(false);
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, "Failed to delete bank account"));
+        toast.error(getApiErrorMessage(error, t("errors.deleteBankAccountFailed")));
       },
     });
   };
