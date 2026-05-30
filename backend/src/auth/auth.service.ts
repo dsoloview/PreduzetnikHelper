@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ export interface TokenPair {
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private jwtService: JwtService,
         private usersService: UsersService,
@@ -87,7 +90,9 @@ export class AuthService {
             if (record && await bcrypt.compare(rawToken, record.hashedToken)) {
                 await this.prisma.refreshToken.delete({ where: { jti } });
             }
-        } catch {}
+        } catch {
+            this.logger.warn('Failed to parse token cookie during logout');
+        }
     }
 
     private parseTokenCookie(cookieToken: string): { jti: string; rawToken: string } {

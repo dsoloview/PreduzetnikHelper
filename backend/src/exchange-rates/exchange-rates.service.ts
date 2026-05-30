@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NbsClient } from './nbs.client';
 import type { IExchangeRatesResponse } from '@preduzetnik/shared';
 import { Currency } from '../generated/prisma/enums';
+import { stripTime } from '../common/utils';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -14,7 +15,7 @@ export class ExchangeRatesService {
     ) {}
 
     async getRatesForDate(date: Date): Promise<IExchangeRatesResponse> {
-        const dateOnly = this.stripTime(date);
+        const dateOnly = stripTime(date);
 
         let rates = await this.prisma.exchangeRate.findMany({
             where: { date: dateOnly },

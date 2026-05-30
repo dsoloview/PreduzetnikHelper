@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Currency } from '../generated/prisma/enums';
+import { formatSerbianDate } from '../common/utils';
 
 export interface NbsRate {
     currencyCode: string;
@@ -14,7 +15,7 @@ export class NbsClient {
     private readonly SUPPORTED_CURRENCIES = [Currency.EUR, Currency.USD];
 
     async fetchRatesForDate(date: Date): Promise<NbsRate[]> {
-        const formatted = this.formatDate(date);
+        const formatted = formatSerbianDate(date);
 
         const body = this.buildSoapEnvelope(
             'GetExchangeRateByDate',
@@ -172,12 +173,5 @@ export class NbsClient {
             .replace(/&amp;/g, '&')
             .replace(/&quot;/g, '"')
             .replace(/&apos;/g, "'");
-    }
-
-    private formatDate(date: Date): string {
-        const dd = String(date.getDate()).padStart(2, '0');
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const yyyy = date.getFullYear();
-        return `${dd}.${mm}.${yyyy}`;
     }
 }
