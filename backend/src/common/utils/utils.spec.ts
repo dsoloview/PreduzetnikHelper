@@ -1,5 +1,5 @@
 import { escapeHtml } from './html.utils';
-import { formatSerbianDate, stripTime } from './date.utils';
+import {formatSerbianDate, getBelgradeYear, stripTime} from './date.utils';
 import { assertOwnership } from './ownership.utils';
 import { ForbiddenException } from '@nestjs/common';
 
@@ -41,5 +41,12 @@ describe('assertOwnership', () => {
 
   it('should throw ForbiddenException when userId does not match', () => {
     expect(() => assertOwnership({ userId: 'user-2' }, 'user-1', 'invoice')).toThrow(ForbiddenException);
+  });
+});
+
+describe('getBelgradeYear', () => {
+  it('uses Belgrade timezone, not UTC', () => {
+    expect(getBelgradeYear(new Date('2026-12-31T23:30:00Z'))).toBe(2027);
+    expect(getBelgradeYear(new Date('2026-12-31T22:30:00Z'))).toBe(2026);
   });
 });

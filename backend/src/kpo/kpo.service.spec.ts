@@ -68,7 +68,7 @@ describe('KpoService', () => {
       expect(result.totalYearly).toEqual(300000);
     });
 
-    it('should escape HTML in client names', async () => {
+    it('should keep client name as plain text (escaping happens in templates)', async () => {
       const invoices = [
         {
           id: 'inv-1', invoiceNumber: 1, year, totalRsd: 50000,
@@ -80,8 +80,7 @@ describe('KpoService', () => {
 
       const result = await service.getKpoForYear(userId, year);
 
-      expect(result.entries[0].description).not.toContain('<Script>');
-      expect(result.entries[0].description).toContain('&lt;Script&gt;');
+      expect(result.entries[0].description).toBe('Faktura br. 1/2026 - <Script> & "Evil"');
     });
 
     it('should return empty entries when no invoices', async () => {

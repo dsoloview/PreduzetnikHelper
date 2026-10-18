@@ -10,6 +10,5 @@ export const stripTime = (date: Date): Date => {
 };
 
 export const getBelgradeYear = (date: Date): number => {
-    return Number(new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: 'Europe/Belgrade' }).format(date));
-}
-
+    return Number(new Intl.DateTimeFormat('en', {year: 'numeric', timeZone: 'Europe/Belgrade'}).format(date));
+};

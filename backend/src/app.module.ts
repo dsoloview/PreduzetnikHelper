@@ -1,4 +1,4 @@
-import {Module} from '@nestjs/common';
+import {ExecutionContext, Module} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { PrismaModule } from "./prisma/prisma.module";
 import { AuthModule } from './auth/auth.module';
@@ -13,6 +13,10 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
+import type { Request } from 'express';
+
+const requestPath = (ctx: ExecutionContext) =>
+    ctx.switchToHttp().getRequest<Request>().path;
 
 @Module({
   imports: [
@@ -30,8 +34,14 @@ import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
     }),
     ThrottlerModule.forRoot([
       { name: 'default', ttl: 60000, limit: 100 },
-      { name: 'auth', ttl: 60000, limit: 10 },
-      { name: 'pdf', ttl: 60000, limit: 10 },
+      {
+        name: 'auth', ttl: 60000, limit: 10,
+        skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
+      },
+      {
+        name: 'pdf', ttl: 60000, limit: 10,
+        skipIf: (ctx) => !requestPath(ctx).endsWith('/pdf'),
+      },
     ]),
     PrismaModule,
     AuthModule,

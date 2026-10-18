@@ -13,5 +13,6 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": ["msw"]
-  }
+  },
+  "packageManager": "pnpm@11.0.3"
 }
