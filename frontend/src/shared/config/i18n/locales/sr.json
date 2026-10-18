@@ -200,7 +200,10 @@
         "itemsMin": "Najmanje jedna stavka",
         "exchangeRateRequired": "Kurs je obavezan za stranu valutu",
         "dueDateAfterIssue": "Rok plaćanja ne može biti pre datuma izdavanja"
-      }
+      },
+      "exchangeRateLoading": "Učitavanje kursa NBS…",
+      "exchangeRateHint": "Srednji kurs NBS na dan {{date}}: {{rate}}",
+      "exchangeRateUnavailable": "Kurs NBS nije dostupan, unesite ga ručno"
     },
     "create": {
       "button": "Kreiraj fakturu",

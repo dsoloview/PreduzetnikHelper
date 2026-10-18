@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ExchangeRatesService } from './exchange-rates.service';
 import type { IExchangeRatesResponse } from '@preduzetnik/shared';
-import {Public} from "../auth/helpers/auth.helpers";
+import { GetRatesQueryDto } from './dto/get-rates-query.dto';
 
 @ApiTags('Exchange Rates')
 @ApiBearerAuth()
@@ -10,13 +10,11 @@ import {Public} from "../auth/helpers/auth.helpers";
 export class ExchangeRatesController {
     constructor(private readonly service: ExchangeRatesService) {}
 
-    @Public()
     @Get()
     @ApiOperation({ summary: 'Get NBS exchange rates (EUR, USD) for a given date' })
-    @ApiQuery({ name: 'date', required: false, description: 'ISO date (YYYY-MM-DD). Defaults to today.' })
     @ApiResponse({ status: 200, description: 'Exchange rates retrieved successfully' })
-    async getRates(@Query('date') dateStr?: string): Promise<IExchangeRatesResponse> {
-        const date = dateStr ? new Date(dateStr) : new Date();
+    async getRates(@Query() query: GetRatesQueryDto): Promise<IExchangeRatesResponse> {
+        const date = query.date ? new Date(query.date) : new Date();
         return this.service.getRatesForDate(date);
     }
 }

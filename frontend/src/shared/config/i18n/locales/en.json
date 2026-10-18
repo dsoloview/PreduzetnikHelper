@@ -200,7 +200,10 @@
         "itemsMin": "At least one item is required",
         "exchangeRateRequired": "Exchange rate is required for foreign currency",
         "dueDateAfterIssue": "Due date cannot be earlier than issue date"
-      }
+      },
+      "exchangeRateLoading": "Loading NBS rate…",
+      "exchangeRateHint": "NBS middle rate on {{date}}: {{rate}}",
+      "exchangeRateUnavailable": "NBS rate unavailable, enter it manually"
     },
     "create": {
       "button": "Create Invoice",

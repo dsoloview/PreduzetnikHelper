@@ -200,7 +200,10 @@
         "itemsMin": "Минимум одна позиция",
         "exchangeRateRequired": "Курс обязателен для валюты",
         "dueDateAfterIssue": "Срок оплаты не может быть раньше даты выдачи"
-      }
+      },
+      "exchangeRateLoading": "Загружаем курс НБС…",
+      "exchangeRateHint": "Средний курс НБС на {{date}}: {{rate}}",
+      "exchangeRateUnavailable": "Курс НБС недоступен, введите его вручную"
     },
     "create": {
       "button": "Создать счёт",

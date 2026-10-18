@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,6 +22,7 @@ import { cn } from "@/shared/lib/utils";
 import { useClients } from "@/entities/client/api/client.queries";
 import { useBankAccounts } from "@/entities/bank-account/api/bank-account.queries";
 import { useProfile } from "@/entities/user/api/user.queries";
+import { useExchangeRates } from "@/entities/exchange-rate/api/exchange-rate.queries";
 import type { ICreateInvoiceRequest, Currency } from "@preduzetnik/shared";
 
 const buildInvoiceSchema = (t: (key: string) => string) =>
@@ -103,6 +104,26 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   const watchedBankAccountId = form.watch("bankAccountId");
   const watchedItems = form.watch("items");
   const currency = form.watch("currency");
+  const issueDate = form.watch("issueDate");
+
+  const rateDate = issueDate ? format(issueDate, "yyyy-MM-dd") : undefined;
+  const { data: nbsRates, isFetching: isRateLoading } = useExchangeRates(rateDate, currency !== "RSD");
+  const nbsRate = nbsRates?.rates.find((r) => r.currencyCode === currency);
+
+  // When editing, keep the saved rate until the user changes currency or issue date
+  const savedRateKey = useRef(
+    defaultValues?.exchangeRate && defaultValues.issueDate
+      ? `${defaultValues.currency}|${format(defaultValues.issueDate, "yyyy-MM-dd")}`
+      : null,
+  );
+
+  // Fill in the NBS middle rate for the issue date; a value typed by hand stays until currency or date changes
+  useEffect(() => {
+    if (!nbsRate) return;
+    if (savedRateKey.current === `${currency}|${rateDate}`) return;
+    savedRateKey.current = null;
+    form.setValue("exchangeRate", nbsRate.middleRate, { shouldValidate: true });
+  }, [nbsRate?.middleRate, currency, rateDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-select default (or first) bank account once the list loads
   useEffect(() => {
@@ -112,6 +133,16 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
     form.setValue("bankAccountId", defaultAccount.id, { shouldValidate: false });
     form.setValue("currency", defaultAccount.currency, { shouldValidate: false });
   }, [defaultAccount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Supply to a foreign client usually happens outside Serbia and doesn't count toward the 8M VAT limit
+  const watchedClientId = form.watch("clientId");
+  useEffect(() => {
+    if (!watchedClientId || watchedClientId === defaultValues?.clientId) return;
+    const client = clients?.find((c) => c.id === watchedClientId);
+    if (client) {
+      form.setValue("domesticSupply", client.type === "DOMESTIC", { shouldValidate: false });
+    }
+  }, [watchedClientId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync currency when the user picks a different bank account
   useEffect(() => {
@@ -132,8 +163,9 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   const handleFormSubmit = (values: InvoiceFormValues) => {
     const requestData: ICreateInvoiceRequest = {
       ...values,
-      issueDate: values.issueDate.toISOString(),
-      dueDate: values.dueDate.toISOString(),
+      // Date only: toISOString() would shift local midnight to the previous day in UTC
+      issueDate: format(values.issueDate, "yyyy-MM-dd"),
+      dueDate: format(values.dueDate, "yyyy-MM-dd"),
       currency: values.currency as Currency,
       items: values.items.map((item) => ({
         description: item.description,
@@ -300,6 +332,16 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                 {form.formState.errors.exchangeRate && (
                   <FieldError errors={[form.formState.errors.exchangeRate]} />
                 )}
+                <p className="text-xs text-muted-foreground">
+                  {isRateLoading
+                    ? t("invoices.form.exchangeRateLoading")
+                    : nbsRate
+                      ? t("invoices.form.exchangeRateHint", {
+                          rate: nbsRate.middleRate,
+                          date: format(new Date(nbsRate.date), "dd.MM.yyyy"),
+                        })
+                      : t("invoices.form.exchangeRateUnavailable")}
+                </p>
               </Field>
             )}
           </div>
