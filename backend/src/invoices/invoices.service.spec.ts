@@ -109,17 +109,46 @@ describe('InvoicesService', () => {
         orderBy: { invoiceNumber: 'desc' },
       });
       
-      expect(prismaMock.invoice.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-          invoiceNumber: 6,
-          totalAmount: 20000,
-          totalRsd: 20000,
-          domesticSupply: true,
-        })
-      }));
+      const createData = (prismaMock.invoice.create as jest.Mock).mock.calls[0][0].data;
+      expect(createData).toMatchObject({ invoiceNumber: 6, domesticSupply: true });
+      expect(Number(createData.totalAmount)).toEqual(20000);
+      expect(Number(createData.totalRsd)).toEqual(20000);
 
       expect(result.displayNumber).toEqual('6/2026');
       expect(result.totalAmount).toEqual(20000);
+    });
+
+    it('should retry when a concurrent create takes the same invoice number', async () => {
+      const { Prisma } = jest.requireActual('../generated/prisma/client');
+      const conflict = new Prisma.PrismaClientKnownRequestError('serialization failure', { code: 'P2034', clientVersion: 'test' });
+      const created = { id: 'inv-1', invoiceNumber: 2, year: 2026, status: InvoiceStatus.DRAFT, clientId: 'client-1',
+        issueDate: new Date(), dueDate: new Date(), currency: Currency.RSD, totalAmount: 100, totalRsd: 100,
+        client: { name: 'C' }, items: [], createdAt: new Date() };
+      const tx = jest.spyOn(prismaMock, '$transaction')
+        .mockRejectedValueOnce(conflict)
+        .mockResolvedValueOnce(created as any);
+      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: 'DOMESTIC' });
+      (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'bank-1' });
+
+      const result = await service.create('user-1', {
+        clientId: 'client-1', bankAccountId: 'bank-1', issueDate: '2026-05-01', dueDate: '2026-05-15',
+        items: [{ description: 'x', quantity: 1, unitPrice: 100 }],
+      });
+
+      expect(tx).toHaveBeenCalledTimes(2);
+      expect(result.invoiceNumber).toBe(2);
+    });
+
+    it('should not retry on unrelated errors', async () => {
+      const tx = jest.spyOn(prismaMock, '$transaction').mockRejectedValue(new Error('db down'));
+      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'client-1', type: 'DOMESTIC' });
+      (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({ id: 'bank-1' });
+
+      await expect(service.create('user-1', {
+        clientId: 'client-1', bankAccountId: 'bank-1', issueDate: '2026-05-01', dueDate: '2026-05-15',
+        items: [{ description: 'x', quantity: 1, unitPrice: 100 }],
+      })).rejects.toThrow('db down');
+      expect(tx).toHaveBeenCalledTimes(1);
     });
 
     it('should throw BadRequest if foreign currency is provided without exchangeRate', async () => {
@@ -426,9 +455,9 @@ describe('InvoicesService', () => {
         items: [{ description: 'New item', quantity: 1, unitPrice: 5000 }],
       });
 
-      expect(prismaMock.invoice.update).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ totalAmount: 5000, totalRsd: 5000 }),
-      }));
+      const updateData = (prismaMock.invoice.update as jest.Mock).mock.calls[0][0].data;
+      expect(Number(updateData.totalAmount)).toEqual(5000);
+      expect(Number(updateData.totalRsd)).toEqual(5000);
       expect(result.totalAmount).toEqual(5000);
     });
 
@@ -436,7 +465,8 @@ describe('InvoicesService', () => {
       const existing = {
         id: invoiceId, userId, status: InvoiceStatus.DRAFT, totalAmount: 1000, totalRsd: 1000,
         exchangeRate: null, currency: Currency.RSD, issueDate: new Date(), dueDate: new Date(),
-        createdAt: new Date(), client: { name: 'Client' }, items: [],
+        createdAt: new Date(), client: { name: 'Client' },
+        items: [{ id: 'i-1', description: 'Item', quantity: 2, unitPrice: 500, total: 1000 }],
       };
       prismaMock.invoice.findUnique.mockResolvedValue(existing as any);
       const updatedInvoice = { ...existing, currency: Currency.EUR, exchangeRate: 117, totalRsd: 117000 };
@@ -444,9 +474,22 @@ describe('InvoicesService', () => {
 
       await service.update(invoiceId, userId, { currency: Currency.EUR, exchangeRate: 117 });
 
-      expect(prismaMock.invoice.update).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ totalRsd: 117000 }),
-      }));
+      const updateData = (prismaMock.invoice.update as jest.Mock).mock.calls[0][0].data;
+      expect(Number(updateData.totalAmount)).toEqual(1000);
+      expect(Number(updateData.totalRsd)).toEqual(117000);
+      // Items are not rewritten when only the currency changes
+      expect(updateData.items).toBeUndefined();
+    });
+
+    it('should reject switching to a foreign currency without an exchange rate', async () => {
+      prismaMock.invoice.findUnique.mockResolvedValue({
+        id: invoiceId, userId, status: InvoiceStatus.DRAFT, exchangeRate: null, currency: Currency.RSD,
+        client: { name: 'Client' }, items: [],
+      } as any);
+
+      await expect(service.update(invoiceId, userId, { currency: Currency.EUR }))
+        .rejects.toThrow(BadRequestException);
+      expect(prismaMock.invoice.update).not.toHaveBeenCalled();
     });
   });
 });
