@@ -17,3 +17,8 @@ export const getBelgradeYearRange = (year: number): { start: Date; end: Date } =
     start: new Date(Date.UTC(year - 1, 11, 31, 23)),
     end: new Date(Date.UTC(year, 11, 31, 23)),
 });
+
+/** Date as printed on documents (sr-RS style) in Belgrade time, independent of the server timezone */
+export const formatBelgradeDate = (date: Date | string): string => {
+    return new Date(date).toLocaleDateString('sr-RS', { timeZone: 'Europe/Belgrade' });
+};

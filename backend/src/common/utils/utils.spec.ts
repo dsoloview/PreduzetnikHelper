@@ -1,5 +1,5 @@
 import { escapeHtml } from './html.utils';
-import {formatSerbianDate, getBelgradeYear, getBelgradeYearRange, stripTime} from './date.utils';
+import {formatBelgradeDate, formatSerbianDate, getBelgradeYear, getBelgradeYearRange, stripTime} from './date.utils';
 import { assertOwnership } from './ownership.utils';
 import { ForbiddenException } from '@nestjs/common';
 
@@ -59,5 +59,15 @@ describe('getBelgradeYearRange', () => {
     expect(getBelgradeYear(start)).toBe(2026);
     expect(getBelgradeYear(new Date(end.getTime() - 1))).toBe(2026);
     expect(getBelgradeYear(end)).toBe(2027);
+  });
+});
+
+describe('formatBelgradeDate', () => {
+  it('prints the Belgrade calendar date regardless of server timezone', () => {
+    // Local midnight in Belgrade sent as UTC by the old frontend
+    expect(formatBelgradeDate('2026-09-30T22:00:00.000Z')).toEqual(formatBelgradeDate('2026-10-01T12:00:00Z'));
+    // Date-only value stored as UTC midnight
+    expect(formatBelgradeDate(new Date('2026-10-01'))).toEqual(formatBelgradeDate('2026-10-01T12:00:00Z'));
+    expect(formatBelgradeDate('2026-10-01T12:00:00Z')).toMatch(/^1\. ?10\. ?2026\.?$/);
   });
 });

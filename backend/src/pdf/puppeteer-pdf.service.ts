@@ -4,6 +4,7 @@ import * as handlebars from 'handlebars';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { IPdfService, InvoicePdfData, KpoPdfData } from './pdf.interface';
+import { formatBelgradeDate } from '../common/utils';
 
 @Injectable()
 export class PuppeteerPdfService implements IPdfService, OnModuleInit, OnModuleDestroy {
@@ -48,8 +49,7 @@ export class PuppeteerPdfService implements IPdfService, OnModuleInit, OnModuleD
 
         handlebars.registerHelper('formatDate', function (dateString) {
             if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('sr-RS');
+            return formatBelgradeDate(dateString);
         });
     }
 

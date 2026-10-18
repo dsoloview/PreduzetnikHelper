@@ -48,6 +48,9 @@ COPY --from=build-backend /app/backend/dist ./backend/dist
 
 WORKDIR /app/backend
 
+# The image runs behind the frontend's nginx proxy
+ENV TRUST_PROXY_HOPS=1
+
 EXPOSE 3000
 
 CMD ["sh", "-c", "npx prisma migrate deploy --schema=prisma/schema.prisma && node dist/src/main"]

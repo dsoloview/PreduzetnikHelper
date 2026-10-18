@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, Logger, OnModuleInit } from '
 import * as path from 'path';
 import type { TDocumentDefinitions, Content, TableCell, Alignment } from 'pdfmake/interfaces';
 import type { IPdfService, InvoicePdfData, KpoPdfData } from './pdf.interface';
+import { formatBelgradeDate } from '../common/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pm = require('pdfmake') as {
@@ -58,7 +59,7 @@ export class PdfmakePdfService implements IPdfService, OnModuleInit {
 
     private formatDate(dateString: string | null | undefined): string {
         if (!dateString) return '';
-        return new Date(dateString).toLocaleDateString('sr-RS');
+        return formatBelgradeDate(dateString);
     }
 
     private async bufferFromDoc(docDefinition: TDocumentDefinitions): Promise<Buffer> {

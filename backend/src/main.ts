@@ -4,12 +4,17 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ConfigService } from "@nestjs/config";
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  // Behind nginx set TRUST_PROXY_HOPS=1, otherwise every request looks like it comes from nginx
+  // and all users share one throttling bucket. Keep 0 when exposed directly, or X-Forwarded-For can be spoofed
+  app.set('trust proxy', Number(configService.get('TRUST_PROXY_HOPS', 0)));
 
   app.use(cookieParser());
   app.use(
