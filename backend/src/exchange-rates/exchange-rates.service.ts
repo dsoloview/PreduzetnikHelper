@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {Inject, Injectable, Logger} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { NbsClient } from './nbs.client';
 import type { IExchangeRatesResponse } from '@preduzetnik/shared';
 import { Currency } from '../generated/prisma/enums';
 import { stripTime } from '../common/utils';
+import { EXCHANGE_RATE_PROVIDER, type IExchangeRateProvider } from './exchange-rate-provider.interface';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -11,7 +11,7 @@ export class ExchangeRatesService {
 
     constructor(
         private prisma: PrismaService,
-        private nbsClient: NbsClient,
+        @Inject(EXCHANGE_RATE_PROVIDER) private rateProvider: IExchangeRateProvider,
     ) {}
 
     async getRatesForDate(date: Date): Promise<IExchangeRatesResponse> {
@@ -45,7 +45,7 @@ export class ExchangeRatesService {
 
     async fetchAndSave(date: Date) {
         try {
-            const nbsRates = await this.nbsClient.fetchRatesForDate(date);
+            const nbsRates = await this.rateProvider.fetchRatesForDate(date);
 
             if (nbsRates.length === 0) {
                 return [];

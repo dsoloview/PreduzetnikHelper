@@ -1,20 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Currency } from '../generated/prisma/enums';
 import { formatSerbianDate } from '../common/utils';
-
-export interface NbsRate {
-    currencyCode: string;
-    middleRate: number;
-}
+import {ExchangeRateQuote, IExchangeRateProvider} from "./exchange-rate-provider.interface";
 
 @Injectable()
-export class NbsClient {
+export class NbsClient implements IExchangeRateProvider {
     private readonly logger = new Logger(NbsClient.name);
     private readonly NBS_SOAP_URL =
         'https://webservices.nbs.rs/CommunicationOfficeService1_0/ExchangeRateXmlService.asmx';
     private readonly SUPPORTED_CURRENCIES = [Currency.EUR, Currency.USD];
 
-    async fetchRatesForDate(date: Date): Promise<NbsRate[]> {
+    async fetchRatesForDate(date: Date): Promise<ExchangeRateQuote[]> {
         const formatted = formatSerbianDate(date);
 
         const body = this.buildSoapEnvelope(
@@ -36,7 +32,7 @@ export class NbsClient {
         return this.parseHtmlTable(html);
     }
 
-    async fetchCurrentRates(): Promise<NbsRate[]> {
+    async fetchCurrentRates(): Promise<ExchangeRateQuote[]> {
         const body = this.buildSoapEnvelope(
             'GetCurrentExchangeRate',
             '<com:exchangeRateListTypeID>2</com:exchangeRateListTypeID>',
@@ -100,8 +96,8 @@ export class NbsClient {
         return content.length > 0 ? content : null;
     }
 
-    private parseHtmlTable(html: string): NbsRate[] {
-        const rates: NbsRate[] = [];
+    private parseHtmlTable(html: string): ExchangeRateQuote[] {
+        const rates: ExchangeRateQuote[] = [];
 
         for (const currency of this.SUPPORTED_CURRENCIES) {
             const rowRegex = new RegExp(
