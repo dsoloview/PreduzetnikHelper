@@ -86,12 +86,11 @@ export class InvoicesController {
         @CurrentUser() user: JwtPayload,
         @Res() res: Response
     ): Promise<void> {
-        const pdfBuffer = await this.invoicesService.generatePdf(id, user.userId);
-        const invoice = await this.invoicesService.findOne(id, user.userId);
+        const { buffer: pdfBuffer, displayNumber } = await this.invoicesService.generatePdf(id, user.userId);
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="faktura-${invoice.displayNumber.replace('/', '-')}.pdf"`,
+            'Content-Disposition': `attachment; filename="faktura-${displayNumber.replace('/', '-')}.pdf"`,
             'Content-Length': pdfBuffer.length,
         });
 

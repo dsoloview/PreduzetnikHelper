@@ -19,8 +19,8 @@ export const invoiceApi = {
     return response.data;
   },
 
-  updateStatus: async (id: string, status: InvoiceStatus): Promise<IInvoiceResponse> => {
-    const response = await apiClient.patch<IInvoiceResponse>(`/invoices/${id}`, { status });
+  updateStatus: async (id: string, status: InvoiceStatus, paidAt?: string): Promise<IInvoiceResponse> => {
+    const response = await apiClient.patch<IInvoiceResponse>(`/invoices/${id}`, { status, paidAt });
     return response.data;
   },
 

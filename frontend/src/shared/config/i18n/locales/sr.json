@@ -151,7 +151,11 @@
       "paid": "Plaćeno",
       "cancelled": "Otkazano",
       "updateSuccess": "Status ažuriran.",
-      "updateError": "Neuspešno ažuriranje statusa."
+      "updateError": "Neuspešno ažuriranje statusa.",
+      "markPaidTitle": "Označi kao plaćeno",
+      "markPaidDescription": "Datum uplate se koristi u KPO knjizi i za obračun limita.",
+      "paidAt": "Datum uplate",
+      "paidOn": "plaćeno {{date}}"
     },
     "table": {
       "number": "Broj",

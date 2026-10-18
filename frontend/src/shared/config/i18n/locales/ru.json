@@ -151,7 +151,11 @@
       "paid": "Оплачен",
       "cancelled": "Отменён",
       "updateSuccess": "Статус обновлён.",
-      "updateError": "Не удалось обновить статус."
+      "updateError": "Не удалось обновить статус.",
+      "markPaidTitle": "Отметить как оплаченный",
+      "markPaidDescription": "Дата оплаты попадёт в КПО и в расчёт лимитов.",
+      "paidAt": "Дата оплаты",
+      "paidOn": "оплачен {{date}}"
     },
     "table": {
       "number": "Номер",

@@ -1,6 +1,6 @@
 export interface IKpoEntry {
   sequenceNumber: number;
-  issueDate: string;
+  date: string; // payment date (paidAt)
   description: string;
   productAmount: number;
   serviceAmount: number;

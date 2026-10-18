@@ -102,6 +102,7 @@ model Invoice {
   invoiceNumber  Int           @map("invoice_number") // Sequential per user per year
   year           Int // Year for numbering (e.g. 2026)
   status         InvoiceStatus @default(DRAFT)
+  paidAt         DateTime?     @map("paid_at") // Set when status becomes PAID; drives KPO and limits
   issueDate      DateTime      @map("issue_date")
   dueDate        DateTime      @map("due_date")
   placeOfIssue   String        @default("Beograd") @map("place_of_issue")
@@ -124,6 +125,7 @@ model Invoice {
   @@unique([userId, invoiceNumber, year]) // 1/2026 unique per user
   @@index([userId, year, status])
   @@index([userId, issueDate])
+  @@index([userId, paidAt])
   @@map("invoices")
 }
 

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
 import { InvoiceStatus } from '../generated/prisma/enums';
+import { getBelgradeYearRange } from '../common/utils';
 
 @Injectable()
 export class KpoService {
@@ -12,18 +13,21 @@ export class KpoService {
     ) {}
 
     async getKpoForYear(userId: string, year: number): Promise<IKpoResponse> {
+        // KPO records income on the day it was received, so the year is taken from paidAt, not from the invoice number
+        const { start, end } = getBelgradeYearRange(year);
         const invoices = await this.prisma.invoice.findMany({
             where: {
                 userId,
-                year,
-                status: { in: [InvoiceStatus.PAID] },
+                status: InvoiceStatus.PAID,
+                paidAt: { gte: start, lt: end },
             },
             include: {
                 client: true,
             },
-            orderBy: {
-                issueDate: 'asc',
-            },
+            orderBy: [
+                { paidAt: 'asc' },
+                { invoiceNumber: 'asc' },
+            ],
         });
 
         let totalYearly = 0;
@@ -33,7 +37,7 @@ export class KpoService {
 
             return {
                 sequenceNumber: index + 1,
-                issueDate: invoice.issueDate.toISOString(),
+                date: invoice.paidAt!.toISOString(),
                 description: `Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`,
                 productAmount: 0,
                 serviceAmount: totalRsd,

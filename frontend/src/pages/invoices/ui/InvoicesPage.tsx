@@ -196,6 +196,11 @@ export const InvoicesPage = () => {
                   </TableCell>
                   <TableCell>
                     <InvoiceStatusSelect invoiceId={invoice.id} status={invoice.status} />
+                    {invoice.paidAt && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {t("invoices.status.paidOn", { date: format(new Date(invoice.paidAt), "dd.MM.yyyy") })}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     {invoice.status === "DRAFT" && (

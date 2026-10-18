@@ -256,7 +256,7 @@ describe('InvoicesService', () => {
       const result = await service.generatePdf(invoiceId, userId);
 
       expect(pdfServiceMock.generateInvoicePdf).toHaveBeenCalled();
-      expect(result).toEqual(Buffer.from('pdf'));
+      expect(result).toEqual({ buffer: Buffer.from('pdf'), displayNumber: '1/2026' });
     });
 
     it('should throw NotFoundException when invoice not found', async () => {
@@ -298,6 +298,74 @@ describe('InvoicesService', () => {
 
       const result = await service.update(invoiceId, userId, dto);
       expect(result.status).toEqual(InvoiceStatus.PAID);
+    });
+
+    describe('status changes and paidAt', () => {
+      const makeExisting = (status: InvoiceStatus, paidAt: Date | null = null) => ({
+        id: invoiceId, userId, status, paidAt, totalAmount: 1000, totalRsd: 1000, exchangeRate: null,
+        currency: Currency.RSD, issueDate: new Date(), dueDate: new Date(), createdAt: new Date(),
+        client: { name: 'Client' }, items: [],
+      });
+      const updateData = () => (prismaMock.invoice.update as jest.Mock).mock.calls[0][0].data;
+
+      beforeEach(() => {
+        prismaMock.invoice.update.mockImplementation((async (args: any) => {
+          const defined = Object.fromEntries(Object.entries(args.data).filter(([, v]) => v !== undefined));
+          return { ...makeExisting(args.data.status), ...defined };
+        }) as any);
+      });
+
+      it('allows any status change, e.g. PAID back to DRAFT, and clears paidAt', async () => {
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.PAID, new Date('2026-05-01')) as any);
+
+        await service.update(invoiceId, userId, { status: InvoiceStatus.DRAFT });
+
+        expect(updateData()).toMatchObject({ status: InvoiceStatus.DRAFT, paidAt: null });
+      });
+
+      it('sets paidAt from the DTO when marking as PAID', async () => {
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.SENT) as any);
+
+        const result = await service.update(invoiceId, userId, { status: InvoiceStatus.PAID, paidAt: '2026-05-20' });
+
+        expect(updateData().paidAt).toEqual(new Date('2026-05-20'));
+        expect(result.paidAt).toEqual(new Date('2026-05-20').toISOString());
+      });
+
+      it('defaults paidAt to now when marking as PAID without a date', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2026-06-01T10:00:00Z'));
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.SENT) as any);
+
+        await service.update(invoiceId, userId, { status: InvoiceStatus.PAID });
+
+        expect(updateData().paidAt).toEqual(new Date('2026-06-01T10:00:00Z'));
+        jest.useRealTimers();
+      });
+
+      it('keeps the existing paidAt when a PAID invoice is updated without a new date', async () => {
+        const paidAt = new Date('2026-04-15');
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.PAID, paidAt) as any);
+
+        await service.update(invoiceId, userId, { status: InvoiceStatus.PAID });
+
+        expect(updateData().paidAt).toEqual(paidAt);
+      });
+
+      it('allows changing only paidAt on a PAID invoice', async () => {
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.PAID, new Date('2026-04-15')) as any);
+
+        await service.update(invoiceId, userId, { paidAt: '2026-04-20' });
+
+        expect(updateData().paidAt).toEqual(new Date('2026-04-20'));
+      });
+
+      it('rejects paidAt for a non-PAID status', async () => {
+        prismaMock.invoice.findUnique.mockResolvedValue(makeExisting(InvoiceStatus.SENT) as any);
+
+        await expect(service.update(invoiceId, userId, { status: InvoiceStatus.CANCELLED, paidAt: '2026-05-20' }))
+          .rejects.toThrow(BadRequestException);
+        expect(prismaMock.invoice.update).not.toHaveBeenCalled();
+      });
     });
 
     it('should throw NotFoundException when invoice not found', async () => {

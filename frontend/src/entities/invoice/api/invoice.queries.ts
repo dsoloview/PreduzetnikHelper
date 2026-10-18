@@ -40,8 +40,8 @@ export const useUpdateInvoice = () => {
 export const useUpdateInvoiceStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: InvoiceStatus }) =>
-      invoiceApi.updateStatus(id, status),
+    mutationFn: ({ id, status, paidAt }: { id: string; status: InvoiceStatus; paidAt?: string }) =>
+      invoiceApi.updateStatus(id, status, paidAt),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       queryClient.invalidateQueries({ queryKey: ["limits"] });

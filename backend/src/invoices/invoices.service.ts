@@ -12,6 +12,9 @@ import { InvoiceStatus, Currency, ClientType } from '../generated/prisma/enums';
 import type { Prisma } from '../generated/prisma/client';
 import {getBelgradeYear} from "../common/utils";
 
+// Fields that may change on a non-DRAFT invoice
+const STATUS_FIELDS = ['status', 'paidAt'];
+
 @Injectable()
 export class InvoicesService {
     constructor(
@@ -141,10 +144,18 @@ export class InvoicesService {
         const definedKeys = Object.entries(dto)
             .filter(([, v]) => v !== undefined)
             .map(([k]) => k);
-        const isOnlyStatusUpdate = definedKeys.length === 1 && definedKeys[0] === 'status';
+        const isOnlyStatusUpdate = definedKeys.every(k => STATUS_FIELDS.includes(k));
         if (existing.status !== InvoiceStatus.DRAFT && !isOnlyStatusUpdate) {
             throw new BadRequestException('Only DRAFT invoices can be edited');
         }
+
+        const nextStatus = dto.status ?? existing.status;
+        if (dto.paidAt && nextStatus !== InvoiceStatus.PAID) {
+            throw new BadRequestException('paidAt can only be set on PAID invoices');
+        }
+        const paidAt = nextStatus === InvoiceStatus.PAID
+            ? (dto.paidAt ? new Date(dto.paidAt) : existing.paidAt ?? new Date())
+            : null;
 
         if (dto.clientId) {
             await this.clientsService.findOne(dto.clientId, userId);
@@ -187,6 +198,7 @@ export class InvoicesService {
                 clientId: dto.clientId,
                 bankAccountId: dto.bankAccountId,
                 status: dto.status as InvoiceStatus,
+                paidAt,
                 issueDate: dto.issueDate ? new Date(dto.issueDate) : undefined,
                 dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
                 placeOfIssue: dto.placeOfIssue,
@@ -228,7 +240,7 @@ export class InvoicesService {
         return this.mapToResponseDto(deleted);
     }
 
-    async generatePdf(id: string, userId: string): Promise<Buffer> {
+    async generatePdf(id: string, userId: string): Promise<{ buffer: Buffer; displayNumber: string }> {
         const invoice = await this.prisma.invoice.findUnique({
             where: { id },
             include: {
@@ -254,7 +266,8 @@ export class InvoicesService {
             bankAccount: invoice.bankAccount,
         };
 
-        return this.pdfService.generateInvoicePdf(pdfData);
+        const buffer = await this.pdfService.generateInvoicePdf(pdfData);
+        return { buffer, displayNumber: mappedDto.displayNumber };
     }
 
     private mapToResponseDto(
@@ -266,6 +279,7 @@ export class InvoicesService {
             year: invoice.year,
             displayNumber: `${invoice.invoiceNumber}/${invoice.year}`,
             status: invoice.status,
+            paidAt: invoice.paidAt ? invoice.paidAt.toISOString() : null,
             clientId: invoice.clientId,
             clientName: invoice.client.name,
             issueDate: invoice.issueDate.toISOString(),

@@ -12,3 +12,8 @@ export const stripTime = (date: Date): Date => {
 export const getBelgradeYear = (date: Date): number => {
     return Number(new Intl.DateTimeFormat('en', {year: 'numeric', timeZone: 'Europe/Belgrade'}).format(date));
 };
+/** [start, end) of a calendar year in Belgrade time. January 1st is always CET (UTC+1), so the year starts at 23:00 UTC on Dec 31. */
+export const getBelgradeYearRange = (year: number): { start: Date; end: Date } => ({
+    start: new Date(Date.UTC(year - 1, 11, 31, 23)),
+    end: new Date(Date.UTC(year, 11, 31, 23)),
+});

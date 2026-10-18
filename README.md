@@ -16,7 +16,7 @@
 
 - **Issue invoices** — create, send, and track invoices with automatic sequential numbering per year; export to PDF ready to send to clients
 - **Manage clients** — keep a directory of domestic and international clients with all required tax details
-- **Maintain the KPO book** — the mandatory income ledger is generated automatically from paid invoices and can be exported to PDF at any time
+- **Maintain the KPO book** — the mandatory income ledger is generated automatically from paid invoices (by payment date) and can be exported to PDF at any time
 - **Track income limits** — real-time progress bars show how close you are to the 6M RSD paušal limit and the 8M RSD VAT threshold
 - **Manage bank accounts** — store multiple accounts (RSD / EUR / USD) with SWIFT and IBAN details
 
@@ -40,9 +40,9 @@ Serbian paušalac operates under a fixed-tax regime with strict rules:
 | **Profile** | Company info: name, PIB, MBR, activity code, municipality, address |
 | **Clients** | CRUD — domestic & international clients, tax ID (PIB/VAT) handling |
 | **Bank Accounts** | Multi-currency accounts (RSD / EUR / USD), SWIFT, IBAN, default account flag |
-| **Invoices** | Full CRUD, status flow `DRAFT → SENT → PAID / CANCELLED`, auto-numbering per year |
-| **PDF Export** | Invoice and KPO book PDFs via PDFMake with DOMPurify XSS sanitization |
-| **KPO Book** | Auto-generated ledger from paid invoices, filterable by year, PDF export |
+| **Invoices** | Full CRUD, statuses `DRAFT` / `SENT` / `PAID` / `CANCELLED` (switchable freely, payment date recorded on PAID), auto-numbering per year |
+| **PDF Export** | Invoice and KPO book PDFs via PDFMake (default) or Puppeteer |
+| **KPO Book** | Auto-generated ledger from paid invoices by payment date, filterable by year, PDF export |
 | **Limits Tracker** | Real-time progress bars for paušal (6M RSD) and VAT (8M RSD) thresholds |
 | **Dashboard** | Revenue stats, limit cards, invoice status breakdown, recent invoices, top clients |
 | **Settings** | Change password |
@@ -66,7 +66,7 @@ PreduzetnikHelper/
 - **Passport + JWT** — access token, refresh token in HttpOnly cookie
 - **class-validator + class-transformer** — DTO validation
 - **Helmet + Throttler** — security headers and rate limiting
-- **PDFMake + DOMPurify** — PDF generation with XSS sanitization
+- **PDFMake** (default) **or Puppeteer + Handlebars** — PDF generation, output escaped by the template engine
 - **Swagger** — auto-generated API docs (dev only)
 
 ### Frontend
@@ -99,7 +99,7 @@ pnpm install
 
 # 3. Configure backend environment
 cp backend/.env.example backend/.env
-# → edit backend/.env: set JWT_SECRET / JWT_REFRESH_SECRET to long random strings
+# → edit backend/.env: set JWT_SECRET to a long random string
 
 # 4. Start PostgreSQL (Docker)
 make db-up
@@ -159,7 +159,6 @@ Copy `backend/.env.example` → `backend/.env`.
 | `DATABASE_URL` | Full PostgreSQL connection string |
 | `JWT_SECRET` | Access token secret (min 32 chars) |
 | `JWT_EXPIRES_IN` | Access token TTL (e.g. `15m`) |
-| `JWT_REFRESH_SECRET` | Refresh token secret (min 32 chars) |
 | `REFRESH_TOKEN_EXPIRES_DAYS` | Refresh token TTL in days |
 | `CORS_ORIGIN` | Allowed frontend origin (e.g. `http://localhost:5173`) |
 | `PDF_PROVIDER` | `pdfmake` (default, no Chrome) or `puppeteer` |

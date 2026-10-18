@@ -100,7 +100,7 @@ export const KpoPage = () => {
                   data.entries.map((entry) => (
                     <TableRow key={entry.sequenceNumber}>
                       <TableCell className="text-muted-foreground">{entry.sequenceNumber}</TableCell>
-                      <TableCell>{format(new Date(entry.issueDate), "dd.MM.yyyy")}</TableCell>
+                      <TableCell>{format(new Date(entry.date), "dd.MM.yyyy")}</TableCell>
                       <TableCell>{entry.description}</TableCell>
                       <TableCell className="text-right font-mono">
                         {formatRsd(entry.productAmount)}

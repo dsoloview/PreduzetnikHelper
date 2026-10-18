@@ -330,7 +330,7 @@ export class PdfmakePdfService implements IPdfService, OnModuleInit {
                 { text: String(e.sequenceNumber), alignment: 'center', fontSize: 9 },
                 {
                     stack: [
-                        { text: this.formatDate(e.issueDate), bold: true, fontSize: 9 },
+                        { text: this.formatDate(e.date), bold: true, fontSize: 9 },
                         { text: e.description, fontSize: 8 },
                     ],
                     alignment: 'left',

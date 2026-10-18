@@ -47,7 +47,7 @@ export interface KpoPdfData {
     totalYearly: number;
     entries: {
         sequenceNumber: number;
-        issueDate: string;
+        date: string;
         description: string;
         productAmount: number;
         serviceAmount: number;

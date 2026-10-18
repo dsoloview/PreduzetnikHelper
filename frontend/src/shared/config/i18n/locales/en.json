@@ -151,7 +151,11 @@
       "paid": "Paid",
       "cancelled": "Cancelled",
       "updateSuccess": "Invoice status updated.",
-      "updateError": "Failed to update status."
+      "updateError": "Failed to update status.",
+      "markPaidTitle": "Mark as paid",
+      "markPaidDescription": "The payment date is used in the KPO book and limit calculations.",
+      "paidAt": "Payment date",
+      "paidOn": "paid {{date}}"
     },
     "table": {
       "number": "Number",

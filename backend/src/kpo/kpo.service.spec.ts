@@ -40,12 +40,12 @@ describe('KpoService', () => {
       const invoices = [
         {
           id: 'inv-1', invoiceNumber: 1, year, totalRsd: 100000,
-          issueDate: new Date('2026-01-15'), currency: Currency.RSD,
+          issueDate: new Date('2026-01-15'), paidAt: new Date('2026-01-20'), currency: Currency.RSD,
           client: { name: 'Client A' },
         },
         {
           id: 'inv-2', invoiceNumber: 2, year, totalRsd: 200000,
-          issueDate: new Date('2026-02-10'), currency: Currency.RSD,
+          issueDate: new Date('2026-02-10'), paidAt: new Date('2026-02-12'), currency: Currency.RSD,
           client: { name: 'Client <B>' },
         },
       ];
@@ -54,17 +54,19 @@ describe('KpoService', () => {
       const result = await service.getKpoForYear(userId, year);
 
       expect(prismaMock.invoice.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({
+        where: {
           userId,
-          year,
-          status: { in: [InvoiceStatus.PAID] },
-        }),
+          status: InvoiceStatus.PAID,
+          // Belgrade year boundaries: 2026-01-01 00:00 CET .. 2027-01-01 00:00 CET
+          paidAt: { gte: new Date('2025-12-31T23:00:00Z'), lt: new Date('2026-12-31T23:00:00Z') },
+        },
       }));
 
       expect(result.year).toEqual(year);
       expect(result.entries).toHaveLength(2);
       expect(result.entries[0].sequenceNumber).toEqual(1);
       expect(result.entries[1].sequenceNumber).toEqual(2);
+      expect(result.entries[0].date).toEqual(new Date('2026-01-20').toISOString());
       expect(result.totalYearly).toEqual(300000);
     });
 
@@ -72,7 +74,7 @@ describe('KpoService', () => {
       const invoices = [
         {
           id: 'inv-1', invoiceNumber: 1, year, totalRsd: 50000,
-          issueDate: new Date('2026-03-01'),
+          issueDate: new Date('2026-03-01'), paidAt: new Date('2026-03-05'),
           client: { name: '<Script> & "Evil"' },
         },
       ];

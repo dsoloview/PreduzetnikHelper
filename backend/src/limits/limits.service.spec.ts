@@ -44,21 +44,21 @@ describe('LimitsService', () => {
     expect(prismaMock.invoice.findMany).toHaveBeenCalledTimes(2);
 
     expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      where: expect.objectContaining({
+      where: {
         userId: 'user-1',
-        year: 2026,
-        status: { in: [InvoiceStatus.PAID] }
-      })
+        status: InvoiceStatus.PAID,
+        paidAt: { gte: new Date('2025-12-31T23:00:00Z'), lt: new Date('2026-12-31T23:00:00Z') },
+      }
     }));
 
     const expectedDate = new Date('2025-05-08T12:00:00.000Z');
     expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      where: expect.objectContaining({
+      where: {
         userId: 'user-1',
-        issueDate: { gte: expectedDate },
+        status: InvoiceStatus.PAID,
+        paidAt: { gte: expectedDate },
         domesticSupply: true,
-        status: { in: [InvoiceStatus.PAID] }
-      })
+      }
     }));
 
     expect(result.pausalLimit.current).toEqual(1500000);

@@ -25,6 +25,11 @@ export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
     @IsEnum(InvoiceStatusEnum)
     status?: InvoiceStatus;
 
+    @ApiPropertyOptional({example: '2026-05-20', description: 'Payment date; only for PAID invoices, defaults to today'})
+    @IsOptional()
+    @IsDateString()
+    paidAt?: string;
+
     @ApiPropertyOptional({example: '2026-05-03'})
     @IsOptional()
     @IsDateString()

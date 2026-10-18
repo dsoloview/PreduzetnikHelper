@@ -36,6 +36,9 @@ export class InvoiceResponseDto implements IInvoiceResponse {
     @ApiProperty({enum: InvoiceStatusEnum})
     status: InvoiceStatus;
 
+    @ApiPropertyOptional({example: '2026-05-20'})
+    paidAt: string | null;
+
     @ApiProperty()
     clientId: string;
 

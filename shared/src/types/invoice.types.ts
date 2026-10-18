@@ -24,6 +24,7 @@ export interface IInvoiceResponse {
   year: number;
   displayNumber: string; // "1/2026" — computed on backend
   status: InvoiceStatus;
+  paidAt: string | null; // ISO date, set while status is PAID
 
   clientId: string;
   clientName: string;
@@ -65,6 +66,7 @@ export interface IUpdateInvoiceRequest {
   clientId?: string;
   bankAccountId?: string;
   status?: InvoiceStatus;
+  paidAt?: string;      // ISO date string, only with PAID
   issueDate?: string;
   dueDate?: string;
   placeOfIssue?: string;
