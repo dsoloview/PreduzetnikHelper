@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashed'),
   compare: jest.fn(),
+  hashSync: jest.fn().mockReturnValue('dummy-hash'),
 }));
 
 jest.mock('crypto', () => ({
@@ -78,19 +79,22 @@ describe('AuthService', () => {
       expect(jwtServiceMock.sign).toHaveBeenCalledWith({ username: 'User', sub: '1' });
     });
 
-    it('should throw UnprocessableEntityException if user not found', async () => {
+    it('should throw UnauthorizedException if user not found', async () => {
       (usersServiceMock.user as jest.Mock).mockResolvedValue(null);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       await expect(service.login({ email: 'test@example.com', password: 'password' }, META))
-        .rejects.toThrow(UnprocessableEntityException);
+        .rejects.toThrow(UnauthorizedException);
+      // Still runs bcrypt so timing doesn't reveal unknown emails
+      expect(bcrypt.compare).toHaveBeenCalled();
     });
 
-    it('should throw UnprocessableEntityException if password invalid', async () => {
+    it('should throw UnauthorizedException if password invalid', async () => {
       (usersServiceMock.user as jest.Mock).mockResolvedValue({ password: 'hashed' });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(service.login({ email: 'test@example.com', password: 'wrong' }, META))
-        .rejects.toThrow(UnprocessableEntityException);
+        .rejects.toThrow(UnauthorizedException);
     });
   });
 

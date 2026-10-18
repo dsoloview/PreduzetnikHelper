@@ -8,6 +8,7 @@ import {JwtAuthGuard} from "./jwt-auth.guard";
 import {APP_GUARD} from "@nestjs/core";
 import {UsersModule} from "../users/users.module";
 import {ConfigService} from "@nestjs/config";
+import {RefreshTokenCleanupScheduler} from "./refresh-token-cleanup.scheduler";
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import {ConfigService} from "@nestjs/config";
     providers: [
         AuthService,
         JwtStrategy,
+        RefreshTokenCleanupScheduler,
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,

@@ -19,6 +19,8 @@ export interface TokenPair {
     refreshToken: string;
 }
 
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('dummy-password-for-timing', 10);
+
 @Injectable()
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
@@ -32,12 +34,10 @@ export class AuthService {
 
     async login(loginDto: LoginDto, meta: { ip?: string; userAgent?: string }): Promise<TokenPair> {
         const user = await this.usersService.user({ email: loginDto.email });
-        if (!user) {
-            throw new UnprocessableEntityException('Invalid credentials');
-        }
-
-        if (!await bcrypt.compare(loginDto.password, user.password)) {
-            throw new UnprocessableEntityException('Invalid credentials');
+        // Compare against a dummy hash for unknown emails so response time doesn't reveal whether the account exists
+        const passwordMatches = await bcrypt.compare(loginDto.password, user?.password ?? DUMMY_PASSWORD_HASH);
+        if (!user || !passwordMatches) {
+            throw new UnauthorizedException('Invalid credentials');
         }
 
         return this.createTokenPair(user, meta);
