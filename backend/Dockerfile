@@ -30,7 +30,7 @@ RUN pnpm --filter backend build
 # ─── Production image ────────────────────────────────────────────────────────
 
 FROM node:22-alpine AS runner
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable
 WORKDIR /app
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
