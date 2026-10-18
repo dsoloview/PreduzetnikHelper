@@ -47,7 +47,7 @@ describe('LimitsService', () => {
       where: expect.objectContaining({
         userId: 'user-1',
         year: 2026,
-        status: { not: InvoiceStatus.CANCELLED }
+        status: { in: [InvoiceStatus.PAID] }
       })
     }));
 
@@ -57,7 +57,7 @@ describe('LimitsService', () => {
         userId: 'user-1',
         issueDate: { gte: expectedDate },
         domesticSupply: true,
-        status: { not: InvoiceStatus.CANCELLED }
+        status: { in: [InvoiceStatus.PAID] }
       })
     }));
 

@@ -8,3 +8,8 @@ export const formatSerbianDate = (date: Date): string => {
 export const stripTime = (date: Date): Date => {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 };
+
+export const getBelgradeYear = (date: Date): number => {
+    return Number(new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: 'Europe/Belgrade' }).format(date));
+}
+

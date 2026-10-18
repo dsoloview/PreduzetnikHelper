@@ -88,7 +88,7 @@ export class AuthController {
     }
 
     private setRefreshCookie(res: Response, token: string): void {
-        const expiresInDays = this.config.get<number>('REFRESH_TOKEN_EXPIRES_DAYS', 30);
+        const expiresInDays = Number(this.config.get('REFRESH_TOKEN_EXPIRES_DAYS', 30));
         res.cookie(REFRESH_COOKIE, token, {
             httpOnly: true,
             secure: this.config.get('NODE_ENV') === 'production',

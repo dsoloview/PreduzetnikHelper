@@ -57,7 +57,7 @@ describe('KpoService', () => {
         where: expect.objectContaining({
           userId,
           year,
-          status: { not: InvoiceStatus.CANCELLED },
+          status: { in: [InvoiceStatus.PAID] },
         }),
       }));
 

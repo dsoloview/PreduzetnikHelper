@@ -122,6 +122,8 @@ model Invoice {
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
   @@unique([userId, invoiceNumber, year]) // 1/2026 unique per user
+  @@index([userId, year, status])
+  @@index([userId, issueDate])
   @@map("invoices")
 }
 

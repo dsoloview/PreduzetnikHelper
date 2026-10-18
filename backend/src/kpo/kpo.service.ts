@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PdfService } from '../pdf/pdf.service';
 import { IKpoResponse, IKpoEntry } from '@preduzetnik/shared';
 import { InvoiceStatus } from '../generated/prisma/enums';
-import { escapeHtml } from '../common/utils';
 
 @Injectable()
 export class KpoService {
@@ -17,9 +16,7 @@ export class KpoService {
             where: {
                 userId,
                 year,
-                status: {
-                    not: InvoiceStatus.CANCELLED
-                }
+                status: { in: [InvoiceStatus.PAID] },
             },
             include: {
                 client: true,
@@ -37,7 +34,7 @@ export class KpoService {
             return {
                 sequenceNumber: index + 1,
                 issueDate: invoice.issueDate.toISOString(),
-                description: escapeHtml(`Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`),
+                description: `Faktura br. ${invoice.invoiceNumber}/${invoice.year} - ${invoice.client.name}`,
                 productAmount: 0,
                 serviceAmount: totalRsd,
                 totalAmount: totalRsd,

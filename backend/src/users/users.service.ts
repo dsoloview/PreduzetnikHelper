@@ -64,7 +64,11 @@ export class UsersService {
         const valid = await bcrypt.compare(dto.currentPassword, user.password);
         if (!valid) throw new UnprocessableEntityException('Current password is incorrect');
         const hashed = await bcrypt.hash(dto.newPassword, 10);
-        await this.prisma.user.update({ where: { id: userId }, data: { password: hashed } });
+
+        await this.prisma.$transaction([
+            this.prisma.user.update({ where: { id: userId }, data: { password: hashed } }),
+            this.prisma.refreshToken.deleteMany({ where: { userId } }),
+        ]);
     }
 
     async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {

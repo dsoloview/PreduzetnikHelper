@@ -10,6 +10,7 @@ import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 import { PdfService } from '../pdf/pdf.service';
 import { InvoiceStatus, Currency, ClientType } from '../generated/prisma/enums';
 import type { Prisma } from '../generated/prisma/client';
+import {getBelgradeYear} from "../common/utils";
 
 @Injectable()
 export class InvoicesService {
@@ -25,7 +26,7 @@ export class InvoicesService {
         const bankAccount = await this.bankAccountsService.findOne(dto.bankAccountId, userId);
 
         const issueDate = new Date(dto.issueDate);
-        const year = issueDate.getFullYear();
+        const year = getBelgradeYear(issueDate);
 
         const domesticSupply = dto.domesticSupply ?? (client.type === ClientType.DOMESTIC);
 
@@ -131,6 +132,10 @@ export class InvoicesService {
         }
         if (existing.userId !== userId) {
             throw new ForbiddenException('Access denied');
+        }
+
+        if (dto.issueDate && getBelgradeYear(new Date(dto.issueDate)) !== existing.year) {
+            throw new BadRequestException('Cannot move invoice to another year');
         }
 
         const definedKeys = Object.entries(dto)

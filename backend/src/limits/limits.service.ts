@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ILimitsResponse, ILimitStatus } from '@preduzetnik/shared';
 import { InvoiceStatus } from '../generated/prisma/enums';
+import {getBelgradeYear} from "../common/utils";
 
 @Injectable()
 export class LimitsService {
@@ -13,7 +14,7 @@ export class LimitsService {
 
     async getLimits(userId: string): Promise<ILimitsResponse> {
         const today = new Date();
-        const currentYear = today.getFullYear();
+        const currentYear = getBelgradeYear(today);
 
         const date365DaysAgo = new Date(today);
         date365DaysAgo.setDate(today.getDate() - this.ROLLING_WINDOW_DAYS);
@@ -22,9 +23,7 @@ export class LimitsService {
             where: {
                 userId,
                 year: currentYear,
-                status: {
-                    not: InvoiceStatus.CANCELLED
-                }
+                status: { in: [InvoiceStatus.PAID] },
             },
             select: {
                 totalRsd: true
@@ -40,9 +39,7 @@ export class LimitsService {
                     gte: date365DaysAgo
                 },
                 domesticSupply: true,
-                status: {
-                    not: InvoiceStatus.CANCELLED
-                }
+                status: { in: [InvoiceStatus.PAID] },
             },
             select: {
                 totalRsd: true
