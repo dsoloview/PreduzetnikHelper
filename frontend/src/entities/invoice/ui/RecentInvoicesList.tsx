@@ -1,11 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { FileText, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Button } from "@/shared/ui/button";
-import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import { FileText } from "lucide-react";
 import type { IInvoiceResponse } from "@preduzetnik/shared";
+import { Card } from "@/shared/ui/card";
+import { Money } from "@/shared/ui/money";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { SectionHeader } from "@/shared/ui/section-header";
+import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import { getDisplayStatus } from "../lib/display-status";
 
 interface RecentInvoicesListProps {
   invoices: IInvoiceResponse[];
@@ -18,51 +20,35 @@ export const RecentInvoicesList = ({ invoices, isLoading }: RecentInvoicesListPr
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{t("dashboard.invoices.title")}</h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/invoices" className="flex items-center gap-1 text-sm">
-            {t("dashboard.invoices.viewAll")} <ArrowRight className="size-3.5" />
-          </Link>
-        </Button>
-      </div>
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-6 space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-8 rounded bg-muted animate-pulse" />
-              ))}
-            </div>
-          ) : recent.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
-              <FileText className="size-8 text-muted-foreground" />
-              <p className="text-muted-foreground text-sm">{t("dashboard.invoices.empty")}</p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {recent.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between px-6 py-3">
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono font-medium text-sm w-16">{invoice.displayNumber}</span>
-                    <span className="text-sm text-muted-foreground truncate max-w-28">
-                      {invoice.clientName}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium hidden sm:block">
-                      {invoice.totalAmount.toLocaleString()} {invoice.currency}
-                    </span>
-                    <span className="text-xs text-muted-foreground hidden md:block">
-                      {format(new Date(invoice.issueDate), "dd.MM.yy")}
-                    </span>
-                    <InvoiceStatusBadge status={invoice.status} />
-                  </div>
+      <SectionHeader title={t("dashboard.invoices.title")} linkTo="/invoices" linkLabel={t("dashboard.invoices.viewAll")} />
+      <Card className="gap-0 py-0">
+        {isLoading ? (
+          <div className="space-y-3 p-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10" />)}
+          </div>
+        ) : recent.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+            <FileText className="size-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t("dashboard.invoices.empty")}</p>
+          </div>
+        ) : (
+          <ul className="divide-y">
+            {recent.map((invoice) => (
+              <li key={invoice.id} className="flex items-center gap-3 px-4 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{invoice.clientName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {invoice.displayNumber} · {format(new Date(invoice.issueDate), "dd.MM.yyyy")}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                <div className="flex flex-col items-end gap-1">
+                  <Money amount={invoice.totalAmount} currency={invoice.currency} className="text-sm font-medium" />
+                  <InvoiceStatusBadge status={getDisplayStatus(invoice)} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
     </section>
   );

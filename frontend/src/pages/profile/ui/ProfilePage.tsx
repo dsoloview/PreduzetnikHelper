@@ -14,6 +14,7 @@ import { Label } from "@/shared/ui/label";
 import { RequiredMark } from "@/shared/ui/required-mark";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Separator } from "@/shared/ui/separator";
+import { PageHeader } from "@/shared/ui/page-header";
 
 const profileSchema = (t: (key: string) => string) => z.object({
   name: z.string().min(1, t("profile.errors.nameRequired")),
@@ -89,11 +90,8 @@ export const ProfilePage = () => {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("profile.title")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{t("profile.subtitle")}</p>
-      </div>
+    <div className="mx-auto w-full max-w-2xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <PageHeader title={t("profile.title")} description={t("profile.subtitle")} />
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Card>

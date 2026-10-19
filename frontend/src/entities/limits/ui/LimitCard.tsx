@@ -1,12 +1,16 @@
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
-import { Badge } from "@/shared/ui/badge";
-import { Progress } from "@/shared/ui/progress";
+import { AlertTriangle } from "lucide-react";
 import type { ILimitStatus } from "@preduzetnik/shared";
+import { cn } from "@/shared/lib/utils";
+import { Card } from "@/shared/ui/card";
+import { Money } from "@/shared/ui/money";
+import { getLimitLevel, type LimitLevel } from "../lib/limit-level";
 
-const formatRsd = (value: number) =>
-  value.toLocaleString("sr-RS", { maximumFractionDigits: 0 }) + " RSD";
+const LEVEL_STYLE: Record<LimitLevel, { bar: string; text: string }> = {
+  ok: { bar: "bg-primary", text: "text-foreground" },
+  warning: { bar: "bg-warning", text: "text-warning-strong" },
+  danger: { bar: "bg-destructive", text: "text-destructive-strong" },
+};
 
 interface LimitCardProps {
   title: string;
@@ -17,89 +21,47 @@ interface LimitCardProps {
 
 export const LimitCard = ({ title, description, status, compact = false }: LimitCardProps) => {
   const { t } = useTranslation();
-
-  const color = status.isExceeded
-    ? "text-destructive"
-    : status.percentage >= 80
-      ? "text-yellow-600"
-      : "text-green-600";
-
-  const progressColor = status.isExceeded
-    ? "[&>[data-slot=progress-indicator]]:bg-destructive"
-    : status.percentage >= 80
-      ? "[&>[data-slot=progress-indicator]]:bg-yellow-500"
-      : "[&>[data-slot=progress-indicator]]:bg-green-500";
-
-  const Icon = status.isExceeded ? AlertTriangle : CheckCircle2;
-
-  if (compact) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-            <Icon className={`size-4 ${color}`} />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div>
-            <p className={`text-2xl font-bold ${color}`}>
-              {status.percentage.toFixed(1)}%
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {formatRsd(status.current)} / {formatRsd(status.limit)}
-            </p>
-          </div>
-          <Progress value={Math.min(status.percentage, 100)} className={`h-2 ${progressColor}`} />
-          <p className="text-xs text-muted-foreground">
-            {t("limits.remaining")}: <span className={`font-medium ${color}`}>{formatRsd(status.remaining)}</span>
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const level = getLimitLevel(status);
+  const style = LEVEL_STYLE[level];
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">{title}</CardTitle>
-            {description && <CardDescription className="mt-1">{description}</CardDescription>}
-          </div>
-          <Icon className={`size-5 mt-0.5 ${color}`} />
+    <Card className={cn("gap-0", compact ? "p-4" : "p-5")}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className={cn("font-medium", compact ? "text-sm text-muted-foreground" : "text-base")}>{title}</h3>
+          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{t("limits.used")}</span>
-            <span className={`font-semibold ${color}`}>{status.percentage.toFixed(1)}%</span>
-          </div>
-          <Progress value={Math.min(status.percentage, 100)} className={`h-3 ${progressColor}`} />
-        </div>
+        <span className={cn("shrink-0 text-lg font-semibold", style.text)}>{status.percentage.toFixed(1)}%</span>
+      </div>
 
-        <div className="grid grid-cols-3 gap-3 text-center text-sm">
-          <div className="space-y-0.5">
-            <p className="text-muted-foreground text-xs">{t("limits.current")}</p>
-            <p className="font-semibold">{formatRsd(status.current)}</p>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-muted-foreground text-xs">{t("limits.limit")}</p>
-            <p className="font-semibold">{formatRsd(status.limit)}</p>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-muted-foreground text-xs">{t("limits.remaining")}</p>
-            <p className={`font-semibold ${color}`}>{formatRsd(status.remaining)}</p>
-          </div>
-        </div>
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-label={title}
+        aria-valuenow={Math.round(status.percentage)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div className={cn("h-full rounded-full transition-all", style.bar)} style={{ width: `${Math.min(status.percentage, 100)}%` }} />
+      </div>
 
-        {status.isExceeded && (
-          <Badge variant="destructive" className="w-full justify-center">
-            {t("limits.exceeded")}
-          </Badge>
-        )}
-      </CardContent>
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
+        <span className="text-muted-foreground">
+          <Money amount={status.current} currency="RSD" className="font-medium text-foreground" />
+          {" / "}
+          <Money amount={status.limit} currency="RSD" />
+        </span>
+        <span className="text-muted-foreground">
+          {t("limits.remaining")}: <Money amount={status.remaining} currency="RSD" className={cn("font-medium", style.text)} />
+        </span>
+      </div>
+
+      {level !== "ok" && (
+        <p className={cn("mt-3 flex items-center gap-1.5 text-xs font-medium", style.text)}>
+          <AlertTriangle className="size-3.5" />
+          {status.isExceeded ? t("limits.exceeded") : t("limits.approaching")}
+        </p>
+      )}
     </Card>
   );
 };

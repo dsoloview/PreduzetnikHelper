@@ -23,17 +23,20 @@ import { Label } from "@/shared/ui/label";
 import { Spinner } from "@/shared/ui/spinner";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import type { InvoiceDisplayStatus } from "../lib/display-status";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 interface InvoiceStatusSelectProps {
   invoiceId: string;
   status: InvoiceStatus;
+  /** Shown on the trigger; differs from status for overdue invoices */
+  displayStatus?: InvoiceDisplayStatus;
 }
 
 const today = () => format(new Date(), "yyyy-MM-dd");
 
-export const InvoiceStatusSelect = ({ invoiceId, status }: InvoiceStatusSelectProps) => {
+export const InvoiceStatusSelect = ({ invoiceId, status, displayStatus = status }: InvoiceStatusSelectProps) => {
   const { t } = useTranslation();
   const { mutate, isPending } = useUpdateInvoiceStatus();
   const [paidDialogOpen, setPaidDialogOpen] = useState(false);
@@ -71,10 +74,11 @@ export const InvoiceStatusSelect = ({ invoiceId, status }: InvoiceStatusSelectPr
             variant="ghost"
             size="sm"
             disabled={isPending}
-            className="h-auto p-0 hover:bg-transparent focus-visible:ring-0"
+            aria-label={t("invoices.status.change")}
+            className="h-auto gap-0.5 rounded-full p-0 hover:bg-transparent focus-visible:ring-2"
           >
-            <InvoiceStatusBadge status={status} />
-            <ChevronDown className="ml-1 size-3 text-muted-foreground" />
+            <InvoiceStatusBadge status={displayStatus} />
+            <ChevronDown className="size-3.5 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">

@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Spinner } from "@/shared/ui/spinner";
 import { RequiredMark } from "@/shared/ui/required-mark";
 import { cn } from "@/shared/lib/utils";
+import { useFormatters } from "@/shared/lib/format";
 
 import { useClients } from "@/entities/client/api/client.queries";
 import { useBankAccounts } from "@/entities/bank-account/api/bank-account.queries";
@@ -72,6 +73,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   const { data: clients } = useClients();
   const { data: bankAccounts } = useBankAccounts();
   const { data: profile } = useProfile();
+  const { number, money } = useFormatters();
 
   const schema = useMemo(() => buildInvoiceSchema(t), [t]);
 
@@ -258,7 +260,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : <span>{t("invoices.form.pickDate")}</span>}
+                        {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -286,7 +288,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : <span>{t("invoices.form.pickDate")}</span>}
+                        {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -400,7 +402,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               <TableHead className="w-[20%]">
                 {t("invoices.form.price")}<RequiredMark />
               </TableHead>
-              <TableHead className="w-[20%]">{t("invoices.form.total")}</TableHead>
+              <TableHead className="w-[20%] text-right">{t("invoices.form.total")}</TableHead>
               <TableHead className="w-[5%]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -450,8 +452,8 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
                       </p>
                     )}
                   </TableCell>
-                  <TableCell className="font-medium pt-3">
-                    {rowTotal.toLocaleString()}
+                  <TableCell className="font-medium pt-3 text-right whitespace-nowrap">
+                    {number(rowTotal, 2)}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -495,8 +497,8 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
         <div className="text-sm text-muted-foreground italic">
           {t("invoices.form.noVatNotice")}
         </div>
-        <div className="text-2xl font-bold">
-          {t("invoices.form.grandTotal")}: {totalAmount.toLocaleString()} {currency}
+        <div className="text-xl font-semibold">
+          {t("invoices.form.grandTotal")}: {money(totalAmount, currency, { decimals: 2 })}
         </div>
       </div>
 

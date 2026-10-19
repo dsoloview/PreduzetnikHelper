@@ -1,18 +1,32 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
+import { format } from "date-fns";
+import { FileDown, FileText, Search, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
+import type { IInvoiceResponse } from "@preduzetnik/shared";
+
 import { useInvoices, useDeleteInvoice } from "@/entities/invoice/api/invoice.queries";
-import { CreateInvoiceDialog } from "@/features/invoice-management/ui/CreateInvoiceDialog";
 import { InvoiceStatusSelect } from "@/entities/invoice/ui/InvoiceStatusSelect";
+import {
+  DISPLAY_STATUSES,
+  getDaysOverdue,
+  getDisplayStatus,
+  type InvoiceDisplayStatus,
+} from "@/entities/invoice/lib/display-status";
+import { CreateInvoiceDialog } from "@/features/invoice-management/ui/CreateInvoiceDialog";
 import { EditInvoiceDialog } from "@/features/invoice-management/ui/EditInvoiceDialog";
+import { ProfileCompletenessAlert } from "@/widgets/profile-completeness/ui/ProfileCompletenessAlert";
+import { invoiceApi } from "@/shared/api/invoice.api";
+import { cn } from "@/shared/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { Badge } from "@/shared/ui/badge";
+import { Money } from "@/shared/ui/money";
+import { Skeleton } from "@/shared/ui/skeleton";
 import { Spinner } from "@/shared/ui/spinner";
-import { FileDown, Trash2, X } from "lucide-react";
-import { format } from "date-fns";
-import { invoiceApi } from "@/shared/api/invoice.api";
-import { toast } from "sonner";
+import { PageContainer, PageHeader } from "@/shared/ui/page-header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +37,73 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import type { InvoiceStatus } from "@preduzetnik/shared";
-import { ProfileCompletenessAlert } from "@/widgets/profile-completeness/ui/ProfileCompletenessAlert";
 
-const ALL_STATUSES: InvoiceStatus[] = ["DRAFT", "SENT", "PAID", "CANCELLED"];
+const formatDate = (iso: string) => format(new Date(iso), "dd.MM.yyyy");
+
+const isDisplayStatus = (value: string | null): value is InvoiceDisplayStatus =>
+  !!value && (DISPLAY_STATUSES as readonly string[]).includes(value);
+
+interface RowActionsProps {
+  invoice: IInvoiceResponse;
+  isDownloading: boolean;
+  onDownload: () => void;
+  onDelete: () => void;
+}
+
+/** PDF for every invoice; edit and delete only while it is a draft */
+const RowActions = ({ invoice, isDownloading, onDownload, onDelete }: RowActionsProps) => {
+  const { t } = useTranslation();
+  const isDraft = invoice.status === "DRAFT";
+
+  return (
+    <div className="flex items-center justify-end gap-0.5">
+      {isDraft && <EditInvoiceDialog invoice={invoice} />}
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled={isDownloading}
+        onClick={onDownload}
+        aria-label={t("invoices.actions.downloadPdf")}
+        title={t("invoices.actions.downloadPdf")}
+      >
+        {isDownloading ? <Spinner className="size-4" /> : <FileDown className="size-4" />}
+      </Button>
+      {isDraft && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onDelete}
+          aria-label={t("invoices.delete.button")}
+          title={t("invoices.delete.button")}
+        >
+          <Trash2 className="size-4 text-destructive" />
+        </Button>
+      )}
+    </div>
+  );
+};
+
+/** The invoice amount, with its RSD value underneath for foreign currencies */
+const AmountCell = ({ invoice, align = "right" }: { invoice: IInvoiceResponse; align?: "left" | "right" }) => (
+  <div className={cn("flex flex-col", align === "right" ? "items-end" : "items-start")}>
+    <Money amount={invoice.totalAmount} currency={invoice.currency} className="font-medium" />
+    {invoice.currency !== "RSD" && (
+      <Money amount={invoice.totalRsd} currency="RSD" className="text-xs text-muted-foreground" />
+    )}
+  </div>
+);
+
+/** Due date, turning red with the number of days once the invoice is overdue */
+const DueDate = ({ invoice }: { invoice: IInvoiceResponse }) => {
+  const { t } = useTranslation();
+  const days = getDaysOverdue(invoice);
+  return (
+    <span className={cn(days > 0 && "text-destructive-strong")}>
+      {formatDate(invoice.dueDate)}
+      {days > 0 && <span className="block text-xs">{t("invoices.overdueDays", { days })}</span>}
+    </span>
+  );
+};
 
 export const InvoicesPage = () => {
   const { t } = useTranslation();
@@ -35,31 +112,39 @@ export const InvoicesPage = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | null>(null);
+
+  // The status filter lives in the URL, so dashboard links like /invoices?status=OVERDUE open pre-filtered
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusParam = searchParams.get("status");
+  const statusFilter = isDisplayStatus(statusParam) ? statusParam : null;
+  const setStatusFilter = (status: InvoiceDisplayStatus | null) => {
+    const next = new URLSearchParams(searchParams);
+    if (status) next.set("status", status);
+    else next.delete("status");
+    setSearchParams(next, { replace: true });
+  };
+
+  const statusCounts = useMemo(() => {
+    const counts = Object.fromEntries(DISPLAY_STATUSES.map((s) => [s, 0])) as Record<InvoiceDisplayStatus, number>;
+    for (const inv of invoices) counts[getDisplayStatus(inv)] += 1;
+    return counts;
+  }, [invoices]);
 
   const filtered = useMemo(() => {
     let result = invoices;
-    if (statusFilter) result = result.filter((inv) => inv.status === statusFilter);
+    if (statusFilter) result = result.filter((inv) => getDisplayStatus(inv) === statusFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (inv) =>
-          inv.clientName.toLowerCase().includes(q) ||
-          inv.displayNumber.toLowerCase().includes(q),
+        (inv) => inv.clientName.toLowerCase().includes(q) || inv.displayNumber.toLowerCase().includes(q),
       );
     }
     return result;
   }, [invoices, statusFilter, search]);
 
-  const totalRsd = useMemo(
-    () => filtered.reduce((sum, inv) => sum + inv.totalRsd, 0),
-    [filtered],
-  );
+  const totalRsd = useMemo(() => filtered.reduce((sum, inv) => sum + inv.totalRsd, 0), [filtered]);
 
-  /**
-   * Per-currency totals across the filtered set. Skips RSD (already shown
-   * separately as the RSD-equivalent grand total).
-   */
+  /** Per-currency totals across the filtered set, besides the RSD-equivalent grand total */
   const foreignTotals = useMemo(() => {
     const byCurrency = new Map<string, number>();
     for (const inv of filtered) {
@@ -97,161 +182,174 @@ export const InvoicesPage = () => {
     });
   };
 
+  const rowActions = (invoice: IInvoiceResponse) => (
+    <RowActions
+      invoice={invoice}
+      isDownloading={downloadingId === invoice.id}
+      onDownload={() => handleDownload(invoice.id, invoice.displayNumber)}
+      onDelete={() => setDeleteId(invoice.id)}
+    />
+  );
+
+  const statusCell = (invoice: IInvoiceResponse) => (
+    <div className="flex flex-col items-start gap-1">
+      <InvoiceStatusSelect invoiceId={invoice.id} status={invoice.status} displayStatus={getDisplayStatus(invoice)} />
+      {invoice.paidAt && (
+        <span className="text-xs text-muted-foreground">
+          {t("invoices.status.paidOn", { date: formatDate(invoice.paidAt) })}
+        </span>
+      )}
+    </div>
+  );
+
+  const emptyState = (
+    <div className="flex flex-col items-center gap-2 py-12 text-center text-sm text-muted-foreground">
+      <FileText className="size-8" />
+      {invoices.length === 0 ? t("invoices.empty") : t("invoices.noResults")}
+    </div>
+  );
+
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("nav.invoices")}</h1>
-          <p className="text-muted-foreground">{t("invoices.subtitle")}</p>
-        </div>
-        <CreateInvoiceDialog />
-      </div>
+    <PageContainer>
+      <PageHeader title={t("nav.invoices")} description={t("invoices.subtitle")} actions={<CreateInvoiceDialog />} />
 
       <ProfileCompletenessAlert />
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Input
-          placeholder={t("invoices.filter.search")}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-64 h-9"
-        />
-        <div className="flex items-center gap-1.5">
-          <Button
-            size="sm"
-            variant={statusFilter === null ? "secondary" : "ghost"}
-            onClick={() => setStatusFilter(null)}
-          >
-            {t("invoices.filter.all")}
-          </Button>
-          {ALL_STATUSES.map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={statusFilter === s ? "secondary" : "ghost"}
-              onClick={() => setStatusFilter(statusFilter === s ? null : s)}
-            >
-              {t(`invoices.status.${s.toLowerCase()}`)}
-            </Button>
-          ))}
+      {/* Filters: search, then status chips with counts (scroll sideways on phones) */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder={t("invoices.filter.search")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 pl-8"
+          />
         </div>
-        {hasFilters && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-muted-foreground"
-            onClick={() => { setSearch(""); setStatusFilter(null); }}
-          >
-            <X className="size-3.5 mr-1" />
-            {t("invoices.filter.clearFilters")}
-          </Button>
-        )}
+        <div className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:pb-0">
+          {([null, ...DISPLAY_STATUSES] as const).map((s) => {
+            const active = statusFilter === s;
+            const count = s ? statusCounts[s] : invoices.length;
+            return (
+              <button
+                key={s ?? "all"}
+                type="button"
+                onClick={() => setStatusFilter(active ? null : s)}
+                className={cn(
+                  "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors",
+                  active
+                    ? "border-primary bg-accent font-medium text-accent-foreground"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground",
+                  s === "OVERDUE" && count > 0 && !active && "text-destructive-strong",
+                )}
+              >
+                {s ? t(`invoices.status.${s.toLowerCase()}`) : t("invoices.filter.all")}
+                <span className="text-xs opacity-70">{count}</span>
+              </button>
+            );
+          })}
+          {hasFilters && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="shrink-0 text-muted-foreground"
+              onClick={() => { setSearch(""); setStatusFilter(null); }}
+            >
+              <X className="mr-1 size-3.5" />
+              {t("invoices.filter.clearFilters")}
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop: table */}
+      <Card className="hidden gap-0 py-0 md:flex">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>{t("invoices.table.number")}</TableHead>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="pl-4">{t("invoices.table.number")}</TableHead>
               <TableHead>{t("invoices.table.client")}</TableHead>
               <TableHead>{t("invoices.table.date")}</TableHead>
-              <TableHead>{t("invoices.table.amount")}</TableHead>
+              <TableHead>{t("invoices.table.dueDate")}</TableHead>
+              <TableHead className="text-right">{t("invoices.table.amount")}</TableHead>
               <TableHead>{t("invoices.table.status")}</TableHead>
-              <TableHead className="text-right">{t("invoices.table.actions")}</TableHead>
+              <TableHead className="pr-4 text-right">
+                <span className="sr-only">{t("invoices.table.actions")}</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               [1, 2, 3].map((i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={6} className="h-12 animate-pulse bg-muted/50" />
+                  <TableCell colSpan={7} className="px-4"><Skeleton className="h-8" /></TableCell>
                 </TableRow>
               ))
-            ) : invoices.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  {t("invoices.empty")}
-                </TableCell>
-              </TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  {t("invoices.noResults")}
-                </TableCell>
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={7}>{emptyState}</TableCell>
               </TableRow>
             ) : (
               filtered.map((invoice) => (
                 <TableRow key={invoice.id}>
-                  <TableCell className="font-medium font-mono">{invoice.displayNumber}</TableCell>
-                  <TableCell>{invoice.clientName}</TableCell>
-                  <TableCell>{format(new Date(invoice.issueDate), "dd.MM.yyyy")}</TableCell>
-                  <TableCell>
-                    {invoice.totalAmount.toLocaleString()} {invoice.currency}
-                    {invoice.currency !== "RSD" && (
-                      <span className="text-xs text-muted-foreground ml-1">
-                        ({invoice.totalRsd.toLocaleString("sr-RS", { maximumFractionDigits: 0 })} RSD)
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <InvoiceStatusSelect invoiceId={invoice.id} status={invoice.status} />
-                    {invoice.paidAt && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {t("invoices.status.paidOn", { date: format(new Date(invoice.paidAt), "dd.MM.yyyy") })}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    {invoice.status === "DRAFT" && (
-                      <EditInvoiceDialog invoice={invoice} />
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={downloadingId === invoice.id}
-                      onClick={() => handleDownload(invoice.id, invoice.displayNumber)}
-                      aria-label={t("invoices.table.actions")}
-                    >
-                      {downloadingId === invoice.id ? (
-                        <Spinner className="h-4 w-4" />
-                      ) : (
-                        <FileDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                    {invoice.status === "DRAFT" && (
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(invoice.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    )}
-                  </TableCell>
+                  <TableCell className="pl-4 font-medium">{invoice.displayNumber}</TableCell>
+                  <TableCell className="max-w-56 truncate">{invoice.clientName}</TableCell>
+                  <TableCell className="text-muted-foreground">{formatDate(invoice.issueDate)}</TableCell>
+                  <TableCell className="text-muted-foreground"><DueDate invoice={invoice} /></TableCell>
+                  <TableCell><AmountCell invoice={invoice} /></TableCell>
+                  <TableCell>{statusCell(invoice)}</TableCell>
+                  <TableCell className="pr-4">{rowActions(invoice)}</TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
+      </Card>
+
+      {/* Phones: one card per invoice */}
+      <div className="space-y-2 md:hidden">
+        {isLoading ? (
+          [1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)
+        ) : filtered.length === 0 ? (
+          <Card>{emptyState}</Card>
+        ) : (
+          filtered.map((invoice) => (
+            <Card key={invoice.id} className="gap-3 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{invoice.clientName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {invoice.displayNumber} · {formatDate(invoice.issueDate)}
+                  </p>
+                </div>
+                <AmountCell invoice={invoice} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                {statusCell(invoice)}
+                {rowActions(invoice)}
+              </div>
+              {getDaysOverdue(invoice) > 0 && (
+                <p className="text-xs text-destructive-strong">
+                  {t("invoices.dueOn", { date: formatDate(invoice.dueDate) })} · {t("invoices.overdueDays", { days: getDaysOverdue(invoice) })}
+                </p>
+              )}
+            </Card>
+          ))
+        )}
       </div>
 
-      {/* Totals row */}
+      {/* Totals for the current filter */}
       {!isLoading && filtered.length > 0 && (
-        <div className="flex justify-end flex-wrap gap-2">
+        <div className="flex flex-wrap items-baseline justify-end gap-x-6 gap-y-1 text-sm">
           {foreignTotals.map(([currency, amount]) => (
-            <Badge
-              key={currency}
-              variant="outline"
-              className="text-sm px-4 py-1.5 font-mono text-muted-foreground"
-            >
-              {t("invoices.totalForeign", {
-                amount: amount.toLocaleString("sr-RS", { maximumFractionDigits: 2 }),
-                currency,
-              })}
-            </Badge>
+            <span key={currency} className="text-muted-foreground">
+              <Money amount={amount} currency={currency} />
+            </span>
           ))}
-          <Badge variant="outline" className="text-sm px-4 py-1.5 font-mono">
-            {t("invoices.total", {
-              amount: totalRsd.toLocaleString("sr-RS", { maximumFractionDigits: 0 }),
-            })}
-          </Badge>
+          <span>
+            <span className="text-muted-foreground">{t("invoices.totalLabel")}: </span>
+            <Money amount={totalRsd} currency="RSD" className="font-semibold" />
+          </span>
         </div>
       )}
 
@@ -259,9 +357,7 @@ export const InvoicesPage = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("invoices.delete.title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("invoices.delete.description")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("invoices.delete.description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>{t("app.cancel")}</AlertDialogCancel>
@@ -276,7 +372,6 @@ export const InvoicesPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </PageContainer>
   );
 };
-

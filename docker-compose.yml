@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:17-alpine
+    platform: linux/amd64
     container_name: preduzetnik-db
     restart: unless-stopped
     ports:

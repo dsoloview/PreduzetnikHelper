@@ -128,9 +128,20 @@
     },
     "actions": {
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "menu": "Actions"
     },
-    "loadError": "Failed to load clients."
+    "loadError": "Failed to load clients.",
+    "search": "Search by name, tax ID or city…",
+    "table": {
+      "name": "Client",
+      "taxId": "Tax ID / VAT",
+      "city": "City",
+      "invoices": "Invoices",
+      "received": "Received",
+      "lastInvoice": "Last invoice"
+    },
+    "invoiceCount": "invoices: {{count}}"
   },
   "invoices": {
     "subtitle": "Manage your invoices and payments.",
@@ -141,8 +152,6 @@
       "all": "All",
       "clearFilters": "Clear filters"
     },
-    "total": "Total: {{amount}} RSD",
-    "totalForeign": "({{amount}} {{currency}})",
     "totalLabel": "Total",
     "totalsTitle": "Totals",
     "status": {
@@ -155,7 +164,9 @@
       "markPaidTitle": "Mark as paid",
       "markPaidDescription": "The payment date is used in the KPO book and limit calculations.",
       "paidAt": "Payment date",
-      "paidOn": "paid {{date}}"
+      "paidOn": "paid {{date}}",
+      "overdue": "Overdue",
+      "change": "Change status"
     },
     "table": {
       "number": "Number",
@@ -163,7 +174,8 @@
       "date": "Date",
       "amount": "Amount",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "dueDate": "Due date"
     },
     "form": {
       "client": "Select Client",
@@ -224,26 +236,27 @@
       "button": "Delete",
       "confirm": "Are you sure you want to delete this invoice?",
       "success": "Invoice deleted successfully!"
+    },
+    "overdueDays": "{{days}} days overdue",
+    "dueOn": "Due {{date}}",
+    "actions": {
+      "downloadPdf": "Download PDF"
     }
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Overview of your business activity.",
+    "subtitle": "Income, invoices and limits at a glance.",
     "stats": {
-      "revenue": "Revenue This Year",
-      "revenueSub": "Paid & sent in {{year}}",
-      "paid": "Paid Invoices",
-      "pending": "Pending",
-      "clients": "Active Clients",
-      "invoices": "invoices",
-      "unique": "unique"
+      "received": "Received in {{year}}",
+      "expected": "Awaiting payment",
+      "overdue": "Overdue",
+      "headroom": "Room left under 6M",
+      "headroomHint": "{{percent}}% used",
+      "invoiceCount": "Invoices: {{count}}"
     },
     "limits": {
       "title": "Tax Limits",
       "viewAll": "View details"
-    },
-    "breakdown": {
-      "title": "Invoice Status Breakdown"
     },
     "invoices": {
       "title": "Recent Invoices",
@@ -251,17 +264,20 @@
       "empty": "No invoices yet."
     },
     "clients": {
-      "title": "Top Clients",
+      "title": "Top clients {{year}}",
       "viewAll": "View all",
-      "empty": "No client data yet."
+      "empty": "No payments received this year yet."
+    },
+    "attention": {
+      "title": "Needs attention",
+      "overdue": "Overdue by {{days}} days",
+      "draft": "Draft from {{date}}, not sent yet",
+      "empty": "All good: no overdue invoices or unsent drafts."
     }
   },
   "limits": {
     "subtitle": "Track your 6M paušal and 8M VAT thresholds.",
     "loadError": "Failed to load limits.",
-    "used": "Used",
-    "current": "Current",
-    "limit": "Limit",
     "remaining": "Remaining",
     "exceeded": "Limit exceeded!",
     "pausal": {
@@ -273,9 +289,12 @@
       "description": "Domestic supply revenue over the last 365 days. Exceeding requires VAT registration."
     },
     "info": {
-      "pausal": "Paušal limit: 6,000,000 RSD per calendar year (all invoices, any currency converted to RSD).",
-      "vat": "VAT limit: 8,000,000 RSD over rolling 365 days (domestic supply invoices only)."
-    }
+      "pausal": "Flat-rate limit: 6,000,000 RSD per calendar year. Counts paid invoices by payment date, foreign currency converted to RSD.",
+      "vat": "VAT limit: 8,000,000 RSD over the last 365 days. Counts paid invoices for domestic supply only.",
+      "title": "How the limits are calculated",
+      "thresholds": "The bar turns yellow at 80% and red at 95%, leaving time to plan your income."
+    },
+    "approaching": "Approaching the limit"
   },
   "bankAccounts": {
     "subtitle": "Manage your bank accounts for invoicing.",
@@ -358,7 +377,10 @@
       "products": "Products (RSD)",
       "services": "Services (RSD)",
       "total": "Total (RSD)"
-    }
+    },
+    "entriesCount": "Entries: {{count}}",
+    "previousYear": "Previous year",
+    "nextYear": "Next year"
   },
   "profileCompleteness": {
     "title": "Complete your business profile",

@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 import { Label } from "@/shared/ui/label";
 import { RequiredMark } from "@/shared/ui/required-mark";
+import { PageHeader } from "@/shared/ui/page-header";
 
 const changePasswordSchema = z
   .object({
@@ -60,11 +61,8 @@ export const SettingsPage = () => {
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("settings.title")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{t("settings.subtitle")}</p>
-      </div>
+    <div className="mx-auto w-full max-w-2xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <PageHeader title={t("settings.title")} description={t("settings.subtitle")} />
 
       <Card>
         <CardHeader>

@@ -1,68 +1,61 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { Users, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Button } from "@/shared/ui/button";
+import { Users } from "lucide-react";
 import type { IInvoiceResponse } from "@preduzetnik/shared";
+import { Card } from "@/shared/ui/card";
+import { Money } from "@/shared/ui/money";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { SectionHeader } from "@/shared/ui/section-header";
 
 interface TopClientsListProps {
   invoices: IInvoiceResponse[];
   isLoading: boolean;
 }
 
+/** Clients by income received this year, with each one's share of the total */
 export const TopClientsList = ({ invoices, isLoading }: TopClientsListProps) => {
   const { t } = useTranslation();
+  const year = new Date().getFullYear();
 
-  const topClients = (() => {
-    const map = new Map<string, { name: string; total: number }>();
-    for (const inv of invoices) {
-      const cur = map.get(inv.clientId) ?? { name: inv.clientName, total: 0 };
-      map.set(inv.clientId, { name: inv.clientName, total: cur.total + inv.totalRsd });
-    }
-    return [...map.values()].sort((a, b) => b.total - a.total).slice(0, 3);
-  })();
+  const totals = new Map<string, { name: string; total: number }>();
+  for (const inv of invoices) {
+    if (inv.status !== "PAID" || !inv.paidAt || new Date(inv.paidAt).getFullYear() !== year) continue;
+    const current = totals.get(inv.clientId) ?? { name: inv.clientName, total: 0 };
+    totals.set(inv.clientId, { name: inv.clientName, total: current.total + inv.totalRsd });
+  }
+  const grandTotal = [...totals.values()].reduce((sum, c) => sum + c.total, 0);
+  const topClients = [...totals.entries()].sort(([, a], [, b]) => b.total - a.total).slice(0, 5);
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{t("dashboard.clients.title")}</h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/clients" className="flex items-center gap-1 text-sm">
-            {t("dashboard.clients.viewAll")} <ArrowRight className="size-3.5" />
-          </Link>
-        </Button>
-      </div>
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-6 space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-8 rounded bg-muted animate-pulse" />
-              ))}
-            </div>
-          ) : topClients.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
-              <Users className="size-8 text-muted-foreground" />
-              <p className="text-muted-foreground text-sm">{t("dashboard.clients.empty")}</p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {topClients.map((client, i) => (
-                <div key={client.name} className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="size-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm font-medium">{client.name}</span>
+      <SectionHeader title={t("dashboard.clients.title", { year })} linkTo="/clients" linkLabel={t("dashboard.clients.viewAll")} />
+      <Card className="gap-0 py-0">
+        {isLoading ? (
+          <div className="space-y-3 p-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-8" />)}
+          </div>
+        ) : topClients.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+            <Users className="size-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t("dashboard.clients.empty")}</p>
+          </div>
+        ) : (
+          <ul className="divide-y">
+            {topClients.map(([id, client]) => {
+              const share = grandTotal > 0 ? (client.total / grandTotal) * 100 : 0;
+              return (
+                <li key={id} className="space-y-1.5 px-4 py-3">
+                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="truncate font-medium">{client.name}</span>
+                    <Money amount={client.total} currency="RSD" className="text-muted-foreground" />
                   </div>
-                  <span className="text-sm font-mono font-medium">
-                    {client.total.toLocaleString("sr-RS", { maximumFractionDigits: 0 })} RSD
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary/70" style={{ width: `${share}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </Card>
     </section>
   );

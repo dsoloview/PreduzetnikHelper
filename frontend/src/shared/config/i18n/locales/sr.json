@@ -129,8 +129,19 @@
     },
     "actions": {
       "edit": "Izmeni",
-      "delete": "Obriši"
-    }
+      "delete": "Obriši",
+      "menu": "Radnje"
+    },
+    "search": "Pretraga po nazivu, PIB-u ili gradu…",
+    "table": {
+      "name": "Klijent",
+      "taxId": "PIB / VAT",
+      "city": "Grad",
+      "invoices": "Faktura",
+      "received": "Naplaćeno",
+      "lastInvoice": "Poslednja faktura"
+    },
+    "invoiceCount": "faktura: {{count}}"
   },
   "invoices": {
     "subtitle": "Upravljanje fakturama i plaćanjima.",
@@ -141,8 +152,6 @@
       "all": "Sve",
       "clearFilters": "Poništi filtere"
     },
-    "total": "Ukupno: {{amount}} RSD",
-    "totalForeign": "({{amount}} {{currency}})",
     "totalLabel": "Ukupno",
     "totalsTitle": "Sumirano",
     "status": {
@@ -155,7 +164,9 @@
       "markPaidTitle": "Označi kao plaćeno",
       "markPaidDescription": "Datum uplate se koristi u KPO knjizi i za obračun limita.",
       "paidAt": "Datum uplate",
-      "paidOn": "plaćeno {{date}}"
+      "paidOn": "plaćeno {{date}}",
+      "overdue": "Kasni",
+      "change": "Promeni status"
     },
     "table": {
       "number": "Broj",
@@ -163,7 +174,8 @@
       "date": "Datum",
       "amount": "Iznos",
       "status": "Status",
-      "actions": "Akcije"
+      "actions": "Akcije",
+      "dueDate": "Rok plaćanja"
     },
     "form": {
       "client": "Klijent",
@@ -224,26 +236,27 @@
       "button": "Obriši",
       "confirm": "Obrisati ovu fakturu?",
       "success": "Faktura obrisana!"
+    },
+    "overdueDays": "kasni {{days}} dana",
+    "dueOn": "Rok {{date}}",
+    "actions": {
+      "downloadPdf": "Preuzmi PDF"
     }
   },
   "dashboard": {
     "title": "Početna",
-    "subtitle": "Pregled poslovne aktivnosti.",
+    "subtitle": "Prihodi, fakture i limiti na jednom mestu.",
     "stats": {
-      "revenue": "Prihod ove godine",
-      "revenueSub": "Plaćeno i poslato u {{year}}",
-      "paid": "Plaćenih",
-      "pending": "Na čekanju",
-      "clients": "Aktivnih klijenata",
-      "invoices": "faktura",
-      "unique": "jedinstvenih"
+      "received": "Naplaćeno u {{year}}",
+      "expected": "Čeka uplatu",
+      "overdue": "Kasni",
+      "headroom": "Do limita od 6M",
+      "headroomHint": "Iskorišćeno {{percent}}%",
+      "invoiceCount": "Faktura: {{count}}"
     },
     "limits": {
       "title": "Poreski limiti",
       "viewAll": "Detaljnije"
-    },
-    "breakdown": {
-      "title": "Raspodela po statusima"
     },
     "invoices": {
       "title": "Poslednje fakture",
@@ -251,17 +264,20 @@
       "empty": "Još nema faktura."
     },
     "clients": {
-      "title": "Top klijenti",
+      "title": "Najveći klijenti {{year}}",
       "viewAll": "Svi klijenti",
-      "empty": "Nema podataka."
+      "empty": "Ove godine još nema uplata."
+    },
+    "attention": {
+      "title": "Zahteva pažnju",
+      "overdue": "Kasni {{days}} dana",
+      "draft": "Nacrt od {{date}}, još nije poslat",
+      "empty": "Sve je u redu: nema faktura koje kasne ni neposlatih nacrta."
     }
   },
   "limits": {
     "subtitle": "Praćenje limita od 6M i 8M RSD.",
     "loadError": "Neuspešno učitavanje limita.",
-    "used": "Iskorišćeno",
-    "current": "Trenutno",
-    "limit": "Limit",
     "remaining": "Preostalo",
     "exceeded": "Limit premašen!",
     "pausal": {
@@ -273,9 +289,12 @@
       "description": "Prihod od domaće isporuke u poslednjih 365 dana. Premašenje zahteva PDV registraciju."
     },
     "info": {
-      "pausal": "Paušalni limit: 6.000.000 RSD godišnje (sve fakture, svaka valuta u RSD).",
-      "vat": "PDV limit: 8.000.000 RSD u 365 dana (samo domaća isporuka)."
-    }
+      "pausal": "Paušalni limit: 6.000.000 RSD za kalendarsku godinu. Računaju se plaćene fakture po datumu uplate, devizne preračunate u RSD.",
+      "vat": "PDV limit: 8.000.000 RSD u poslednjih 365 dana. Računaju se samo plaćene fakture za promet u zemlji.",
+      "title": "Kako se računaju limiti",
+      "thresholds": "Traka postaje žuta na 80% i crvena na 95%, da biste imali vremena da isplanirate prihod."
+    },
+    "approaching": "Približavate se limitu"
   },
   "bankAccounts": {
     "subtitle": "Upravljanje bankovnim računima.",
@@ -358,7 +377,10 @@
       "products": "Proizvodi (RSD)",
       "services": "Usluge (RSD)",
       "total": "Ukupno (RSD)"
-    }
+    },
+    "entriesCount": "Unosa: {{count}}",
+    "previousYear": "Prethodna godina",
+    "nextYear": "Sledeća godina"
   },
   "profileCompleteness": {
     "title": "Dovršite profil kompanije",

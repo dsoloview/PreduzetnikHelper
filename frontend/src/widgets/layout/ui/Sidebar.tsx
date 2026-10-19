@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { Brand } from "@/shared/ui/brand";
 import { IncompleteDot } from "@/shared/ui/incomplete-dot";
 import { useProfile } from "@/entities/user/api/user.queries";
 import { isMissingProfileDetails } from "@/entities/user/lib/profile-completeness";
@@ -21,8 +22,8 @@ const linkClass = (isActive: boolean) =>
   cn(
     "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
     isActive
-      ? "bg-primary text-primary-foreground"
-      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+      ? "bg-accent text-accent-foreground"
+      : "text-muted-foreground hover:bg-muted hover:text-foreground",
   );
 
 interface SidebarProps {
@@ -50,7 +51,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
 
       <aside
         className={cn(
-          "z-50 w-64 border-r bg-card flex flex-col",
+          "z-50 w-60 border-r bg-sidebar flex flex-col",
           // Mobile: fixed slide-in drawer
           "fixed inset-y-0 left-0 transform transition-transform duration-200 ease-in-out",
           open ? "translate-x-0" : "-translate-x-full",
@@ -59,8 +60,8 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
         )}
         aria-label={t("app.navAria")}
       >
-        <div className="p-6 border-b flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight text-primary">Preduzetnik</h2>
+        <div className="h-14 px-4 border-b flex items-center justify-between">
+          <Brand />
           <Button
             variant="ghost"
             size="icon"
@@ -72,7 +73,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           </Button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto" onClick={onClose}>
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto" onClick={onClose}>
           {navItems.map((item) => (
             <NavLink key={item.to} to={item.to} className={({ isActive }) => linkClass(isActive)}>
               <item.icon className="size-4" />
@@ -82,7 +83,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           ))}
         </nav>
 
-        <div className="p-4 border-t space-y-1" onClick={onClose}>
+        <div className="p-3 border-t space-y-0.5" onClick={onClose}>
           <NavLink to="/profile" className={({ isActive }) => linkClass(isActive)}>
             <UserCircle className="size-4" />
             {t("nav.profile")}
