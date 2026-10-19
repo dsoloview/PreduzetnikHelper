@@ -66,7 +66,7 @@ export const EditInvoiceDialog = ({ invoice }: EditInvoiceDialogProps) => {
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{t("invoices.edit.title")} #{invoice.displayNumber}</DialogTitle>
           <DialogDescription>

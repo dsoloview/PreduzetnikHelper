@@ -1,14 +1,13 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
 
 import { Input } from "@/shared/ui/input";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import { Button } from "@/shared/ui/button";
-import { Spinner } from "@/shared/ui/spinner";
+import { Building2, Globe } from "lucide-react";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/shared/ui/field";
 import { RequiredMark } from "@/shared/ui/required-mark";
+import { ChoiceCards, FormActions, FormSection, type ChoiceOption } from "@/shared/ui/form-layout";
 
 const clientSchema = (t: (key: string) => string) => z.object({
   type: z.enum(["DOMESTIC", "INTERNATIONAL"]),
@@ -63,153 +62,101 @@ export const ClientForm = ({ onSubmit, defaultValues, isLoading }: ClientFormPro
     },
   });
 
-  const clientType = form.watch("type");
+  const clientType = useWatch({ control: form.control, name: "type" });
+  const isDomestic = clientType === "DOMESTIC";
 
   const handleSubmit = form.handleSubmit((data) => onSubmit(stripEmptyOptionals(data)));
 
+  const typeOptions: ChoiceOption<ClientFormValues["type"]>[] = [
+    { value: "DOMESTIC", label: t("clients.type.domestic"), description: t("clients.form.typeHint.domestic"), icon: Building2 },
+    { value: "INTERNATIONAL", label: t("clients.type.international"), description: t("clients.form.typeHint.international"), icon: Globe },
+  ];
+
+  /** Switching to a foreign client clears the default "RS" so the country gets filled in */
+  const changeType = (type: ClientFormValues["type"], onChange: (value: ClientFormValues["type"]) => void) => {
+    onChange(type);
+    const country = form.getValues("country");
+    if (type === "INTERNATIONAL" && country === "RS") form.setValue("country", "");
+    if (type === "DOMESTIC" && !country) form.setValue("country", "RS");
+  };
+
+  const textField = (
+    name: "name" | "taxId" | "registrationNumber" | "address" | "city" | "postalCode" | "country" | "email" | "phone",
+    label: string,
+    { required = false, hint, placeholder, wide = false, type, inputMode }: {
+      required?: boolean;
+      hint?: string;
+      placeholder?: string;
+      wide?: boolean;
+      type?: string;
+      inputMode?: "numeric" | "email" | "tel";
+    } = {},
+  ) => (
+    <Controller
+      name={name}
+      control={form.control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid} className={wide ? "sm:col-span-2" : undefined}>
+          <FieldLabel>
+            {label}
+            {required && <RequiredMark />}
+          </FieldLabel>
+          <Input {...field} type={type} inputMode={inputMode} placeholder={placeholder} aria-invalid={fieldState.invalid} />
+          {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : hint && <FieldDescription>{hint}</FieldDescription>}
+        </Field>
+      )}
+    />
+  );
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <FieldGroup>
-        <Controller
-          name="type"
-          control={form.control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel>{t("clients.form.type")}</FieldLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DOMESTIC">{t("clients.type.domestic")}</SelectItem>
-                  <SelectItem value="INTERNATIONAL">{t("clients.type.international")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-          )}
-        />
+      <Controller
+        name="type"
+        control={form.control}
+        render={({ field }) => (
+          <ChoiceCards
+            ariaLabel={t("clients.form.type")}
+            value={field.value}
+            onChange={(type) => changeType(type, field.onChange)}
+            options={typeOptions}
+            className="sm:grid-cols-2"
+          />
+        )}
+      />
 
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field aria-required data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("clients.form.name")}<RequiredMark /></FieldLabel>
-              <Input {...field} aria-invalid={fieldState.invalid} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+      <FormSection title={t("clients.form.sections.company")} description={t("clients.form.sections.companyDesc")}>
+        {textField("name", t("clients.form.name"), { required: true, wide: true })}
+        {textField("taxId", isDomestic ? t("clients.form.pib") : t("clients.form.taxId"), {
+          required: true,
+          hint: isDomestic ? t("clients.form.pibHint") : t("clients.form.taxIdHint"),
+          placeholder: isDomestic ? "123456789" : "DE123456789",
+          inputMode: isDomestic ? "numeric" : undefined,
+        })}
+        {textField("registrationNumber", isDomestic ? t("clients.form.mbr") : t("clients.form.registrationNumber"), {
+          required: true,
+          hint: isDomestic ? t("clients.form.mbrHint") : t("clients.form.registrationNumberHint"),
+          placeholder: isDomestic ? "12345678" : undefined,
+          inputMode: isDomestic ? "numeric" : undefined,
+        })}
+      </FormSection>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Controller
-            name="taxId"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>
-                  {clientType === "DOMESTIC" ? t("clients.form.pib") : t("clients.form.taxId")}
-                  <RequiredMark />
-                </FieldLabel>
-                <Input {...field} aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="registrationNumber"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.mbr")}<RequiredMark /></FieldLabel>
-                <Input {...field} aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        </div>
+      <FormSection title={t("clients.form.sections.address")} description={t("clients.form.sections.addressDesc")}>
+        {textField("address", t("clients.form.address"), { required: true, wide: true, placeholder: t("clients.form.addressPlaceholder") })}
+        {textField("city", t("clients.form.city"), { required: true })}
+        {textField("postalCode", t("clients.form.postalCode"))}
+        {textField("country", t("clients.form.country"), {
+          required: true,
+          hint: t("clients.form.countryHint"),
+          placeholder: isDomestic ? "RS" : "DE",
+        })}
+      </FormSection>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Controller
-            name="email"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.email")}</FieldLabel>
-                <Input {...field} type="email" aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="phone"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.phone")}</FieldLabel>
-                <Input
-                  {...field}
-                  placeholder={t("clients.form.phoneHint")}
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        </div>
+      <FormSection title={t("clients.form.sections.contacts")} description={t("clients.form.sections.contactsDesc")}>
+        {textField("email", t("clients.form.email"), { type: "email", inputMode: "email", placeholder: "billing@company.com" })}
+        {textField("phone", t("clients.form.phone"), { inputMode: "tel", placeholder: t("clients.form.phoneHint") })}
+      </FormSection>
 
-        <Controller
-          name="address"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{t("clients.form.address")}<RequiredMark /></FieldLabel>
-              <Input {...field} aria-invalid={fieldState.invalid} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        <div className="grid grid-cols-3 gap-4">
-          <Controller
-            name="city"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.city")}<RequiredMark /></FieldLabel>
-                <Input {...field} aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            name="postalCode"
-            control={form.control}
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>{t("clients.form.postalCode")}</FieldLabel>
-                <Input {...field} />
-              </Field>
-            )}
-          />
-          <Controller
-            name="country"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{t("clients.form.country")}<RequiredMark /></FieldLabel>
-                <Input {...field} aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        </div>
-      </FieldGroup>
-
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading && <Spinner className="mr-2" />}
-        {t("clients.form.submit")}
-      </Button>
+      <FormActions submitLabel={t("clients.form.submit")} isLoading={isLoading} />
     </form>
   );
 };

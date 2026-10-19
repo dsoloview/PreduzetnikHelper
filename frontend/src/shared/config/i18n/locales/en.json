@@ -35,7 +35,8 @@
       "en": "English",
       "ru": "Russian",
       "sr": "Serbian"
-    }
+    },
+    "optional": "optional"
   },
   "errors": {
     "downloadPdfFailed": "Failed to download PDF",
@@ -99,12 +100,31 @@
       "pib": "PIB (Tax ID)",
       "mbr": "MBR (Registration Number)",
       "taxId": "Tax ID / VAT",
-      "submit": "Save Client"
+      "submit": "Save Client",
+      "typeHint": {
+        "domestic": "Serbian company or entrepreneur: PIB and MB, invoices in RSD",
+        "international": "Foreign company: VAT and registration number, invoices in foreign currency"
+      },
+      "sections": {
+        "company": "Company",
+        "companyDesc": "Name and numbers exactly as in the register — they appear on the invoice.",
+        "address": "Address",
+        "addressDesc": "The client's registered address.",
+        "contacts": "Contacts",
+        "contactsDesc": "Optional. Useful for sending invoices and reminders."
+      },
+      "pibHint": "9 digits",
+      "mbrHint": "8 digits",
+      "taxIdHint": "VAT ID or another tax number of the client's country",
+      "registrationNumber": "Registration number",
+      "registrationNumberHint": "The company's number in its national business register",
+      "addressPlaceholder": "Street and number",
+      "countryHint": "Two-letter code: RS, DE, GB…"
     },
     "create": {
       "button": "Add Client",
       "title": "Add New Client",
-      "description": "Add a new client to your list to issue invoices.",
+      "description": "Client details are printed on the invoice.",
       "success": "Client created successfully!"
     },
     "edit": {
@@ -215,7 +235,15 @@
       },
       "exchangeRateLoading": "Loading NBS rate…",
       "exchangeRateHint": "NBS middle rate on {{date}}: {{rate}}",
-      "exchangeRateUnavailable": "NBS rate unavailable, enter it manually"
+      "exchangeRateUnavailable": "NBS rate unavailable, enter it manually",
+      "sections": {
+        "client": "Client and payment",
+        "clientDesc": "Who is billed and where the money goes.",
+        "dates": "Dates and place",
+        "datesDesc": "The year of the issue date sets the invoice number."
+      },
+      "itemsDesc": "Services or goods with quantity and price in the invoice currency.",
+      "dueIn": "in {{days}} days"
     },
     "create": {
       "button": "Create Invoice",
@@ -309,14 +337,27 @@
     "form": {
       "bankName": "Bank Name",
       "accountNumber": "Account Number",
-      "accountNumberHint": "Format: XXX-XXXXXXXXXX-XX",
+      "accountNumberHint": "18 digits: bank code, account number and check digits.",
       "swiftCode": "SWIFT / BIC",
       "swiftPlaceholder": "BKBMRS22",
       "iban": "IBAN",
       "ibanPlaceholder": "RS35160005080003520714",
       "currency": "Currency",
-      "isDefault": "Set as default account",
-      "submit": "Save Account"
+      "isDefault": "Default account",
+      "submit": "Save Account",
+      "sections": {
+        "bank": "Bank and currency",
+        "bankDesc": "The currency decides which invoices this account fits.",
+        "details": "Account details",
+        "detailsDesc": "The account number is required. IBAN and SWIFT are only needed for payments from abroad.",
+        "detailsDescForeign": "Add IBAN and SWIFT for a foreign currency account, or clients abroad cannot pay."
+      },
+      "bankNamePlaceholder": "e.g. Banca Intesa",
+      "currencyHint": {
+        "rsd": "Dinar account, for payments from Serbian clients",
+        "foreign": "Foreign currency account, for payments from abroad"
+      },
+      "isDefaultHint": "Pre-selected on new invoices in the same currency."
     },
     "errors": {
       "bankNameRequired": "Bank name is required",
@@ -325,7 +366,7 @@
     "create": {
       "button": "Add Bank Account",
       "title": "Add Bank Account",
-      "description": "Add a new bank account to use on invoices.",
+      "description": "These details are printed on invoices so clients know where to pay.",
       "success": "Bank account added successfully!"
     },
     "edit": {

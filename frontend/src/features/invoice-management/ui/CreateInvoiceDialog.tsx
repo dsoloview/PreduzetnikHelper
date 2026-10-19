@@ -42,7 +42,7 @@ export const CreateInvoiceDialog = () => {
           {t("invoices.create.button")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{t("invoices.create.title")}</DialogTitle>
           <DialogDescription>

@@ -42,7 +42,7 @@ export const CreateBankAccountDialog = () => {
           {t("bankAccounts.create.button")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("bankAccounts.create.title")}</DialogTitle>
           <DialogDescription>{t("bankAccounts.create.description")}</DialogDescription>

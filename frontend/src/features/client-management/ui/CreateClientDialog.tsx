@@ -42,7 +42,7 @@ export const CreateClientDialog = () => {
           {t("clients.create.button")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("clients.create.title")}</DialogTitle>
           <DialogDescription>

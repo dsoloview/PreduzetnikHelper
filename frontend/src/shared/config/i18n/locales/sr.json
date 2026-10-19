@@ -35,7 +35,8 @@
       "en": "English",
       "ru": "Русский",
       "sr": "Српски"
-    }
+    },
+    "optional": "opciono"
   },
   "errors": {
     "downloadPdfFailed": "Neuspešno preuzimanje PDF-a",
@@ -100,12 +101,31 @@
       "pib": "PIB (poreski broj)",
       "mbr": "MBR (matični broj)",
       "taxId": "Poreski broj / VAT",
-      "submit": "Sačuvaj klijenta"
+      "submit": "Sačuvaj klijenta",
+      "typeHint": {
+        "domestic": "Firma ili preduzetnik iz Srbije: PIB i MB, fakture u RSD",
+        "international": "Strana firma: VAT i registarski broj, fakture u devizama"
+      },
+      "sections": {
+        "company": "Firma",
+        "companyDesc": "Naziv i brojevi tačno kao u registru — prikazuju se na fakturi.",
+        "address": "Adresa",
+        "addressDesc": "Registrovana adresa klijenta.",
+        "contacts": "Kontakt",
+        "contactsDesc": "Opciono. Korisno za slanje faktura i podsetnika."
+      },
+      "pibHint": "9 cifara",
+      "mbrHint": "8 cifara",
+      "taxIdHint": "VAT ID ili drugi poreski broj zemlje klijenta",
+      "registrationNumber": "Registarski broj",
+      "registrationNumberHint": "Broj firme u privrednom registru njene zemlje",
+      "addressPlaceholder": "Ulica i broj",
+      "countryHint": "Dvoslovni kod: RS, DE, GB…"
     },
     "create": {
       "button": "Dodaj klijenta",
       "title": "Novi klijent",
-      "description": "Dodajte klijenta za izdavanje faktura.",
+      "description": "Podaci o klijentu se štampaju na fakturi.",
       "success": "Klijent kreiran!"
     },
     "edit": {
@@ -215,7 +235,15 @@
       },
       "exchangeRateLoading": "Učitavanje kursa NBS…",
       "exchangeRateHint": "Srednji kurs NBS na dan {{date}}: {{rate}}",
-      "exchangeRateUnavailable": "Kurs NBS nije dostupan, unesite ga ručno"
+      "exchangeRateUnavailable": "Kurs NBS nije dostupan, unesite ga ručno",
+      "sections": {
+        "client": "Klijent i plaćanje",
+        "clientDesc": "Kome se izdaje faktura i gde stiže novac.",
+        "dates": "Datumi i mesto",
+        "datesDesc": "Godina datuma izdavanja određuje broj fakture."
+      },
+      "itemsDesc": "Usluge ili roba sa količinom i cenom u valuti fakture.",
+      "dueIn": "za {{days}} dana"
     },
     "create": {
       "button": "Kreiraj fakturu",
@@ -309,14 +337,27 @@
     "form": {
       "bankName": "Naziv banke",
       "accountNumber": "Broj računa",
-      "accountNumberHint": "Format: XXX-XXXXXXXXXX-XX",
+      "accountNumberHint": "18 cifara: kod banke, broj računa i kontrolni broj.",
       "swiftCode": "SWIFT / BIC",
       "swiftPlaceholder": "BKBMRS22",
       "iban": "IBAN",
       "ibanPlaceholder": "RS35160005080003520714",
       "currency": "Valuta",
-      "isDefault": "Postavi kao podrazumevani",
-      "submit": "Sačuvaj račun"
+      "isDefault": "Glavni račun",
+      "submit": "Sačuvaj račun",
+      "sections": {
+        "bank": "Banka i valuta",
+        "bankDesc": "Valuta određuje za koje fakture je račun pogodan.",
+        "details": "Podaci o računu",
+        "detailsDesc": "Broj računa je obavezan. IBAN i SWIFT su potrebni samo za uplate iz inostranstva.",
+        "detailsDescForeign": "Za devizni račun unesite IBAN i SWIFT, inače klijent iz inostranstva ne može da plati."
+      },
+      "bankNamePlaceholder": "npr. Banca Intesa",
+      "currencyHint": {
+        "rsd": "Dinarski, za uplate od klijenata iz Srbije",
+        "foreign": "Devizni, za uplate iz inostranstva"
+      },
+      "isDefaultHint": "Automatski se bira na novim fakturama u istoj valuti."
     },
     "errors": {
       "bankNameRequired": "Naziv banke je obavezan",
@@ -325,7 +366,7 @@
     "create": {
       "button": "Dodaj račun",
       "title": "Novi račun",
-      "description": "Dodajte bankovni račun za izdavanje faktura.",
+      "description": "Podaci se štampaju na fakturama da bi klijenti znali gde da plate.",
       "success": "Račun dodat!"
     },
     "edit": {

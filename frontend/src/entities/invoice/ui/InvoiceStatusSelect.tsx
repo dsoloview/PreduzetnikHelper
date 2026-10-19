@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { INVOICE_STATUSES, type InvoiceStatus } from "@preduzetnik/shared";
+import type { InvoiceStatus } from "@preduzetnik/shared";
 import { useUpdateInvoiceStatus } from "@/entities/invoice/api/invoice.queries";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ import { Label } from "@/shared/ui/label";
 import { Spinner } from "@/shared/ui/spinner";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
-import type { InvoiceDisplayStatus } from "../lib/display-status";
+import { INVOICE_STATUSES, type InvoiceDisplayStatus } from "../lib/display-status";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 

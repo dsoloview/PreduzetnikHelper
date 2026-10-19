@@ -41,7 +41,7 @@ export const EditBankAccountDialog = ({ account, open, onOpenChange }: EditBankA
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("bankAccounts.edit.title")}</DialogTitle>
           <DialogDescription>{account.bankName} — {account.accountNumber}</DialogDescription>

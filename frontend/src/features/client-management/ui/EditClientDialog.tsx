@@ -38,7 +38,7 @@ export const EditClientDialog = ({ client, open, onOpenChange }: EditClientDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("clients.edit.title")}</DialogTitle>
           <DialogDescription>

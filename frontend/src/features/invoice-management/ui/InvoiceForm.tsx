@@ -15,8 +15,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { Calendar } from "@/shared/ui/calendar";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
-import { Spinner } from "@/shared/ui/spinner";
 import { RequiredMark } from "@/shared/ui/required-mark";
+import { FormActions, FormSection } from "@/shared/ui/form-layout";
 import { cn } from "@/shared/lib/utils";
 import { useFormatters } from "@/shared/lib/format";
 
@@ -58,6 +58,9 @@ const buildInvoiceSchema = (t: (key: string) => string) =>
       message: t("invoices.form.errors.dueDateAfterIssue"),
       path: ["dueDate"],
     });
+
+/** Quick picks for the due date, counted from the issue date */
+const DUE_IN_DAYS = [7, 15, 30] as const;
 
 export type InvoiceFormValues = z.infer<ReturnType<typeof buildInvoiceSchema>>;
 
@@ -179,14 +182,13 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
+    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+      <FormSection title={t("invoices.form.sections.client")} description={t("invoices.form.sections.clientDesc")}>
           <Controller
             name="clientId"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field data-invalid={fieldState.invalid} className="sm:col-span-2">
                 <FieldLabel>{t("invoices.form.client")}<RequiredMark /></FieldLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger aria-invalid={fieldState.invalid}>
@@ -204,12 +206,11 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               </Field>
             )}
           />
-
           <Controller
             name="bankAccountId"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field data-invalid={fieldState.invalid} className="sm:col-span-2">
                 <FieldLabel>{t("invoices.form.bankAccount")}<RequiredMark /></FieldLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger aria-invalid={fieldState.invalid}>
@@ -227,7 +228,121 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               </Field>
             )}
           />
+          <Controller
+            name="currency"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>{t("invoices.form.currency")}</FieldLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RSD">RSD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            )}
+          />
+          {currency !== "RSD" && (
+            <Field data-invalid={!!form.formState.errors.exchangeRate}>
+              <FieldLabel>{t("invoices.form.exchangeRate")}<RequiredMark /></FieldLabel>
+              <Input
+                inputMode="decimal"
+                aria-invalid={!!form.formState.errors.exchangeRate}
+                {...form.register("exchangeRate", {
+                  setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
+                })}
+              />
+              {form.formState.errors.exchangeRate && (
+                <FieldError errors={[form.formState.errors.exchangeRate]} />
+              )}
+              <p className="text-xs text-muted-foreground">
+                {isRateLoading
+                  ? t("invoices.form.exchangeRateLoading")
+                  : nbsRate
+                    ? t("invoices.form.exchangeRateHint", {
+                        rate: nbsRate.middleRate,
+                        date: format(new Date(nbsRate.date), "dd.MM.yyyy"),
+                      })
+                    : t("invoices.form.exchangeRateUnavailable")}
+              </p>
+            </Field>
+          )}
+      </FormSection>
 
+      <FormSection title={t("invoices.form.sections.dates")} description={t("invoices.form.sections.datesDesc")}>
+          <Controller
+            name="issueDate"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>{t("invoices.form.issueDate")}<RequiredMark /></FieldLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                  </PopoverContent>
+                </Popover>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+          <Controller
+            name="dueDate"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>{t("invoices.form.dueDate")}<RequiredMark /></FieldLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                  </PopoverContent>
+                </Popover>
+                <div className="flex flex-wrap gap-1">
+                  {DUE_IN_DAYS.map((days) => (
+                    <button
+                      key={days}
+                      type="button"
+                      onClick={() => field.onChange(addDays(form.getValues("issueDate") ?? today, days))}
+                      className="rounded-md border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      {t("invoices.form.dueIn", { days })}
+                    </button>
+                  ))}
+                </div>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
           <Controller
             name="placeOfIssue"
             control={form.control}
@@ -239,146 +354,27 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               </Field>
             )}
           />
-        </div>
-
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="issueDate"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>{t("invoices.form.issueDate")}<RequiredMark /></FieldLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                    </PopoverContent>
-                  </Popover>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="dueDate"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>{t("invoices.form.dueDate")}<RequiredMark /></FieldLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "dd.MM.yyyy") : <span>{t("invoices.form.pickDate")}</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                    </PopoverContent>
-                  </Popover>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="currency"
-              control={form.control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel>{t("invoices.form.currency")}</FieldLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="RSD">RSD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="USD">USD</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-            />
-            {currency !== "RSD" && (
-              <Field data-invalid={!!form.formState.errors.exchangeRate}>
-                <FieldLabel>{t("invoices.form.exchangeRate")}<RequiredMark /></FieldLabel>
-                <Input
-                  inputMode="decimal"
-                  aria-invalid={!!form.formState.errors.exchangeRate}
-                  {...form.register("exchangeRate", {
-                    setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
-                  })}
-                />
-                {form.formState.errors.exchangeRate && (
-                  <FieldError errors={[form.formState.errors.exchangeRate]} />
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {isRateLoading
-                    ? t("invoices.form.exchangeRateLoading")
-                    : nbsRate
-                      ? t("invoices.form.exchangeRateHint", {
-                          rate: nbsRate.middleRate,
-                          date: format(new Date(nbsRate.date), "dd.MM.yyyy"),
-                        })
-                      : t("invoices.form.exchangeRateUnavailable")}
-                </p>
-              </Field>
-            )}
-          </div>
-
           <Controller
             name="domesticSupply"
             control={form.control}
             render={({ field }) => (
-              <div className="flex items-start gap-2 py-2">
-                <Checkbox
-                  id="domesticSupply"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="mt-0.5"
-                />
-                <div className="grid gap-0.5">
-                  <label
-                    htmlFor="domesticSupply"
-                    className="text-sm font-medium leading-none cursor-pointer"
-                  >
-                    {t("invoices.form.domesticSupply")}
-                  </label>
-                  <p className="text-xs text-muted-foreground">
-                    {t("invoices.form.domesticSupplyHint")}
-                  </p>
-                </div>
-              </div>
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:col-span-2">
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
+                <span>
+                  <span className="block text-sm font-medium">{t("invoices.form.domesticSupply")}</span>
+                  <span className="block text-xs text-muted-foreground">{t("invoices.form.domesticSupplyHint")}</span>
+                </span>
+              </label>
             )}
           />
-        </div>
-      </div>
+      </FormSection>
 
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">{t("invoices.form.items")}</h3>
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold">{t("invoices.form.items")}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t("invoices.form.itemsDesc")}</p>
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -390,7 +386,8 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
           </Button>
         </div>
 
-        <Table>
+        <div className="-mx-1 overflow-x-auto px-1">
+        <Table className="min-w-[560px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[40%]">
@@ -472,6 +469,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
             })}
           </TableBody>
         </Table>
+        </div>
         {itemsRootError && (
           <p className="text-sm text-destructive">{itemsRootError}</p>
         )}
@@ -493,19 +491,14 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
         )}
       />
 
-      <div className="flex flex-col items-end space-y-2 border-t pt-4">
-        <div className="text-sm text-muted-foreground italic">
-          {t("invoices.form.noVatNotice")}
-        </div>
+      <div className="flex flex-col items-end gap-1">
+        <div className="text-xs text-muted-foreground italic">{t("invoices.form.noVatNotice")}</div>
         <div className="text-xl font-semibold">
           {t("invoices.form.grandTotal")}: {money(totalAmount, currency, { decimals: 2 })}
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading && <Spinner className="mr-2" />}
-        {submitLabel ?? t("invoices.form.submit")}
-      </Button>
+      <FormActions submitLabel={submitLabel ?? t("invoices.form.submit")} isLoading={isLoading} />
     </form>
   );
 };
