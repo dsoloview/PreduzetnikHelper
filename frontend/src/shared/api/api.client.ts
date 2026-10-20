@@ -21,7 +21,8 @@ apiClient.interceptors.request.use(
 );
 
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+/** Requests that got a 401 while a refresh was in flight; each is retried or rejected once the refresh settles */
+let refreshQueue: Array<{ retry: (token: string) => void; fail: (error: unknown) => void }> = [];
 
 apiClient.interceptors.response.use(
   (response) => response,
@@ -34,10 +35,13 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          refreshQueue.push((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(apiClient(originalRequest));
+        return new Promise((resolve, reject) => {
+          refreshQueue.push({
+            retry: (token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(apiClient(originalRequest));
+            },
+            fail: reject,
           });
         });
       }
@@ -49,11 +53,13 @@ apiClient.interceptors.response.use(
         const response = await apiClient.post<{ accessToken: string }>('/auth/refresh');
         const newToken = response.data.accessToken;
         useAuthStore.getState().setToken(newToken);
-        refreshQueue.forEach((cb) => cb(newToken));
+        refreshQueue.forEach(({ retry }) => retry(newToken));
         refreshQueue = [];
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch {
+        // Without this the queued requests would never settle and their queries would show a spinner forever
+        refreshQueue.forEach(({ fail }) => fail(error));
         refreshQueue = [];
         useAuthStore.getState().clearToken();
         window.dispatchEvent(new Event('auth:unauthorized'));
