@@ -176,6 +176,28 @@ Used only by `docker-compose.yml`. Defaults are sane for local dev, so this file
 
 ---
 
+## Production Deployment
+
+`docker-compose.prod.yml` runs the whole app: PostgreSQL (not exposed outside Docker), the API, the web app behind nginx and a backup job.
+
+```bash
+cp .env.example .env        # set POSTGRES_PASSWORD, JWT_SECRET and APP_URL
+make prod-up                # build and start; the app is on http://localhost:8080
+make prod-logs              # follow logs
+```
+
+- **HTTPS.** Put a TLS reverse proxy (Caddy, Traefik, Cloudflare Tunnel…) in front of port `APP_PORT` for a real domain: the refresh-token cookie is `Secure` in production. Set `TRUST_PROXY_HOPS=2` when that proxy forwards to the app's nginx.
+- **Health.** `GET /api/health` is public; both containers have Docker health checks.
+- **Backups.** The `backup` service writes a `pg_dump` to `./backups` on start and then daily, keeping `BACKUP_KEEP_DAYS` days. `make prod-backup` takes one right away. Copy that folder off the server, e.g. with a nightly `rsync`.
+- **Restore** (⚠ replaces the current data):
+
+  ```bash
+  docker compose -f docker-compose.prod.yml exec -T postgres sh -c \
+    'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner' < backups/<file>.dump
+  ```
+
+---
+
 ## Project Architecture
 
 ### Backend Module Structure

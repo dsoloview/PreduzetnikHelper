@@ -33,3 +33,6 @@ pnpm-debug.log*
 agents.md
 SECURITY.md
 docs/
+
+# Database dumps from docker-compose.prod.yml
+/backups/

@@ -1,7 +1,8 @@
 .PHONY: help install dev dev-be dev-fe build \
         db-up db-down db-reset db-migrate db-generate db-studio db-logs \
         test test-be test-fe test-e2e test-watch test-cov lint lint-be lint-fe \
-        typecheck typecheck-fe build-shared
+        typecheck typecheck-fe build-shared \
+        prod-up prod-down prod-logs prod-backup
 
 # ─── Meta ─────────────────────────────────────────────────────────────────────
 
@@ -103,3 +104,19 @@ typecheck: ## TypeScript type-check all packages
 
 typecheck-fe: ## TypeScript type-check frontend only
 	pnpm --filter frontend exec tsc --noEmit
+
+# ─── Production (docker-compose.prod.yml) ─────────────────────────────────────
+
+PROD = docker compose -f docker-compose.prod.yml
+
+prod-up: ## Build and start the production stack
+	$(PROD) up -d --build
+
+prod-down: ## Stop the production stack (data and backups are kept)
+	$(PROD) down
+
+prod-logs: ## Follow production logs
+	$(PROD) logs -f
+
+prod-backup: ## Take a database backup right now
+	$(PROD) exec backup /usr/local/bin/backup.sh --once

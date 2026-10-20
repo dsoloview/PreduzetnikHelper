@@ -31,5 +31,9 @@ COPY --from=build-frontend /app/frontend/dist /usr/share/nginx/html
 COPY frontend/nginx.conf /etc/nginx/templates/default.conf.template
 ENV BACKEND_URL=http://backend:3000
 ENV PORT=80
+ENV NGINX_RESOLVER=[fd12::10]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO /dev/null "http://127.0.0.1:${PORT}/" || exit 1
 
 EXPOSE 80

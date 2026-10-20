@@ -53,4 +53,7 @@ ENV TRUST_PROXY_HOPS=1
 
 EXPOSE 3000
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget -qO /dev/null "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
+
 CMD ["sh", "-c", "npx prisma migrate deploy --schema=prisma/schema.prisma && node dist/src/main"]

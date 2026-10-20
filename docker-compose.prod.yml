@@ -1,0 +1,77 @@
+# Production stack: PostgreSQL, API, web app (nginx) and daily database backups.
+#   cp .env.example .env   # then set the "Production" variables
+#   make prod-up
+# The app listens on APP_PORT (8080 by default). Put an HTTPS reverse proxy in front of it for a real domain:
+# the refresh-token cookie is Secure in production, so browsers only send it over HTTPS (localhost is exempt).
+name: preduzetnik
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-preduzetnik}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-preduzetnik}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # No published port: only the API and the backup job reach the database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      # POSTGRES_PASSWORD must be URL-safe here (letters, digits, - and _), or percent-encode it
+      DATABASE_URL: postgresql://${POSTGRES_USER:-preduzetnik}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-preduzetnik}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      REFRESH_TOKEN_EXPIRES_DAYS: ${REFRESH_TOKEN_EXPIRES_DAYS:-30}
+      CORS_ORIGIN: ${APP_URL:-http://localhost:8080}
+      NODE_ENV: production
+      PDF_PROVIDER: pdfmake
+      # nginx in the frontend container; use 2 if another reverse proxy (HTTPS) sits in front of it
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:3000
+      NGINX_RESOLVER: 127.0.0.11
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-preduzetnik}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-preduzetnik}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./deploy/backup.sh:/usr/local/bin/backup.sh:ro
+      - ${BACKUP_DIR:-./backups}:/backups
+    entrypoint: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
