@@ -9,7 +9,9 @@ import {
   IsString,
   ValidateNested,
   ArrayMinSize,
+  MaxLength,
 } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 import { Type } from 'class-transformer';
 import type { Currency } from '@preduzetnik/shared';
 import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
@@ -36,6 +38,7 @@ export class CreateInvoiceDto implements ICreateInvoiceRequest {
   @ApiPropertyOptional({ example: 'Beograd' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.city)
   placeOfIssue?: string;
 
   @ApiPropertyOptional({
@@ -62,6 +65,7 @@ export class CreateInvoiceDto implements ICreateInvoiceRequest {
   @ApiPropertyOptional({ example: 'Payment for web development services' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.note)
   note?: string;
 
   @ApiProperty({ type: [CreateInvoiceItemDto] })

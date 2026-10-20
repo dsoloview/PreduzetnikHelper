@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, Min, MaxLength } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 import { ICreateInvoiceItemRequest } from '@preduzetnik/shared';
 
 export class CreateInvoiceItemDto implements ICreateInvoiceItemRequest {
   @ApiProperty({ example: 'Web development services — May 2026' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.description)
   description: string;
 
   @ApiProperty({ example: 1.5 })

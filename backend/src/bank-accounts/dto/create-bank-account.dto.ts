@@ -5,7 +5,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MaxLength,
 } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 import type { Currency } from '@preduzetnik/shared';
 import { Currency as CurrencyEnum } from '../../generated/prisma/enums';
 import { ICreateBankAccountRequest } from '@preduzetnik/shared';
@@ -14,6 +16,7 @@ export class CreateBankAccountDto implements ICreateBankAccountRequest {
   @ApiProperty({ example: 'Banca Intesa' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.name)
   bankName: string;
 
   @ApiProperty({
@@ -22,16 +25,19 @@ export class CreateBankAccountDto implements ICreateBankAccountRequest {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.code)
   accountNumber: string;
 
   @ApiPropertyOptional({ example: 'BKBMRS22' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.code)
   swiftCode?: string;
 
   @ApiPropertyOptional({ example: 'RS35160005080003520714' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.code)
   iban?: string;
 
   @ApiProperty({ enum: CurrencyEnum, default: CurrencyEnum.RSD })

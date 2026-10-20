@@ -1,25 +1,25 @@
 import { create } from 'zustand';
 
-const STORAGE_KEY = 'preduzetnik_access_token';
+export type SessionStatus = 'unknown' | 'authenticated' | 'anonymous';
 
 interface AuthState {
   accessToken: string | null;
+  status: SessionStatus;
   isAuthenticated: boolean;
   setToken: (token: string) => void;
   clearToken: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  accessToken: localStorage.getItem(STORAGE_KEY),
-  isAuthenticated: !!localStorage.getItem(STORAGE_KEY),
+  accessToken: null,
+  status: 'unknown',
+  isAuthenticated: false,
 
   setToken: (token: string) => {
-    localStorage.setItem(STORAGE_KEY, token);
-    set({ accessToken: token, isAuthenticated: true });
+    set({ accessToken: token, status: 'authenticated', isAuthenticated: true });
   },
 
   clearToken: () => {
-    localStorage.removeItem(STORAGE_KEY);
-    set({ accessToken: null, isAuthenticated: false });
+    set({ accessToken: null, status: 'anonymous', isAuthenticated: false });
   },
 }));

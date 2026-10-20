@@ -7,7 +7,9 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  MaxLength,
 } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 import { Transform } from 'class-transformer';
 import { emptyToUndefined } from '../../common/transformers/empty-to-undefined.transformer';
 
@@ -17,11 +19,13 @@ export class CreateClientDto implements ICreateClientRequest {
   type: ClientType;
   @ApiProperty({ example: 'name' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.name)
   name: string;
   @ApiPropertyOptional({ example: 'test@test.com' })
   @Transform(emptyToUndefined)
   @IsOptional()
   @IsEmail()
+  @MaxLength(MAX_LENGTH.email)
   email?: string;
   @ApiPropertyOptional({
     example: '+381641234567',
@@ -30,24 +34,31 @@ export class CreateClientDto implements ICreateClientRequest {
   @Transform(emptyToUndefined)
   @IsOptional()
   @IsPhoneNumber()
+  @MaxLength(MAX_LENGTH.code)
   phone?: string;
   @ApiProperty({ example: 'address' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.address)
   address: string;
   @ApiProperty({ example: 'city' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.city)
   city: string;
   @ApiProperty({ example: '11000', required: false })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.postalCode)
   postalCode?: string;
   @ApiProperty({ example: 'country' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.city)
   country: string;
   @ApiProperty({ example: '123456789' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.code)
   taxId: string;
   @ApiProperty({ example: '123456789' })
   @IsNotEmpty()
+  @MaxLength(MAX_LENGTH.code)
   registrationNumber: string;
 }

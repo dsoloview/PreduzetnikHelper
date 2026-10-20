@@ -1,15 +1,19 @@
 import { IUpdateUserRequest } from '@preduzetnik/shared';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 
 export class UpdateUserDto implements IUpdateUserRequest {
-  @IsOptional() @IsString() name?: string;
-  @IsOptional() @IsString() companyName?: string;
-  @IsOptional() @IsString() pib?: string;
-  @IsOptional() @IsString() mbr?: string;
-  @IsOptional() @IsString() activityCode?: string;
-  @IsOptional() @IsString() address?: string;
-  @IsOptional() @IsString() city?: string;
-  @IsOptional() @IsString() postalCode?: string;
-  @IsOptional() @IsString() municipality?: string;
-  @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.name) name?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.name) companyName?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.code) pib?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.code) mbr?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.code) activityCode?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.address) address?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.city) city?: string;
+  @IsOptional()
+  @IsString()
+  @MaxLength(MAX_LENGTH.postalCode)
+  postalCode?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.city) municipality?: string;
+  @IsOptional() @IsString() @MaxLength(MAX_LENGTH.code) phone?: string;
 }

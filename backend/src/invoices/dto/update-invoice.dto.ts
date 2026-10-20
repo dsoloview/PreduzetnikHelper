@@ -9,7 +9,9 @@ import {
   IsUUID,
   ValidateNested,
   ArrayMinSize,
+  MaxLength,
 } from 'class-validator';
+import { MAX_LENGTH } from '../../common/validation/max-length';
 import { Type } from 'class-transformer';
 import { IUpdateInvoiceRequest } from '@preduzetnik/shared';
 import type { InvoiceStatus, Currency } from '@preduzetnik/shared';
@@ -56,6 +58,7 @@ export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
   @ApiPropertyOptional({ example: 'Beograd' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.city)
   placeOfIssue?: string;
 
   @ApiPropertyOptional()
@@ -66,6 +69,7 @@ export class UpdateInvoiceDto implements IUpdateInvoiceRequest {
   @ApiPropertyOptional({ example: 'Updated note' })
   @IsOptional()
   @IsString()
+  @MaxLength(MAX_LENGTH.note)
   note?: string;
 
   @ApiPropertyOptional({ enum: CurrencyEnum })

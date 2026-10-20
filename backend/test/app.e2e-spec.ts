@@ -142,6 +142,9 @@ describe('API (e2e, real database)', () => {
         .post('/api/clients', { name: 'X', unexpected: true })
         .expect(400);
       await newInvoice({ issueDate: 'not-a-date' }).expect(400);
+      await newInvoice({
+        items: [{ description: 'x'.repeat(10_000), quantity: 1, unitPrice: 1 }],
+      }).expect(400);
     });
   });
 
