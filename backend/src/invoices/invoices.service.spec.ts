@@ -155,15 +155,21 @@ describe('InvoicesService', () => {
       expect(result.totalAmount).toEqual(20000);
     });
 
-    it('should retry when a concurrent create takes the same invoice number', async () => {
-      const { Prisma } = jest.requireActual('../generated/prisma/client');
-      const conflict = new Prisma.PrismaClientKnownRequestError(
-        'serialization failure',
-        { code: 'P2034', clientVersion: 'test' },
+    it('takes a per-user, per-year advisory lock before numbering', async () => {
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) =>
+        cb(prismaMock),
       );
-      const created = {
+      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({
+        id: 'client-1',
+        type: 'DOMESTIC',
+      });
+      (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({
+        id: 'bank-1',
+      });
+      prismaMock.invoice.findFirst.mockResolvedValue(null);
+      prismaMock.invoice.create.mockResolvedValue({
         id: 'inv-1',
-        invoiceNumber: 2,
+        invoiceNumber: 1,
         year: 2026,
         status: InvoiceStatus.DRAFT,
         clientId: 'client-1',
@@ -175,20 +181,9 @@ describe('InvoicesService', () => {
         client: { name: 'C' },
         items: [],
         createdAt: new Date(),
-      };
-      const tx = jest
-        .spyOn(prismaMock, '$transaction')
-        .mockRejectedValueOnce(conflict)
-        .mockResolvedValueOnce(created);
-      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({
-        id: 'client-1',
-        type: 'DOMESTIC',
-      });
-      (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({
-        id: 'bank-1',
-      });
+      } as any);
 
-      const result = await service.create('user-1', {
+      await service.create('user-1', {
         clientId: 'client-1',
         bankAccountId: 'bank-1',
         issueDate: '2026-05-01',
@@ -196,32 +191,14 @@ describe('InvoicesService', () => {
         items: [{ description: 'x', quantity: 1, unitPrice: 100 }],
       });
 
-      expect(tx).toHaveBeenCalledTimes(2);
-      expect(result.invoiceNumber).toBe(2);
-    });
-
-    it('should not retry on unrelated errors', async () => {
-      const tx = jest
-        .spyOn(prismaMock, '$transaction')
-        .mockRejectedValue(new Error('db down'));
-      (clientsServiceMock.findOne as jest.Mock).mockResolvedValue({
-        id: 'client-1',
-        type: 'DOMESTIC',
-      });
-      (bankAccountsServiceMock.findOne as jest.Mock).mockResolvedValue({
-        id: 'bank-1',
-      });
-
-      await expect(
-        service.create('user-1', {
-          clientId: 'client-1',
-          bankAccountId: 'bank-1',
-          issueDate: '2026-05-01',
-          dueDate: '2026-05-15',
-          items: [{ description: 'x', quantity: 1, unitPrice: 100 }],
-        }),
-      ).rejects.toThrow('db down');
-      expect(tx).toHaveBeenCalledTimes(1);
+      const lockCall = (prismaMock.$executeRaw as jest.Mock).mock.calls[0];
+      expect(lockCall[0].join('?')).toContain('pg_advisory_xact_lock');
+      expect(lockCall.slice(1)).toEqual(['user-1', 2026]);
+      const lockOrder = (prismaMock.$executeRaw as jest.Mock).mock
+        .invocationCallOrder[0];
+      const readOrder = (prismaMock.invoice.findFirst as jest.Mock).mock
+        .invocationCallOrder[0];
+      expect(lockOrder).toBeLessThan(readOrder);
     });
 
     it('should throw BadRequest if foreign currency is provided without exchangeRate', async () => {

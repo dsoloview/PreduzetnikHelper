@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
@@ -32,21 +32,25 @@ const requestPath = (ctx: ExecutionContext) =>
         return config;
       },
     }),
-    ThrottlerModule.forRoot([
-      { name: 'default', ttl: 60000, limit: 100 },
-      {
-        name: 'auth',
-        ttl: 60000,
-        limit: 10,
-        skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
-      },
-      {
-        name: 'pdf',
-        ttl: 60000,
-        limit: 10,
-        skipIf: (ctx) => !requestPath(ctx).endsWith('/pdf'),
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        { name: 'default', ttl: 60000, limit: 100 },
+        {
+          name: 'auth',
+          ttl: 60000,
+          // Overridable so e2e tests can sign up more users than a person would in a minute
+          limit: Number(config.get('THROTTLE_AUTH_LIMIT', 10)),
+          skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
+        },
+        {
+          name: 'pdf',
+          ttl: 60000,
+          limit: 10,
+          skipIf: (ctx) => !requestPath(ctx).endsWith('/pdf'),
+        },
+      ],
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,

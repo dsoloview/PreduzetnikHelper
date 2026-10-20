@@ -141,7 +141,8 @@ make db-down      # Stop PostgreSQL
 make db-migrate   # Apply pending migrations
 make db-studio    # Open Prisma Studio
 make db-reset     # Drop DB and re-apply all migrations (⚠ deletes data)
-make test         # Run backend tests
+make test         # Run backend and frontend unit tests
+make test-e2e     # Run API e2e tests against the local PostgreSQL in a throwaway database
 make lint         # Lint all packages
 make typecheck    # TypeScript type-check all packages
 ```

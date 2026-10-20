@@ -8,5 +8,10 @@
   },
   "moduleNameMapper": {
     "^(\\.{1,2}/.*)\\.js$": "$1"
-  }
+  },
+  "globalSetup": "<rootDir>/e2e-global-setup.ts",
+  "setupFiles": ["<rootDir>/e2e-env.ts"],
+  "maxWorkers": 1,
+  "testTimeout": 30000,
+  "globalTeardown": "<rootDir>/e2e-global-teardown.ts"
 }

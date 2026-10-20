@@ -55,44 +55,43 @@ export class InvoicesService {
       dto.exchangeRate,
     );
 
-    const invoice = await this.withNumberingRetry(() =>
-      this.prisma.$transaction(
-        async (tx) => {
-          const lastInvoice = await tx.invoice.findFirst({
-            where: { userId, year },
-            orderBy: { invoiceNumber: 'desc' },
-          });
-          const invoiceNumber = (lastInvoice?.invoiceNumber ?? 0) + 1;
+    const invoice = await this.prisma.$transaction(async (tx) => {
+      // Number assignment is read-then-write: serialize it per user and year with a transaction-scoped
+      // advisory lock, so concurrent creations queue up instead of failing. Other users are not blocked.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}), ${year})`;
 
-          return tx.invoice.create({
-            data: {
-              userId,
-              clientId: dto.clientId,
-              bankAccountId: dto.bankAccountId,
-              invoiceNumber,
-              year,
-              issueDate,
-              dueDate: new Date(dto.dueDate),
-              placeOfIssue: dto.placeOfIssue,
-              domesticSupply,
-              currency,
-              exchangeRate: currency === Currency.RSD ? null : dto.exchangeRate,
-              totalAmount: totals.totalAmount,
-              totalRsd: totals.totalRsd,
-              note: dto.note,
-              items: {
-                create: totals.items,
-              },
-            },
-            include: {
-              client: true,
-              items: true,
-            },
-          });
+      const lastInvoice = await tx.invoice.findFirst({
+        where: { userId, year },
+        orderBy: { invoiceNumber: 'desc' },
+      });
+      const invoiceNumber = (lastInvoice?.invoiceNumber ?? 0) + 1;
+
+      return tx.invoice.create({
+        data: {
+          userId,
+          clientId: dto.clientId,
+          bankAccountId: dto.bankAccountId,
+          invoiceNumber,
+          year,
+          issueDate,
+          dueDate: new Date(dto.dueDate),
+          placeOfIssue: dto.placeOfIssue,
+          domesticSupply,
+          currency,
+          exchangeRate: currency === Currency.RSD ? null : dto.exchangeRate,
+          totalAmount: totals.totalAmount,
+          totalRsd: totals.totalRsd,
+          note: dto.note,
+          items: {
+            create: totals.items,
+          },
         },
-        { isolationLevel: 'Serializable' },
-      ),
-    );
+        include: {
+          client: true,
+          items: true,
+        },
+      });
+    });
 
     return this.mapToResponseDto(invoice);
   }
@@ -298,28 +297,6 @@ export class InvoicesService {
 
     const buffer = await this.pdfService.generateInvoicePdf(pdfData);
     return { buffer, displayNumber: mappedDto.displayNumber };
-  }
-
-  /**
-   * Two invoices created at the same time read the same last number; Postgres aborts one of the
-   * Serializable transactions (P2034) or the unique index rejects it (P2002). Retrying picks the next number.
-   */
-  private async withNumberingRetry<T>(
-    operation: () => Promise<T>,
-    attempts = 3,
-  ): Promise<T> {
-    for (let attempt = 1; ; attempt++) {
-      try {
-        return await operation();
-      } catch (error) {
-        const isConflict =
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          (error.code === 'P2034' || error.code === 'P2002');
-        if (!isConflict || attempt >= attempts) {
-          throw error;
-        }
-      }
-    }
   }
 
   private mapToResponseDto(

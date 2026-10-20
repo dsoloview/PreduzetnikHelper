@@ -1,6 +1,6 @@
 .PHONY: help install dev dev-be dev-fe build \
         db-up db-down db-reset db-migrate db-generate db-studio db-logs \
-        test test-be test-watch test-cov lint lint-be lint-fe \
+        test test-be test-fe test-e2e test-watch test-cov lint lint-be lint-fe \
         typecheck typecheck-fe build-shared
 
 # ─── Meta ─────────────────────────────────────────────────────────────────────
@@ -62,8 +62,21 @@ db-studio: ## Open Prisma Studio in browser
 
 # ─── Test ─────────────────────────────────────────────────────────────────────
 
-test: ## Run all backend tests
+test: ## Run backend and frontend unit tests
 	pnpm --filter backend test
+	pnpm --filter frontend test
+
+test-be: ## Run backend unit tests
+	pnpm --filter backend test
+
+test-fe: ## Run frontend unit tests
+	pnpm --filter frontend test
+
+# Creates a throwaway database next to E2E_DATABASE_URL for each run and drops it afterwards
+E2E_DATABASE_URL ?= postgresql://$${POSTGRES_USER:-preduzetnik}:$${POSTGRES_PASSWORD:-preduzetnik}@localhost:5432/$${POSTGRES_DB:-preduzetnik}
+
+test-e2e: ## Run backend e2e tests against the local PostgreSQL (make db-up first)
+	E2E_DATABASE_URL="$(E2E_DATABASE_URL)" pnpm --filter backend test:e2e
 
 test-watch: ## Run backend tests in watch mode
 	pnpm --filter backend test:watch

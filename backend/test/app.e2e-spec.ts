@@ -1,172 +1,228 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { PrismaService } from '../src/prisma/prisma.service';
-import { PdfService } from '../src/pdf/pdf.service';
-import { createPrismaMock } from '../src/prisma/prisma.service.mock';
-import { JwtService } from '@nestjs/jwt';
-import { randomUUID } from 'crypto';
+import type { App } from 'supertest/types';
+import { AppModule } from '../src/app.module';
+import { configureApp } from '../src/app.setup';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication;
-  let prismaMock: ReturnType<typeof createPrismaMock>;
-  let jwtToken: string;
-  const mockUserId = randomUUID();
-  const mockClientId = randomUUID();
-  const mockBankAccountId = randomUUID();
+/**
+ * End-to-end tests against a real Postgres (see e2e-database.ts): migrations, transactions,
+ * unique indexes and the HTTP pipeline (prefix, validation, cookies) are all the production ones.
+ */
+describe('API (e2e, real database)', () => {
+  let app: NestExpressApplication;
+  let http: App;
+
+  const PASSWORD = 'Password123';
+  let emailCounter = 0;
+
+  const register = async () => {
+    const email = `user${++emailCounter}-${Date.now()}@e2e.test`;
+    const res = await request(http)
+      .post('/api/auth/register')
+      .send({ email, password: PASSWORD, name: 'E2E User' })
+      .expect(201);
+    const body = res.body as { accessToken: string };
+    return {
+      email,
+      token: body.accessToken,
+      cookie: [res.headers['set-cookie']].flat()[0] ?? '',
+    };
+  };
+
+  const authed = (token: string) => ({
+    get: (url: string) =>
+      request(http).get(url).set('Authorization', `Bearer ${token}`),
+    post: (url: string, body: object) =>
+      request(http)
+        .post(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send(body),
+    patch: (url: string, body: object) =>
+      request(http)
+        .patch(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send(body),
+  });
+
+  /** A user with one domestic client and one RSD bank account */
+  const userWithClient = async () => {
+    const user = await register();
+    const api = authed(user.token);
+    const client = await api
+      .post('/api/clients', {
+        type: 'DOMESTIC',
+        name: 'Klijent d.o.o.',
+        address: 'Knez Mihailova 1',
+        city: 'Beograd',
+        country: 'RS',
+        taxId: '123456789',
+        registrationNumber: '12345678',
+      })
+      .expect(201);
+    const account = await api
+      .post('/api/bank-accounts', {
+        bankName: 'Banka',
+        accountNumber: '160-0000000000001-11',
+        currency: 'RSD',
+      })
+      .expect(201);
+    const newInvoice = (overrides: object = {}) =>
+      api.post('/api/invoices', {
+        clientId: (client.body as { id: string }).id,
+        bankAccountId: (account.body as { id: string }).id,
+        issueDate: '2026-05-10',
+        dueDate: '2026-05-25',
+        items: [{ description: 'Usluga', quantity: 1, unitPrice: 100000 }],
+        ...overrides,
+      });
+    return { ...user, api, newInvoice };
+  };
 
   beforeAll(async () => {
-    prismaMock = createPrismaMock();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(PrismaService)
-      .useValue(prismaMock)
-      .overrideProvider(PdfService)
-      .useValue({
-        generateInvoicePdf: jest
-          .fn()
-          .mockResolvedValue(Buffer.from('mock-pdf')),
-        generateKpoPdf: jest.fn().mockResolvedValue(Buffer.from('mock-pdf')),
-      })
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    }).compile();
+    app = moduleRef.createNestApplication<NestExpressApplication>();
+    configureApp(app);
     await app.init();
-
-    // Generate a valid token for authorized requests
-    const jwtService = app.get<JwtService>(JwtService);
-    jwtToken = jwtService.sign({ username: 'E2E User', sub: mockUserId });
+    http = app.getHttpServer();
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  it('GET /api/health', async () => {
+    await request(http).get('/api/health').expect(200).expect({ status: 'ok' });
   });
 
-  describe('Auth Flow', () => {
-    it('/auth/register (POST)', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(null);
-      prismaMock.user.create.mockResolvedValue({
-        id: mockUserId,
-        email: 'e2e@example.com',
-      } as any);
+  describe('auth', () => {
+    it('sets an HttpOnly refresh cookie and rotates it on refresh', async () => {
+      const { cookie } = await register();
+      expect(cookie).toMatch(/^refreshToken=/);
+      expect(cookie).toMatch(/HttpOnly/i);
 
-      return request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'e2e@example.com',
-          password: 'password123',
-          companyName: 'E2E Test PR',
-          name: 'E2E User',
-          address: 'E2E St 1',
-          city: 'Belgrade',
-          pib: '123456789',
-          mbr: '98765432',
-          activityCode: '6201',
-        })
-        .expect(201)
-        .expect((res) => {
-          expect(res.body.accessToken).toBeDefined();
-        });
+      const refreshed = await request(http)
+        .post('/api/auth/refresh')
+        .set('Cookie', cookie)
+        .expect(200);
+      expect((refreshed.body as { accessToken: string }).accessToken).toEqual(
+        expect.any(String),
+      );
+
+      // The old refresh token was consumed by the rotation
+      await request(http)
+        .post('/api/auth/refresh')
+        .set('Cookie', cookie)
+        .expect(401);
+    });
+
+    it('answers 401 alike for an unknown email and a wrong password', async () => {
+      const { email } = await register();
+      await request(http)
+        .post('/api/auth/login')
+        .send({ email: 'nobody@e2e.test', password: PASSWORD })
+        .expect(401);
+      await request(http)
+        .post('/api/auth/login')
+        .send({ email, password: 'Wrongpass1' })
+        .expect(401);
+    });
+
+    it('rejects requests without a token', async () => {
+      await request(http).get('/api/invoices').expect(401);
     });
   });
 
-  describe('Core Flow', () => {
-    it('/clients (POST)', () => {
-      prismaMock.client.create.mockResolvedValue({
-        id: mockClientId,
-        name: 'E2E Client',
-      } as any);
+  describe('validation', () => {
+    it('rejects unknown fields and invalid values with 400', async () => {
+      const { api, newInvoice } = await userWithClient();
+      await api
+        .post('/api/clients', { name: 'X', unexpected: true })
+        .expect(400);
+      await newInvoice({ issueDate: 'not-a-date' }).expect(400);
+    });
+  });
 
-      return request(app.getHttpServer())
-        .post('/clients')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: 'E2E Client',
-          address: 'Client St 1',
-          city: 'Novi Sad',
-          country: 'Serbia',
-          type: 'DOMESTIC',
-          taxId: '111111111',
-          registrationNumber: '22222222',
-        })
-        .expect(201)
-        .expect((res) => {
-          expect(res.body.id).toEqual(mockClientId);
-        });
+  describe('invoices', () => {
+    it('numbers invoices sequentially per year', async () => {
+      const { newInvoice } = await userWithClient();
+      const numbers: string[] = [];
+      for (let i = 0; i < 3; i++) {
+        const res = await newInvoice().expect(201);
+        numbers.push((res.body as { displayNumber: string }).displayNumber);
+      }
+      expect(numbers).toEqual(['1/2026', '2/2026', '3/2026']);
     });
 
-    it('/invoices (POST)', () => {
-      prismaMock.client.findUnique.mockResolvedValue({
-        id: mockClientId,
-        type: 'DOMESTIC',
-        userId: mockUserId,
-      } as any);
-      prismaMock.bankAccount.findUnique.mockResolvedValue({
-        id: mockBankAccountId,
-        userId: mockUserId,
-      } as any);
-      prismaMock.invoice.findFirst.mockResolvedValue(null);
+    it('gives concurrent creations distinct consecutive numbers', async () => {
+      const { newInvoice } = await userWithClient();
+      const results = await Promise.all(
+        Array.from({ length: 5 }, () => newInvoice()),
+      );
 
-      const mockCreatedInvoice = {
-        id: randomUUID(),
-        invoiceNumber: 1,
-        year: new Date().getFullYear(),
-        status: 'DRAFT',
-        clientId: mockClientId,
-        issueDate: new Date(),
-        dueDate: new Date(),
-        totalAmount: 50000,
-        totalRsd: 50000,
-        client: { name: 'E2E Client' },
-        items: [],
-      };
-
-      prismaMock.invoice.create.mockResolvedValue(mockCreatedInvoice as any);
-
-      return request(app.getHttpServer())
-        .post('/invoices')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          clientId: mockClientId,
-          bankAccountId: mockBankAccountId,
-          issueDate: new Date().toISOString(),
-          dueDate: new Date(Date.now() + 86400000 * 10).toISOString(),
-          placeOfIssue: 'Belgrade',
-          items: [{ description: 'Consulting', quantity: 10, unitPrice: 5000 }],
-        })
-        .expect(201)
-        .expect((res) => {
-          expect(res.body.id).toEqual(mockCreatedInvoice.id);
-          expect(res.body.totalAmount).toEqual(50000);
-        });
+      expect(results.map((r) => r.status)).toEqual([201, 201, 201, 201, 201]);
+      const numbers = results
+        .map((r) => (r.body as { invoiceNumber: number }).invoiceNumber)
+        .sort((a, b) => a - b);
+      expect(numbers).toEqual([1, 2, 3, 4, 5]);
     });
 
-    it('/limits (GET)', () => {
-      // Mock for pausal limit (all invoices)
-      prismaMock.invoice.findMany.mockResolvedValueOnce([
-        { totalRsd: 50000 },
-      ] as any);
-      // Mock for vat limit (domestic only)
-      prismaMock.invoice.findMany.mockResolvedValueOnce([
-        { totalRsd: 50000 },
-      ] as any);
+    it('stores exact decimal amounts', async () => {
+      const { newInvoice } = await userWithClient();
+      const res = await newInvoice({
+        items: [{ description: 'Sitno', quantity: 3, unitPrice: 0.1 }],
+      }).expect(201);
+      expect((res.body as { totalAmount: number }).totalAmount).toBe(0.3);
+    });
 
-      return request(app.getHttpServer())
-        .get('/limits')
-        .set('Authorization', `Bearer ${jwtToken}`)
+    it('counts a paid invoice in KPO and the limits by payment date', async () => {
+      const { api, newInvoice } = await userWithClient();
+      const created = await newInvoice({
+        issueDate: '2025-12-20',
+        dueDate: '2026-01-05',
+      }).expect(201);
+      const id = (created.body as { id: string }).id;
+
+      await api
+        .patch(`/api/invoices/${id}`, { status: 'PAID', paidAt: '2026-01-03' })
+        .expect(200);
+
+      const kpo2025 = await api.get('/api/kpo?year=2025').expect(200);
+      const kpo2026 = await api.get('/api/kpo?year=2026').expect(200);
+      expect((kpo2025.body as { entries: unknown[] }).entries).toHaveLength(0);
+      expect((kpo2026.body as { totalYearly: number }).totalYearly).toBe(
+        100000,
+      );
+    });
+
+    it('returns a PDF', async () => {
+      const { api, newInvoice } = await userWithClient();
+      const created = await newInvoice().expect(201);
+      const res = await api
+        .get(`/api/invoices/${(created.body as { id: string }).id}/pdf`)
+        .buffer(true)
+        .parse((response, done) => {
+          const chunks: Buffer[] = [];
+          response.on('data', (chunk: Buffer) => chunks.push(chunk));
+          response.on('end', () => done(null, Buffer.concat(chunks)));
+        })
         .expect(200)
-        .expect((res) => {
-          expect(res.body.pausalLimit.current).toEqual(50000);
-          expect(res.body.vatLimit.current).toEqual(50000);
-        });
+        .expect('Content-Type', /application\/pdf/);
+      expect((res.body as Buffer).subarray(0, 4).toString()).toBe('%PDF');
+    });
+
+    it("hides one user's invoices from another", async () => {
+      const owner = await userWithClient();
+      const created = await owner.newInvoice().expect(201);
+      const id = (created.body as { id: string }).id;
+
+      const stranger = authed((await register()).token);
+      const list = await stranger.get('/api/invoices').expect(200);
+      expect(list.body).toEqual([]);
+      const single = await stranger.get(`/api/invoices/${id}`);
+      expect([403, 404]).toContain(single.status);
     });
   });
 });
