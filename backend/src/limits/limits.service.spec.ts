@@ -43,32 +43,41 @@ describe('LimitsService', () => {
 
     expect(prismaMock.invoice.findMany).toHaveBeenCalledTimes(2);
 
-    expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      where: {
-        userId: 'user-1',
-        status: InvoiceStatus.PAID,
-        paidAt: { gte: new Date('2025-12-31T23:00:00Z'), lt: new Date('2026-12-31T23:00:00Z') },
-      }
-    }));
+    expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        where: {
+          userId: 'user-1',
+          status: InvoiceStatus.PAID,
+          paidAt: {
+            gte: new Date('2025-12-31T23:00:00Z'),
+            lt: new Date('2026-12-31T23:00:00Z'),
+          },
+        },
+      }),
+    );
 
     const expectedDate = new Date('2025-05-08T12:00:00.000Z');
-    expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      where: {
-        userId: 'user-1',
-        status: InvoiceStatus.PAID,
-        paidAt: { gte: expectedDate },
-        domesticSupply: true,
-      }
-    }));
+    expect(prismaMock.invoice.findMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        where: {
+          userId: 'user-1',
+          status: InvoiceStatus.PAID,
+          paidAt: { gte: expectedDate },
+          domesticSupply: true,
+        },
+      }),
+    );
 
     expect(result.pausalLimit.current).toEqual(1500000);
     expect(result.pausalLimit.remaining).toEqual(4500000);
-    expect(result.pausalLimit.percentage).toEqual(25.00);
+    expect(result.pausalLimit.percentage).toEqual(25.0);
     expect(result.pausalLimit.isExceeded).toBe(false);
 
     expect(result.vatLimit.current).toEqual(1000000);
     expect(result.vatLimit.remaining).toEqual(7000000);
-    expect(result.vatLimit.percentage).toEqual(12.50);
+    expect(result.vatLimit.percentage).toEqual(12.5);
     expect(result.vatLimit.isExceeded).toBe(false);
   });
 

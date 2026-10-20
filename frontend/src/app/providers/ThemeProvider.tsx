@@ -1,17 +1,16 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-
-type Theme = "light" | "dark" | "system";
-
-interface ThemeContextValue {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  resolvedTheme: "light" | "dark";
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { ThemeContext, type Theme } from "./theme-context";
 
 const STORAGE_KEY = "theme";
+const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+/** The OS color scheme as an external store, so a change re-renders without syncing state in an effect */
+const subscribeToSystemTheme = (onChange: () => void) => {
+  const mediaQuery = window.matchMedia(DARK_QUERY);
+  mediaQuery.addEventListener("change", onChange);
+  return () => mediaQuery.removeEventListener("change", onChange);
+};
+const getSystemPrefersDark = () => window.matchMedia(DARK_QUERY).matches;
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -24,33 +23,14 @@ export const ThemeProvider = ({ children, defaultTheme = "system" }: ThemeProvid
     return (localStorage.getItem(STORAGE_KEY) as Theme) || defaultTheme;
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const systemPrefersDark = useSyncExternalStore(subscribeToSystemTheme, getSystemPrefersDark, () => false);
+  const resolvedTheme = theme === "system" ? (systemPrefersDark ? "dark" : "light") : theme;
 
-  const applyTheme = (newTheme: Theme) => {
+  useEffect(() => {
     const root = document.documentElement;
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const resolved = newTheme === "system" ? (systemDark ? "dark" : "light") : newTheme;
-
     root.classList.remove("light", "dark");
-    root.classList.add(resolved);
-    setResolvedTheme(resolved);
-  };
-
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      if (theme === "system") {
-        applyTheme("system");
-      }
-    };
-
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, [theme]);
+    root.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -66,12 +46,4 @@ export const ThemeProvider = ({ children, defaultTheme = "system" }: ThemeProvid
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
-  }
-  return context;
 };

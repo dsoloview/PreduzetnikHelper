@@ -6,7 +6,10 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 export class AppController {
   @Get()
   @HttpCode(200)
-  @ApiOkResponse({ description: 'Liveness probe', schema: { example: { status: 'ok' } } })
+  @ApiOkResponse({
+    description: 'Liveness probe',
+    schema: { example: { status: 'ok' } },
+  })
   health(): { status: string } {
     return { status: 'ok' };
   }

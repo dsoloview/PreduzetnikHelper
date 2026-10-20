@@ -4,6 +4,6 @@ import { LimitsController } from './limits.controller';
 
 @Module({
   providers: [LimitsService],
-  controllers: [LimitsController]
+  controllers: [LimitsController],
 })
 export class LimitsModule {}

@@ -1,4 +1,4 @@
-import { useTheme } from "@/app/providers/ThemeProvider";
+import { useTheme } from "@/app/providers/use-theme";
 import { Button } from "@/shared/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";

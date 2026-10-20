@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../prisma/prisma.service.mock';
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt', () => ({
@@ -46,7 +49,9 @@ describe('UsersService', () => {
 
       const result = await service.user({ email: 'test@example.com' });
 
-      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: { email: 'test@example.com' },
+      });
       expect(result?.id).toEqual(userId);
     });
 
@@ -62,11 +67,15 @@ describe('UsersService', () => {
     it('should return list of users with given params', async () => {
       prismaMock.user.findMany.mockResolvedValue([mockUser] as any);
 
-      const result = await service.users({ where: { email: 'test@example.com' } });
-
-      expect(prismaMock.user.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      const result = await service.users({
         where: { email: 'test@example.com' },
-      }));
+      });
+
+      expect(prismaMock.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { email: 'test@example.com' },
+        }),
+      );
       expect(result).toHaveLength(1);
     });
   });
@@ -75,11 +84,17 @@ describe('UsersService', () => {
     it('should create and return new user', async () => {
       prismaMock.user.create.mockResolvedValue(mockUser as any);
 
-      const result = await service.createUser({ email: 'test@example.com', password: 'hashed', name: 'Test User' });
+      const result = await service.createUser({
+        email: 'test@example.com',
+        password: 'hashed',
+        name: 'Test User',
+      });
 
-      expect(prismaMock.user.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ email: 'test@example.com' }),
-      }));
+      expect(prismaMock.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ email: 'test@example.com' }),
+        }),
+      );
       expect(result.id).toEqual(userId);
     });
   });
@@ -89,12 +104,17 @@ describe('UsersService', () => {
       const updated = { ...mockUser, name: 'Changed' };
       prismaMock.user.update.mockResolvedValue(updated as any);
 
-      const result = await service.updateUser({ where: { id: userId }, data: { name: 'Changed' } });
-
-      expect(prismaMock.user.update).toHaveBeenCalledWith(expect.objectContaining({
+      const result = await service.updateUser({
         where: { id: userId },
         data: { name: 'Changed' },
-      }));
+      });
+
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: userId },
+          data: { name: 'Changed' },
+        }),
+      );
       expect(result.name).toEqual('Changed');
     });
   });
@@ -104,12 +124,16 @@ describe('UsersService', () => {
       const updatedUser = { ...mockUser, name: 'Updated Name' };
       prismaMock.user.update.mockResolvedValue(updatedUser as any);
 
-      const result = await service.updateProfile(userId, { name: 'Updated Name' });
+      const result = await service.updateProfile(userId, {
+        name: 'Updated Name',
+      });
 
-      expect(prismaMock.user.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: userId },
-        data: { name: 'Updated Name' },
-      }));
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: userId },
+          data: { name: 'Updated Name' },
+        }),
+      );
       expect(result.name).toEqual('Updated Name');
       expect((result as any).password).toBeUndefined();
     });
@@ -121,28 +145,41 @@ describe('UsersService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       prismaMock.user.update.mockResolvedValue(mockUser as any);
 
-      await service.changePassword(userId, { currentPassword: 'old', newPassword: 'new-strong' });
+      await service.changePassword(userId, {
+        currentPassword: 'old',
+        newPassword: 'new-strong',
+      });
 
       expect(bcrypt.hash).toHaveBeenCalledWith('new-strong', 10);
-      expect(prismaMock.user.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: userId },
-        data: { password: 'new-hashed' },
-      }));
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: userId },
+          data: { password: 'new-hashed' },
+        }),
+      );
     });
 
     it('should throw NotFoundException when user not found', async () => {
       prismaMock.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.changePassword(userId, { currentPassword: 'old', newPassword: 'new' }))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.changePassword(userId, {
+          currentPassword: 'old',
+          newPassword: 'new',
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw UnprocessableEntityException when current password is wrong', async () => {
       prismaMock.user.findUnique.mockResolvedValue(mockUser as any);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.changePassword(userId, { currentPassword: 'wrong', newPassword: 'new' }))
-        .rejects.toThrow(UnprocessableEntityException);
+      await expect(
+        service.changePassword(userId, {
+          currentPassword: 'wrong',
+          newPassword: 'new',
+        }),
+      ).rejects.toThrow(UnprocessableEntityException);
     });
   });
 
@@ -152,7 +189,9 @@ describe('UsersService', () => {
 
       const result = await service.deleteUser({ id: userId });
 
-      expect(prismaMock.user.delete).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(prismaMock.user.delete).toHaveBeenCalledWith({
+        where: { id: userId },
+      });
       expect(result.id).toEqual(userId);
     });
   });

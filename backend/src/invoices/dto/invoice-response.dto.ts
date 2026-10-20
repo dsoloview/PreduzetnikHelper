@@ -1,83 +1,86 @@
-import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
-import {IInvoiceResponse, IInvoiceItemResponse} from '@preduzetnik/shared';
-import type {InvoiceStatus, Currency} from '@preduzetnik/shared';
-import { InvoiceStatus as InvoiceStatusEnum, Currency as CurrencyEnum } from '../../generated/prisma/enums';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IInvoiceResponse, IInvoiceItemResponse } from '@preduzetnik/shared';
+import type { InvoiceStatus, Currency } from '@preduzetnik/shared';
+import {
+  InvoiceStatus as InvoiceStatusEnum,
+  Currency as CurrencyEnum,
+} from '../../generated/prisma/enums';
 
 export class InvoiceItemResponseDto implements IInvoiceItemResponse {
-    @ApiProperty()
-    id: string;
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty({example: 'Web development services'})
-    description: string;
+  @ApiProperty({ example: 'Web development services' })
+  description: string;
 
-    @ApiProperty({example: 1.5})
-    quantity: number;
+  @ApiProperty({ example: 1.5 })
+  quantity: number;
 
-    @ApiProperty({example: 150050})
-    unitPrice: number;
+  @ApiProperty({ example: 150050 })
+  unitPrice: number;
 
-    @ApiProperty({example: 225075})
-    total: number;
+  @ApiProperty({ example: 225075 })
+  total: number;
 }
 
 export class InvoiceResponseDto implements IInvoiceResponse {
-    @ApiProperty()
-    id: string;
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty({example: 1})
-    invoiceNumber: number;
+  @ApiProperty({ example: 1 })
+  invoiceNumber: number;
 
-    @ApiProperty({example: 2026})
-    year: number;
+  @ApiProperty({ example: 2026 })
+  year: number;
 
-    @ApiProperty({example: '1/2026'})
-    displayNumber: string;
+  @ApiProperty({ example: '1/2026' })
+  displayNumber: string;
 
-    @ApiProperty({enum: InvoiceStatusEnum})
-    status: InvoiceStatus;
+  @ApiProperty({ enum: InvoiceStatusEnum })
+  status: InvoiceStatus;
 
-    @ApiPropertyOptional({example: '2026-05-20'})
-    paidAt: string | null;
+  @ApiPropertyOptional({ example: '2026-05-20' })
+  paidAt: string | null;
 
-    @ApiProperty()
-    clientId: string;
+  @ApiProperty()
+  clientId: string;
 
-    @ApiProperty({example: 'Acme Corp'})
-    clientName: string;
+  @ApiProperty({ example: 'Acme Corp' })
+  clientName: string;
 
-    @ApiProperty({example: '2026-05-03'})
-    issueDate: string;
+  @ApiProperty({ example: '2026-05-03' })
+  issueDate: string;
 
-    @ApiProperty({example: '2026-06-03'})
-    dueDate: string;
+  @ApiProperty({ example: '2026-06-03' })
+  dueDate: string;
 
-    @ApiProperty({example: 'Beograd'})
-    placeOfIssue: string;
+  @ApiProperty({ example: 'Beograd' })
+  placeOfIssue: string;
 
-    @ApiProperty({example: true})
-    domesticSupply: boolean;
+  @ApiProperty({ example: true })
+  domesticSupply: boolean;
 
-    @ApiProperty({enum: CurrencyEnum})
-    currency: Currency;
+  @ApiProperty({ enum: CurrencyEnum })
+  currency: Currency;
 
-    @ApiPropertyOptional({example: 117.5})
-    exchangeRate: number | null;
+  @ApiPropertyOptional({ example: 117.5 })
+  exchangeRate: number | null;
 
-    @ApiProperty({example: 150050})
-    totalAmount: number;
+  @ApiProperty({ example: 150050 })
+  totalAmount: number;
 
-    @ApiProperty({example: 17630875})
-    totalRsd: number;
+  @ApiProperty({ example: 17630875 })
+  totalRsd: number;
 
-    @ApiPropertyOptional()
-    note: string | null;
+  @ApiPropertyOptional()
+  note: string | null;
 
-    @ApiProperty()
-    bankAccountId: string;
+  @ApiProperty()
+  bankAccountId: string;
 
-    @ApiProperty({type: [InvoiceItemResponseDto]})
-    items: InvoiceItemResponseDto[];
+  @ApiProperty({ type: [InvoiceItemResponseDto] })
+  items: InvoiceItemResponseDto[];
 
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 }

@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { LoginPage } from "@/pages/login/ui/LoginPage";
 import { RegisterPage } from "@/pages/register/ui/RegisterPage";
 import { DashboardPage } from "@/pages/dashboard/ui/DashboardPage";
@@ -10,31 +10,12 @@ import { ProfilePage } from "@/pages/profile/ui/ProfilePage";
 import { KpoPage } from "@/pages/kpo/ui/KpoPage";
 import { SettingsPage } from "@/pages/settings/ui/SettingsPage";
 import { useAuthStore } from "@/entities/user/model/auth.store";
+import { ProtectedRoute, PublicRoute } from "./route-guards";
 import { MainLayout } from "@/widgets/layout/ui/MainLayout";
 
 window.addEventListener('auth:unauthorized', () => {
   useAuthStore.getState().clearToken();
 });
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-};
 
 export const router = createBrowserRouter([
   {

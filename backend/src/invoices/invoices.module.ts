@@ -8,6 +8,6 @@ import { PdfModule } from '../pdf/pdf.module';
 @Module({
   imports: [ClientsModule, BankAccountsModule, PdfModule],
   providers: [InvoicesService],
-  controllers: [InvoicesController]
+  controllers: [InvoicesController],
 })
 export class InvoicesModule {}

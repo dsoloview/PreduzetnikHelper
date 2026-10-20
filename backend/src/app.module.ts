@@ -1,9 +1,9 @@
-import {ExecutionContext, Module} from '@nestjs/common';
+import { ExecutionContext, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { PrismaModule } from "./prisma/prisma.module";
+import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
@@ -16,7 +16,7 @@ import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
 import type { Request } from 'express';
 
 const requestPath = (ctx: ExecutionContext) =>
-    ctx.switchToHttp().getRequest<Request>().path;
+  ctx.switchToHttp().getRequest<Request>().path;
 
 @Module({
   imports: [
@@ -35,11 +35,15 @@ const requestPath = (ctx: ExecutionContext) =>
     ThrottlerModule.forRoot([
       { name: 'default', ttl: 60000, limit: 100 },
       {
-        name: 'auth', ttl: 60000, limit: 10,
+        name: 'auth',
+        ttl: 60000,
+        limit: 10,
         skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
       },
       {
-        name: 'pdf', ttl: 60000, limit: 10,
+        name: 'pdf',
+        ttl: 60000,
+        limit: 10,
         skipIf: (ctx) => !requestPath(ctx).endsWith('/pdf'),
       },
     ]),
@@ -55,8 +59,6 @@ const requestPath = (ctx: ExecutionContext) =>
     ExchangeRatesModule,
   ],
   controllers: [AppController],
-  providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

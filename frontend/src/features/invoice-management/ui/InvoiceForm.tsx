@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
@@ -106,10 +106,10 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
     name: "items",
   });
 
-  const watchedBankAccountId = form.watch("bankAccountId");
-  const watchedItems = form.watch("items");
-  const currency = form.watch("currency");
-  const issueDate = form.watch("issueDate");
+  const watchedBankAccountId = useWatch({ control: form.control, name: "bankAccountId" });
+  const watchedItems = useWatch({ control: form.control, name: "items" });
+  const currency = useWatch({ control: form.control, name: "currency" });
+  const issueDate = useWatch({ control: form.control, name: "issueDate" });
 
   const rateDate = issueDate ? format(issueDate, "yyyy-MM-dd") : undefined;
   const { data: nbsRates, isFetching: isRateLoading } = useExchangeRates(rateDate, currency !== "RSD");
@@ -140,7 +140,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   }, [defaultAccount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Supply to a foreign client usually happens outside Serbia and doesn't count toward the 8M VAT limit
-  const watchedClientId = form.watch("clientId");
+  const watchedClientId = useWatch({ control: form.control, name: "clientId" });
   useEffect(() => {
     if (!watchedClientId || watchedClientId === defaultValues?.clientId) return;
     const client = clients?.find((c) => c.id === watchedClientId);

@@ -4,13 +4,13 @@ import { PuppeteerPdfService } from './puppeteer-pdf.service';
 import { PdfmakePdfService } from './pdfmake-pdf.service';
 import { PDF_SERVICE } from './pdf.interface';
 
-const provider = process.env.PDF_PROVIDER === 'puppeteer' ? PuppeteerPdfService : PdfmakePdfService;
+const provider =
+  process.env.PDF_PROVIDER === 'puppeteer'
+    ? PuppeteerPdfService
+    : PdfmakePdfService;
 
 @Module({
-    providers: [
-        PdfService,
-        { provide: PDF_SERVICE, useClass: provider },
-    ],
-    exports: [PdfService],
+  providers: [PdfService, { provide: PDF_SERVICE, useClass: provider }],
+  exports: [PdfService],
 })
 export class PdfModule {}

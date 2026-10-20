@@ -2,7 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BankAccountsService } from './bank-accounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../prisma/prisma.service.mock';
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Currency } from '../generated/prisma/enums';
 
 describe('BankAccountsService', () => {
@@ -41,31 +45,49 @@ describe('BankAccountsService', () => {
 
   describe('create', () => {
     it('should create account without clearing defaults when isDefault is false', async () => {
-      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prismaMock));
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) =>
+        cb(prismaMock),
+      );
       prismaMock.bankAccount.create.mockResolvedValue(mockAccount as any);
 
-      const dto = { bankName: 'UniCredit', accountNumber: '160-123456-12', currency: Currency.RSD, isDefault: false };
+      const dto = {
+        bankName: 'UniCredit',
+        accountNumber: '160-123456-12',
+        currency: Currency.RSD,
+        isDefault: false,
+      };
       const result = await service.create(userId, dto);
 
       expect(prismaMock.bankAccount.updateMany).not.toHaveBeenCalled();
-      expect(prismaMock.bankAccount.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ userId, isDefault: false }),
-      }));
+      expect(prismaMock.bankAccount.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ userId, isDefault: false }),
+        }),
+      );
       expect(result.id).toEqual(accountId);
     });
 
     it('should clear other defaults when isDefault is true', async () => {
-      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prismaMock));
-      prismaMock.bankAccount.updateMany.mockResolvedValue({ count: 1 } as any);
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) =>
+        cb(prismaMock),
+      );
+      prismaMock.bankAccount.updateMany.mockResolvedValue({ count: 1 });
       const defaultAccount = { ...mockAccount, isDefault: true };
       prismaMock.bankAccount.create.mockResolvedValue(defaultAccount as any);
 
-      await service.create(userId, { bankName: 'UniCredit', accountNumber: '160-123456-12', currency: Currency.RSD, isDefault: true });
+      await service.create(userId, {
+        bankName: 'UniCredit',
+        accountNumber: '160-123456-12',
+        currency: Currency.RSD,
+        isDefault: true,
+      });
 
-      expect(prismaMock.bankAccount.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: { userId },
-        data: { isDefault: false },
-      }));
+      expect(prismaMock.bankAccount.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId },
+          data: { isDefault: false },
+        }),
+      );
     });
   });
 
@@ -75,9 +97,11 @@ describe('BankAccountsService', () => {
 
       const result = await service.findAll(userId);
 
-      expect(prismaMock.bankAccount.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: { userId },
-      }));
+      expect(prismaMock.bankAccount.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId },
+        }),
+      );
       expect(result).toHaveLength(1);
     });
   });
@@ -93,24 +117,36 @@ describe('BankAccountsService', () => {
     it('should throw NotFoundException when account not found', async () => {
       prismaMock.bankAccount.findUnique.mockResolvedValue(null);
 
-      await expect(service.findOne(accountId, userId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(accountId, userId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException when account belongs to another user', async () => {
-      prismaMock.bankAccount.findUnique.mockResolvedValue({ ...mockAccount, userId: 'other' } as any);
+      prismaMock.bankAccount.findUnique.mockResolvedValue({
+        ...mockAccount,
+        userId: 'other',
+      } as any);
 
-      await expect(service.findOne(accountId, userId)).rejects.toThrow(ForbiddenException);
+      await expect(service.findOne(accountId, userId)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
   describe('update', () => {
     it('should update account without clearing defaults when isDefault is false', async () => {
       prismaMock.bankAccount.findUnique.mockResolvedValue(mockAccount as any);
-      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prismaMock));
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) =>
+        cb(prismaMock),
+      );
       const updated = { ...mockAccount, bankName: 'Raiffeisen' };
       prismaMock.bankAccount.update.mockResolvedValue(updated as any);
 
-      const result = await service.update(accountId, userId, { bankName: 'Raiffeisen', isDefault: false });
+      const result = await service.update(accountId, userId, {
+        bankName: 'Raiffeisen',
+        isDefault: false,
+      });
 
       expect(prismaMock.bankAccount.updateMany).not.toHaveBeenCalled();
       expect(result.bankName).toEqual('Raiffeisen');
@@ -118,16 +154,23 @@ describe('BankAccountsService', () => {
 
     it('should clear other defaults when updating with isDefault true', async () => {
       prismaMock.bankAccount.findUnique.mockResolvedValue(mockAccount as any);
-      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prismaMock));
-      prismaMock.bankAccount.updateMany.mockResolvedValue({ count: 1 } as any);
-      prismaMock.bankAccount.update.mockResolvedValue({ ...mockAccount, isDefault: true } as any);
+      (prismaMock.$transaction as jest.Mock).mockImplementation(async (cb) =>
+        cb(prismaMock),
+      );
+      prismaMock.bankAccount.updateMany.mockResolvedValue({ count: 1 });
+      prismaMock.bankAccount.update.mockResolvedValue({
+        ...mockAccount,
+        isDefault: true,
+      } as any);
 
       await service.update(accountId, userId, { isDefault: true });
 
-      expect(prismaMock.bankAccount.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ userId, NOT: { id: accountId } }),
-        data: { isDefault: false },
-      }));
+      expect(prismaMock.bankAccount.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ userId, NOT: { id: accountId } }),
+          data: { isDefault: false },
+        }),
+      );
     });
   });
 
@@ -138,21 +181,34 @@ describe('BankAccountsService', () => {
 
       const result = await service.remove(accountId, userId);
 
-      expect(prismaMock.bankAccount.delete).toHaveBeenCalledWith({ where: { id: accountId } });
+      expect(prismaMock.bankAccount.delete).toHaveBeenCalledWith({
+        where: { id: accountId },
+      });
       expect(result.id).toEqual(accountId);
     });
 
     it('should throw BadRequestException when deleting default account if others exist', async () => {
-      prismaMock.bankAccount.findUnique.mockResolvedValue({ ...mockAccount, isDefault: true } as any);
-      prismaMock.bankAccount.count.mockResolvedValue(2 as any);
+      prismaMock.bankAccount.findUnique.mockResolvedValue({
+        ...mockAccount,
+        isDefault: true,
+      } as any);
+      prismaMock.bankAccount.count.mockResolvedValue(2);
 
-      await expect(service.remove(accountId, userId)).rejects.toThrow(BadRequestException);
+      await expect(service.remove(accountId, userId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should allow deleting default account when it is the only one', async () => {
-      prismaMock.bankAccount.findUnique.mockResolvedValue({ ...mockAccount, isDefault: true } as any);
-      prismaMock.bankAccount.count.mockResolvedValue(1 as any);
-      prismaMock.bankAccount.delete.mockResolvedValue({ ...mockAccount, isDefault: true } as any);
+      prismaMock.bankAccount.findUnique.mockResolvedValue({
+        ...mockAccount,
+        isDefault: true,
+      } as any);
+      prismaMock.bankAccount.count.mockResolvedValue(1);
+      prismaMock.bankAccount.delete.mockResolvedValue({
+        ...mockAccount,
+        isDefault: true,
+      } as any);
 
       const result = await service.remove(accountId, userId);
       expect(result.id).toEqual(accountId);

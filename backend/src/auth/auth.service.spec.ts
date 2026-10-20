@@ -4,7 +4,10 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-import { UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt', () => ({
@@ -25,7 +28,15 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersServiceMock: Partial<UsersService>;
   let jwtServiceMock: Partial<JwtService>;
-  let prismaMock: { refreshToken: { create: jest.Mock; findMany: jest.Mock; findUnique: jest.Mock; delete: jest.Mock; deleteMany: jest.Mock } };
+  let prismaMock: {
+    refreshToken: {
+      create: jest.Mock;
+      findMany: jest.Mock;
+      findUnique: jest.Mock;
+      delete: jest.Mock;
+      deleteMany: jest.Mock;
+    };
+  };
   let configServiceMock: Partial<ConfigService>;
 
   beforeEach(async () => {
@@ -68,33 +79,51 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('should return accessToken and refreshToken if credentials are valid', async () => {
-      const mockUser = { id: '1', email: 'test@example.com', password: 'hashed', name: 'User' };
+      const mockUser = {
+        id: '1',
+        email: 'test@example.com',
+        password: 'hashed',
+        name: 'User',
+      };
       (usersServiceMock.user as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.login({ email: 'test@example.com', password: 'password123' }, META);
+      const result = await service.login(
+        { email: 'test@example.com', password: 'password123' },
+        META,
+      );
 
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('refreshToken');
-      expect(jwtServiceMock.sign).toHaveBeenCalledWith({ username: 'User', sub: '1' });
+      expect(jwtServiceMock.sign).toHaveBeenCalledWith({
+        username: 'User',
+        sub: '1',
+      });
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
       (usersServiceMock.user as jest.Mock).mockResolvedValue(null);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      await expect(service.login({ email: 'test@example.com', password: 'password' }, META))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.login(
+          { email: 'test@example.com', password: 'password' },
+          META,
+        ),
+      ).rejects.toThrow(UnauthorizedException);
       // Still runs bcrypt so timing doesn't reveal unknown emails
       expect(bcrypt.compare).toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException if password invalid', async () => {
-      (usersServiceMock.user as jest.Mock).mockResolvedValue({ password: 'hashed' });
+      (usersServiceMock.user as jest.Mock).mockResolvedValue({
+        password: 'hashed',
+      });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.login({ email: 'test@example.com', password: 'wrong' }, META))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.login({ email: 'test@example.com', password: 'wrong' }, META),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -107,7 +136,10 @@ describe('AuthService', () => {
       };
 
       (usersServiceMock.user as jest.Mock).mockResolvedValue(null);
-      (usersServiceMock.createUser as jest.Mock).mockResolvedValue({ id: '2', ...dto });
+      (usersServiceMock.createUser as jest.Mock).mockResolvedValue({
+        id: '2',
+        ...dto,
+      });
 
       const result = await service.register(dto, META);
 
@@ -119,8 +151,12 @@ describe('AuthService', () => {
     it('should throw UnprocessableEntityException if email already exists', async () => {
       (usersServiceMock.user as jest.Mock).mockResolvedValue({ id: '1' });
 
-      await expect(service.register({ email: 'existing@example.com', password: 'p', name: 'x' }, META))
-        .rejects.toThrow(UnprocessableEntityException);
+      await expect(
+        service.register(
+          { email: 'existing@example.com', password: 'p', name: 'x' },
+          META,
+        ),
+      ).rejects.toThrow(UnprocessableEntityException);
     });
   });
 
@@ -130,7 +166,12 @@ describe('AuthService', () => {
     const cookieToken = `${jti}.${rawToken}`;
 
     it('should return new token pair when refresh token is valid', async () => {
-      const mockUser = { id: '1', email: 'test@example.com', name: 'User', password: 'hashed' };
+      const mockUser = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'User',
+        password: 'hashed',
+      };
       const record = {
         jti,
         userId: '1',
@@ -143,7 +184,9 @@ describe('AuthService', () => {
 
       const result = await service.refresh(cookieToken, META);
 
-      expect(prismaMock.refreshToken.delete).toHaveBeenCalledWith({ where: { jti } });
+      expect(prismaMock.refreshToken.delete).toHaveBeenCalledWith({
+        where: { jti },
+      });
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('refreshToken');
     });
@@ -151,7 +194,9 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException when token record not found', async () => {
       prismaMock.refreshToken.findUnique.mockResolvedValue(null);
 
-      await expect(service.refresh(cookieToken, META)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh(cookieToken, META)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when token is expired', async () => {
@@ -163,7 +208,9 @@ describe('AuthService', () => {
         user: {},
       });
 
-      await expect(service.refresh(cookieToken, META)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh(cookieToken, META)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException and revoke all tokens when hash mismatch (token theft)', async () => {
@@ -176,12 +223,18 @@ describe('AuthService', () => {
       });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.refresh(cookieToken, META)).rejects.toThrow(UnauthorizedException);
-      expect(prismaMock.refreshToken.deleteMany).toHaveBeenCalledWith({ where: { userId: '1' } });
+      await expect(service.refresh(cookieToken, META)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      expect(prismaMock.refreshToken.deleteMany).toHaveBeenCalledWith({
+        where: { userId: '1' },
+      });
     });
 
     it('should throw UnauthorizedException when cookie has invalid format', async () => {
-      await expect(service.refresh('no-dot-token', META)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh('no-dot-token', META)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -199,7 +252,9 @@ describe('AuthService', () => {
 
       await service.logout(cookieToken);
 
-      expect(prismaMock.refreshToken.delete).toHaveBeenCalledWith({ where: { jti } });
+      expect(prismaMock.refreshToken.delete).toHaveBeenCalledWith({
+        where: { jti },
+      });
     });
 
     it('should silently skip when token record not found', async () => {
@@ -210,7 +265,10 @@ describe('AuthService', () => {
     });
 
     it('should silently skip when token hash does not match', async () => {
-      prismaMock.refreshToken.findUnique.mockResolvedValue({ jti, hashedToken: 'hashed' });
+      prismaMock.refreshToken.findUnique.mockResolvedValue({
+        jti,
+        hashedToken: 'hashed',
+      });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(service.logout(cookieToken)).resolves.not.toThrow();
@@ -226,7 +284,9 @@ describe('AuthService', () => {
     it('should delete all refresh tokens for the user', async () => {
       await service.logoutAll('user-1');
 
-      expect(prismaMock.refreshToken.deleteMany).toHaveBeenCalledWith({ where: { userId: 'user-1' } });
+      expect(prismaMock.refreshToken.deleteMany).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+      });
     });
   });
 });

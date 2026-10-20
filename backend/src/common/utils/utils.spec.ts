@@ -1,5 +1,11 @@
 import { escapeHtml } from './html.utils';
-import {formatBelgradeDate, formatSerbianDate, getBelgradeYear, getBelgradeYearRange, stripTime} from './date.utils';
+import {
+  formatBelgradeDate,
+  formatSerbianDate,
+  getBelgradeYear,
+  getBelgradeYearRange,
+  stripTime,
+} from './date.utils';
 import { assertOwnership } from './ownership.utils';
 import { ForbiddenException } from '@nestjs/common';
 
@@ -36,11 +42,15 @@ describe('stripTime', () => {
 
 describe('assertOwnership', () => {
   it('should not throw when userId matches', () => {
-    expect(() => assertOwnership({ userId: 'user-1' }, 'user-1', 'invoice')).not.toThrow();
+    expect(() =>
+      assertOwnership({ userId: 'user-1' }, 'user-1', 'invoice'),
+    ).not.toThrow();
   });
 
   it('should throw ForbiddenException when userId does not match', () => {
-    expect(() => assertOwnership({ userId: 'user-2' }, 'user-1', 'invoice')).toThrow(ForbiddenException);
+    expect(() =>
+      assertOwnership({ userId: 'user-2' }, 'user-1', 'invoice'),
+    ).toThrow(ForbiddenException);
   });
 });
 
@@ -65,9 +75,15 @@ describe('getBelgradeYearRange', () => {
 describe('formatBelgradeDate', () => {
   it('prints the Belgrade calendar date regardless of server timezone', () => {
     // Local midnight in Belgrade sent as UTC by the old frontend
-    expect(formatBelgradeDate('2026-09-30T22:00:00.000Z')).toEqual(formatBelgradeDate('2026-10-01T12:00:00Z'));
+    expect(formatBelgradeDate('2026-09-30T22:00:00.000Z')).toEqual(
+      formatBelgradeDate('2026-10-01T12:00:00Z'),
+    );
     // Date-only value stored as UTC midnight
-    expect(formatBelgradeDate(new Date('2026-10-01'))).toEqual(formatBelgradeDate('2026-10-01T12:00:00Z'));
-    expect(formatBelgradeDate('2026-10-01T12:00:00Z')).toMatch(/^1\. ?10\. ?2026\.?$/);
+    expect(formatBelgradeDate(new Date('2026-10-01'))).toEqual(
+      formatBelgradeDate('2026-10-01T12:00:00Z'),
+    );
+    expect(formatBelgradeDate('2026-10-01T12:00:00Z')).toMatch(
+      /^1\. ?10\. ?2026\.?$/,
+    );
   });
 });

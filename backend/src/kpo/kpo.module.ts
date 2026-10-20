@@ -6,6 +6,6 @@ import { PdfModule } from '../pdf/pdf.module';
 @Module({
   imports: [PdfModule],
   providers: [KpoService],
-  controllers: [KpoController]
+  controllers: [KpoController],
 })
 export class KpoModule {}

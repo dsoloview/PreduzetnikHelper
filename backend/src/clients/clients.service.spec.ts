@@ -44,12 +44,26 @@ describe('ClientsService', () => {
     it('should create and return a client', async () => {
       prismaMock.client.create.mockResolvedValue(mockClient as any);
 
-      const dto = { name: 'ACME Corp', type: ClientType.DOMESTIC, taxId: '123456789', registrationNumber: '987654321', address: 'Knez Mihailova 1', city: 'Belgrade', country: 'Serbia', email: 'acme@example.com' };
+      const dto = {
+        name: 'ACME Corp',
+        type: ClientType.DOMESTIC,
+        taxId: '123456789',
+        registrationNumber: '987654321',
+        address: 'Knez Mihailova 1',
+        city: 'Belgrade',
+        country: 'Serbia',
+        email: 'acme@example.com',
+      };
       const result = await service.create('user-1', dto);
 
-      expect(prismaMock.client.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ userId: 'user-1', name: 'ACME Corp' }),
-      }));
+      expect(prismaMock.client.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            userId: 'user-1',
+            name: 'ACME Corp',
+          }),
+        }),
+      );
       expect(result.id).toEqual('client-1');
     });
   });
@@ -60,9 +74,11 @@ describe('ClientsService', () => {
 
       const result = await service.findAll('user-1');
 
-      expect(prismaMock.client.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: { userId: 'user-1' },
-      }));
+      expect(prismaMock.client.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'user-1' },
+        }),
+      );
       expect(result).toHaveLength(1);
     });
   });
@@ -78,13 +94,20 @@ describe('ClientsService', () => {
     it('should throw NotFoundException when client not found', async () => {
       prismaMock.client.findUnique.mockResolvedValue(null);
 
-      await expect(service.findOne('client-1', 'user-1')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('client-1', 'user-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException when client belongs to another user', async () => {
-      prismaMock.client.findUnique.mockResolvedValue({ ...mockClient, userId: 'other-user' } as any);
+      prismaMock.client.findUnique.mockResolvedValue({
+        ...mockClient,
+        userId: 'other-user',
+      } as any);
 
-      await expect(service.findOne('client-1', 'user-1')).rejects.toThrow(ForbiddenException);
+      await expect(service.findOne('client-1', 'user-1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -94,19 +117,25 @@ describe('ClientsService', () => {
       const updated = { ...mockClient, name: 'Updated Corp' };
       prismaMock.client.update.mockResolvedValue(updated as any);
 
-      const result = await service.update('client-1', 'user-1', { name: 'Updated Corp' });
+      const result = await service.update('client-1', 'user-1', {
+        name: 'Updated Corp',
+      });
 
-      expect(prismaMock.client.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: 'client-1' },
-        data: { name: 'Updated Corp' },
-      }));
+      expect(prismaMock.client.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'client-1' },
+          data: { name: 'Updated Corp' },
+        }),
+      );
       expect(result.name).toEqual('Updated Corp');
     });
 
     it('should throw NotFoundException when updating non-existent client', async () => {
       prismaMock.client.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('client-1', 'user-1', { name: 'x' })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('client-1', 'user-1', { name: 'x' }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -117,14 +146,21 @@ describe('ClientsService', () => {
 
       const result = await service.remove('client-1', 'user-1');
 
-      expect(prismaMock.client.delete).toHaveBeenCalledWith({ where: { id: 'client-1' } });
+      expect(prismaMock.client.delete).toHaveBeenCalledWith({
+        where: { id: 'client-1' },
+      });
       expect(result.id).toEqual('client-1');
     });
 
     it('should throw ForbiddenException when removing a client owned by another user', async () => {
-      prismaMock.client.findUnique.mockResolvedValue({ ...mockClient, userId: 'other' } as any);
+      prismaMock.client.findUnique.mockResolvedValue({
+        ...mockClient,
+        userId: 'other',
+      } as any);
 
-      await expect(service.remove('client-1', 'user-1')).rejects.toThrow(ForbiddenException);
+      await expect(service.remove('client-1', 'user-1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

@@ -5,7 +5,6 @@ import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { PdfService } from '../src/pdf/pdf.service';
 import { createPrismaMock } from '../src/prisma/prisma.service.mock';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 
@@ -27,7 +26,9 @@ describe('AppController (e2e)', () => {
       .useValue(prismaMock)
       .overrideProvider(PdfService)
       .useValue({
-        generateInvoicePdf: jest.fn().mockResolvedValue(Buffer.from('mock-pdf')),
+        generateInvoicePdf: jest
+          .fn()
+          .mockResolvedValue(Buffer.from('mock-pdf')),
         generateKpoPdf: jest.fn().mockResolvedValue(Buffer.from('mock-pdf')),
       })
       .compile();
@@ -35,7 +36,7 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.init();
-    
+
     // Generate a valid token for authorized requests
     const jwtService = app.get<JwtService>(JwtService);
     jwtToken = jwtService.sign({ username: 'E2E User', sub: mockUserId });
@@ -52,7 +53,10 @@ describe('AppController (e2e)', () => {
   describe('Auth Flow', () => {
     it('/auth/register (POST)', async () => {
       prismaMock.user.findUnique.mockResolvedValue(null);
-      prismaMock.user.create.mockResolvedValue({ id: mockUserId, email: 'e2e@example.com' } as any);
+      prismaMock.user.create.mockResolvedValue({
+        id: mockUserId,
+        email: 'e2e@example.com',
+      } as any);
 
       return request(app.getHttpServer())
         .post('/auth/register')
@@ -76,7 +80,10 @@ describe('AppController (e2e)', () => {
 
   describe('Core Flow', () => {
     it('/clients (POST)', () => {
-      prismaMock.client.create.mockResolvedValue({ id: mockClientId, name: 'E2E Client' } as any);
+      prismaMock.client.create.mockResolvedValue({
+        id: mockClientId,
+        name: 'E2E Client',
+      } as any);
 
       return request(app.getHttpServer())
         .post('/clients')
@@ -97,10 +104,17 @@ describe('AppController (e2e)', () => {
     });
 
     it('/invoices (POST)', () => {
-      prismaMock.client.findUnique.mockResolvedValue({ id: mockClientId, type: 'DOMESTIC', userId: mockUserId } as any);
-      prismaMock.bankAccount.findUnique.mockResolvedValue({ id: mockBankAccountId, userId: mockUserId } as any);
+      prismaMock.client.findUnique.mockResolvedValue({
+        id: mockClientId,
+        type: 'DOMESTIC',
+        userId: mockUserId,
+      } as any);
+      prismaMock.bankAccount.findUnique.mockResolvedValue({
+        id: mockBankAccountId,
+        userId: mockUserId,
+      } as any);
       prismaMock.invoice.findFirst.mockResolvedValue(null);
-      
+
       const mockCreatedInvoice = {
         id: randomUUID(),
         invoiceNumber: 1,
@@ -112,9 +126,9 @@ describe('AppController (e2e)', () => {
         totalAmount: 50000,
         totalRsd: 50000,
         client: { name: 'E2E Client' },
-        items: []
+        items: [],
       };
-      
+
       prismaMock.invoice.create.mockResolvedValue(mockCreatedInvoice as any);
 
       return request(app.getHttpServer())
@@ -126,9 +140,7 @@ describe('AppController (e2e)', () => {
           issueDate: new Date().toISOString(),
           dueDate: new Date(Date.now() + 86400000 * 10).toISOString(),
           placeOfIssue: 'Belgrade',
-          items: [
-            { description: 'Consulting', quantity: 10, unitPrice: 5000 },
-          ],
+          items: [{ description: 'Consulting', quantity: 10, unitPrice: 5000 }],
         })
         .expect(201)
         .expect((res) => {
@@ -139,9 +151,13 @@ describe('AppController (e2e)', () => {
 
     it('/limits (GET)', () => {
       // Mock for pausal limit (all invoices)
-      prismaMock.invoice.findMany.mockResolvedValueOnce([{ totalRsd: 50000 }] as any);
+      prismaMock.invoice.findMany.mockResolvedValueOnce([
+        { totalRsd: 50000 },
+      ] as any);
       // Mock for vat limit (domestic only)
-      prismaMock.invoice.findMany.mockResolvedValueOnce([{ totalRsd: 50000 }] as any);
+      prismaMock.invoice.findMany.mockResolvedValueOnce([
+        { totalRsd: 50000 },
+      ] as any);
 
       return request(app.getHttpServer())
         .get('/limits')

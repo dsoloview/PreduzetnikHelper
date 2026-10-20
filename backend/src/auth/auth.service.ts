@@ -1,8 +1,8 @@
 import {
-    Injectable,
-    Logger,
-    UnauthorizedException,
-    UnprocessableEntityException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -15,125 +15,152 @@ import * as crypto from 'crypto';
 import { User } from '../generated/prisma/client';
 
 export interface TokenPair {
-    accessToken: string;
-    refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 const DUMMY_PASSWORD_HASH = bcrypt.hashSync('dummy-password-for-timing', 10);
 
 @Injectable()
 export class AuthService {
-    private readonly logger = new Logger(AuthService.name);
+  private readonly logger = new Logger(AuthService.name);
 
-    constructor(
-        private jwtService: JwtService,
-        private usersService: UsersService,
-        private prisma: PrismaService,
-        private config: ConfigService,
-    ) {}
+  constructor(
+    private jwtService: JwtService,
+    private usersService: UsersService,
+    private prisma: PrismaService,
+    private config: ConfigService,
+  ) {}
 
-    async login(loginDto: LoginDto, meta: { ip?: string; userAgent?: string }): Promise<TokenPair> {
-        const user = await this.usersService.user({ email: loginDto.email });
-        // Compare against a dummy hash for unknown emails so response time doesn't reveal whether the account exists
-        const passwordMatches = await bcrypt.compare(loginDto.password, user?.password ?? DUMMY_PASSWORD_HASH);
-        if (!user || !passwordMatches) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        return this.createTokenPair(user, meta);
+  async login(
+    loginDto: LoginDto,
+    meta: { ip?: string; userAgent?: string },
+  ): Promise<TokenPair> {
+    const user = await this.usersService.user({ email: loginDto.email });
+    // Compare against a dummy hash for unknown emails so response time doesn't reveal whether the account exists
+    const passwordMatches = await bcrypt.compare(
+      loginDto.password,
+      user?.password ?? DUMMY_PASSWORD_HASH,
+    );
+    if (!user || !passwordMatches) {
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    async register(registerDto: RegisterDto, meta: { ip?: string; userAgent?: string }): Promise<TokenPair> {
-        const existingUser = await this.usersService.user({ email: registerDto.email });
-        if (existingUser) {
-            throw new UnprocessableEntityException('Email already exists');
-        }
+    return this.createTokenPair(user, meta);
+  }
 
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        const createdUser = await this.usersService.createUser({
-            ...registerDto,
-            password: hashedPassword,
-        });
-
-        if (!createdUser) {
-            throw new UnprocessableEntityException('Failed to create user');
-        }
-
-        return this.createTokenPair(createdUser, meta);
+  async register(
+    registerDto: RegisterDto,
+    meta: { ip?: string; userAgent?: string },
+  ): Promise<TokenPair> {
+    const existingUser = await this.usersService.user({
+      email: registerDto.email,
+    });
+    if (existingUser) {
+      throw new UnprocessableEntityException('Email already exists');
     }
 
-    async refresh(cookieToken: string, meta: { ip?: string; userAgent?: string }): Promise<TokenPair> {
-        const { jti, rawToken } = this.parseTokenCookie(cookieToken);
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const createdUser = await this.usersService.createUser({
+      ...registerDto,
+      password: hashedPassword,
+    });
 
-        const record = await this.prisma.refreshToken.findUnique({
-            where: { jti },
-            include: { user: true },
-        });
+    if (!createdUser) {
+      throw new UnprocessableEntityException('Failed to create user');
+    }
 
-        if (!record || record.expiresAt < new Date()) {
-            throw new UnauthorizedException('Invalid or expired refresh token');
-        }
+    return this.createTokenPair(createdUser, meta);
+  }
 
-        if (!await bcrypt.compare(rawToken, record.hashedToken)) {
-            await this.prisma.refreshToken.deleteMany({ where: { userId: record.userId } });
-            throw new UnauthorizedException('Invalid or expired refresh token');
-        }
+  async refresh(
+    cookieToken: string,
+    meta: { ip?: string; userAgent?: string },
+  ): Promise<TokenPair> {
+    const { jti, rawToken } = this.parseTokenCookie(cookieToken);
 
+    const record = await this.prisma.refreshToken.findUnique({
+      where: { jti },
+      include: { user: true },
+    });
+
+    if (!record || record.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (!(await bcrypt.compare(rawToken, record.hashedToken))) {
+      await this.prisma.refreshToken.deleteMany({
+        where: { userId: record.userId },
+      });
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    await this.prisma.refreshToken.delete({ where: { jti } });
+    return this.createTokenPair(record.user, meta);
+  }
+
+  async logout(cookieToken: string): Promise<void> {
+    try {
+      const { jti, rawToken } = this.parseTokenCookie(cookieToken);
+      const record = await this.prisma.refreshToken.findUnique({
+        where: { jti },
+      });
+      if (record && (await bcrypt.compare(rawToken, record.hashedToken))) {
         await this.prisma.refreshToken.delete({ where: { jti } });
-        return this.createTokenPair(record.user, meta);
+      }
+    } catch {
+      this.logger.warn('Failed to parse token cookie during logout');
     }
+  }
 
-    async logout(cookieToken: string): Promise<void> {
-        try {
-            const { jti, rawToken } = this.parseTokenCookie(cookieToken);
-            const record = await this.prisma.refreshToken.findUnique({ where: { jti } });
-            if (record && await bcrypt.compare(rawToken, record.hashedToken)) {
-                await this.prisma.refreshToken.delete({ where: { jti } });
-            }
-        } catch {
-            this.logger.warn('Failed to parse token cookie during logout');
-        }
+  private parseTokenCookie(cookieToken: string): {
+    jti: string;
+    rawToken: string;
+  } {
+    const dotIndex = cookieToken.indexOf('.');
+    if (dotIndex === -1) {
+      throw new UnauthorizedException('Invalid token format');
     }
+    return {
+      jti: cookieToken.substring(0, dotIndex),
+      rawToken: cookieToken.substring(dotIndex + 1),
+    };
+  }
 
-    private parseTokenCookie(cookieToken: string): { jti: string; rawToken: string } {
-        const dotIndex = cookieToken.indexOf('.');
-        if (dotIndex === -1) {
-            throw new UnauthorizedException('Invalid token format');
-        }
-        return {
-            jti: cookieToken.substring(0, dotIndex),
-            rawToken: cookieToken.substring(dotIndex + 1),
-        };
-    }
+  async logoutAll(userId: string): Promise<void> {
+    await this.prisma.refreshToken.deleteMany({ where: { userId } });
+  }
 
-    async logoutAll(userId: string): Promise<void> {
-        await this.prisma.refreshToken.deleteMany({ where: { userId } });
-    }
+  private async createTokenPair(
+    user: User,
+    meta: { ip?: string; userAgent?: string },
+  ): Promise<TokenPair> {
+    const jti = crypto.randomUUID();
+    const rawToken = crypto.randomBytes(64).toString('hex');
+    const hashedToken = await bcrypt.hash(rawToken, 10);
 
-    private async createTokenPair(user: User, meta: { ip?: string; userAgent?: string }): Promise<TokenPair> {
-        const jti = crypto.randomUUID();
-        const rawToken = crypto.randomBytes(64).toString('hex');
-        const hashedToken = await bcrypt.hash(rawToken, 10);
+    const expiresInDays = Number(
+      this.config.get('REFRESH_TOKEN_EXPIRES_DAYS', 30),
+    );
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 
-        const expiresInDays = Number(this.config.get('REFRESH_TOKEN_EXPIRES_DAYS', 30));
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+    await this.prisma.refreshToken.create({
+      data: {
+        jti,
+        userId: user.id,
+        hashedToken,
+        expiresAt,
+        userAgent: meta.userAgent,
+        ip: meta.ip,
+      },
+    });
 
-        await this.prisma.refreshToken.create({
-            data: {
-                jti,
-                userId: user.id,
-                hashedToken,
-                expiresAt,
-                userAgent: meta.userAgent,
-                ip: meta.ip,
-            },
-        });
+    const accessToken = this.jwtService.sign({
+      username: user.name,
+      sub: user.id,
+    });
 
-        const accessToken = this.jwtService.sign(
-            { username: user.name, sub: user.id },
-        );
-
-        return { accessToken, refreshToken: `${jti}.${rawToken}` };
-    }
+    return { accessToken, refreshToken: `${jti}.${rawToken}` };
+  }
 }
