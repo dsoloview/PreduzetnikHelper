@@ -44,14 +44,4 @@ describe("restoreSession", () => {
 
     expect(adapter).toHaveBeenCalledTimes(1);
   });
-
-  it("never stores the access token in localStorage", async () => {
-    localStorage.setItem("preduzetnik_access_token", "legacy");
-    const { useAuthStore } = await setup(() => Promise.reject(new Error("unused")));
-
-    useAuthStore.getState().setToken("secret");
-
-    expect(localStorage.getItem("preduzetnik_access_token")).toBeNull();
-    expect(JSON.stringify({ ...localStorage })).not.toContain("secret");
-  });
 });

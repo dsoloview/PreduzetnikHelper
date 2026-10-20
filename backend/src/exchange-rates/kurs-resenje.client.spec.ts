@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { KursResenjeClient } from './kurs-resenje.client';
 
 const rate = (
@@ -17,11 +18,22 @@ const rate = (
 describe('KursResenjeClient', () => {
   let client: KursResenjeClient;
   let fetchMock: jest.Mock;
+  let logError: jest.SpyInstance;
+  const realFetch = global.fetch;
 
   beforeEach(() => {
     client = new KursResenjeClient();
     fetchMock = jest.fn();
     global.fetch = fetchMock;
+    // The client logs every request and failure; keep test output clean and assert on the errors instead
+    logError = jest.spyOn(Logger.prototype, 'error').mockImplementation();
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation();
+    jest.spyOn(Logger.prototype, 'log').mockImplementation();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    global.fetch = realFetch;
   });
 
   /** Responds per currency, based on the requested URL */
@@ -92,6 +104,7 @@ describe('KursResenjeClient', () => {
     await expect(client.fetchRatesForDate(new Date())).rejects.toThrow(
       'HTTP 503',
     );
+    expect(logError).toHaveBeenCalledWith(expect.stringContaining('HTTP 503'));
   });
 
   it('throws when the response has no middle rate', async () => {
@@ -102,6 +115,9 @@ describe('KursResenjeClient', () => {
 
     await expect(client.fetchRatesForDate(new Date())).rejects.toThrow(
       'without a middle rate for EUR',
+    );
+    expect(logError).toHaveBeenCalledWith(
+      expect.stringContaining('No exchange_middle'),
     );
   });
 });
