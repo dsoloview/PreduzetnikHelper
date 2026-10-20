@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: preduzetnik
+          POSTGRES_PASSWORD: preduzetnik
+          POSTGRES_DB: preduzetnik
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U preduzetnik"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version comes from "packageManager" in package.json
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared types
+        run: pnpm --filter @preduzetnik/shared build
+
+      - name: Generate Prisma client
+        run: pnpm --filter backend prisma:generate
+
+      - name: Backend · format
+        run: pnpm --filter backend format:check
+
+      - name: Backend · lint
+        run: pnpm --filter backend lint:check
+
+      - name: Backend · types
+        run: pnpm --filter backend exec tsc --noEmit
+
+      - name: Backend · unit tests
+        run: pnpm --filter backend test
+
+      - name: Backend · e2e tests
+        run: pnpm --filter backend test:e2e
+        env:
+          E2E_DATABASE_URL: postgresql://preduzetnik:preduzetnik@localhost:5432/preduzetnik
+
+      - name: Backend · build
+        run: pnpm --filter backend build
+
+      - name: Frontend · lint
+        run: pnpm --filter frontend exec eslint . --max-warnings=0
+
+      - name: Frontend · tests
+        run: pnpm --filter frontend test
+
+      - name: Frontend · types and build
+        run: pnpm --filter frontend build
+
+  docker:
+    name: Docker images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -f backend/Dockerfile -t preduzetnik-backend .
+
+      - name: Build frontend image
+        run: docker build -f frontend/Dockerfile -t preduzetnik-frontend .
+
+      - name: Validate production compose file
+        run: docker compose -f docker-compose.prod.yml config --quiet
+        env:
+          POSTGRES_PASSWORD: ci
+          JWT_SECRET: ci
