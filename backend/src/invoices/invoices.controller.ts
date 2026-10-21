@@ -12,7 +12,6 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import {
   ApiTags,
@@ -105,7 +104,6 @@ export class InvoicesController {
   }
 
   @Get(':id/pdf')
-  @Throttle({ pdf: { ttl: 60000, limit: 10 } })
   @ApiOperation({ summary: 'Generate PDF for an invoice' })
   @ApiResponse({ status: 200, description: 'PDF file generated successfully' })
   async getPdf(

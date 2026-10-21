@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLimits } from "@/entities/limits/api/limits.queries";
 import { useInvoices } from "@/entities/invoice/api/invoice.queries";
 import { summarizeInvoices } from "@/entities/invoice/lib/summary";
+import { useTaxMonthsNeedingAttention } from "@/entities/tax/api/tax.queries";
 import { LimitCard } from "@/entities/limits/ui/LimitCard";
 import { RecentInvoicesList } from "@/entities/invoice/ui/RecentInvoicesList";
 import { TopClientsList } from "@/entities/client/ui/TopClientsList";
@@ -18,6 +19,7 @@ export const DashboardPage = () => {
   const { data: limits, isLoading: limitsLoading } = useLimits();
   const { data: invoices = [], isLoading: invoicesLoading } = useInvoices();
   const summary = useMemo(() => summarizeInvoices(invoices), [invoices]);
+  const taxes = useTaxMonthsNeedingAttention();
 
   return (
     <PageContainer>
@@ -29,7 +31,7 @@ export const DashboardPage = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <AttentionList invoices={invoices} isLoading={invoicesLoading} />
+          <AttentionList invoices={invoices} taxMonths={taxes.months} isLoading={invoicesLoading || taxes.isLoading} />
           <RecentInvoicesList invoices={invoices} isLoading={invoicesLoading} />
         </div>
 

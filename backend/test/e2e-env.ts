@@ -13,3 +13,4 @@ process.env.JWT_SECRET ??= 'e2e-jwt-secret-that-is-long-enough-for-tests';
 process.env.PDF_PROVIDER = 'pdfmake';
 process.env.NODE_ENV = 'test';
 process.env.THROTTLE_AUTH_LIMIT = '1000';
+process.env.THROTTLE_DEFAULT_LIMIT = '10000';

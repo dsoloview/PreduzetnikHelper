@@ -43,6 +43,8 @@ describe('API (e2e, real database)', () => {
         .patch(url)
         .set('Authorization', `Bearer ${token}`)
         .send(body),
+    delete: (url: string) =>
+      request(http).delete(url).set('Authorization', `Bearer ${token}`),
   });
 
   /** A user with one domestic client and one RSD bank account */
@@ -226,6 +228,80 @@ describe('API (e2e, real database)', () => {
       expect(list.body).toEqual([]);
       const single = await stranger.get(`/api/invoices/${id}`);
       expect([403, 404]).toContain(single.status);
+    });
+  });
+  describe('tax calendar', () => {
+    const obligationBody = {
+      name: 'Porez na prihod',
+      amount: 6500.5,
+      recipientName: 'Poreska uprava',
+      recipientAccount: '840-711122843-32',
+      reference: '1234567890',
+      startYear: 2026,
+      startMonth: 9,
+    };
+
+    type Calendar = {
+      months: {
+        month: number;
+        dueDate: string;
+        items: {
+          obligationId: string;
+          amount: number;
+          ipsQr: string | null;
+          payment: { id: string } | null;
+        }[];
+      }[];
+    };
+
+    it('builds a calendar with IPS QR codes and tracks paid months', async () => {
+      const { api } = await userWithClient();
+      const created = await api
+        .post('/api/taxes/obligations', obligationBody)
+        .expect(201);
+      const obligationId = (created.body as { id: string }).id;
+
+      const calendar = (
+        await api.get('/api/taxes/calendar?year=2026').expect(200)
+      ).body as Calendar;
+      expect(calendar.months.map((m) => m.month)).toEqual([9, 10, 11, 12]);
+      expect(calendar.months[0].dueDate).toBe('2026-10-15');
+      expect(calendar.months[0].items[0].ipsQr).toMatch(
+        /^K:PR\|V:01\|C:1\|R:840000071112284332\|N:Poreska uprava\|I:RSD6500,50\|P:E2E User\|SF:253\|S:Porez na prihod 09\/2026\|RO:971234567890$/,
+      );
+
+      const paid = await api
+        .post('/api/taxes/payments', {
+          obligationId,
+          year: 2026,
+          month: 9,
+          paidAt: '2026-10-14',
+        })
+        .expect(201);
+
+      const after = (await api.get('/api/taxes/calendar?year=2026').expect(200))
+        .body as Calendar;
+      expect(after.months[0].items[0].payment).toMatchObject({
+        id: (paid.body as { id: string }).id,
+      });
+      expect(after.months[1].items[0].payment).toBeNull();
+
+      // History is protected: an obligation with payments cannot be deleted
+      const stranger = authed((await register()).token);
+      await stranger
+        .delete(`/api/taxes/obligations/${obligationId}`)
+        .expect(404);
+      await api.delete(`/api/taxes/obligations/${obligationId}`).expect(409);
+    });
+
+    it('rejects an account number with wrong check digits', async () => {
+      const { api } = await userWithClient();
+      await api
+        .post('/api/taxes/obligations', {
+          ...obligationBody,
+          recipientAccount: '840-711122843-33',
+        })
+        .expect(400);
     });
   });
 });

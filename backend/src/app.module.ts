@@ -13,6 +13,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
+import { TaxesModule } from './taxes/taxes.module';
 import type { Request } from 'express';
 
 const requestPath = (ctx: ExecutionContext) =>
@@ -35,11 +36,14 @@ const requestPath = (ctx: ExecutionContext) =>
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => [
-        { name: 'default', ttl: 60000, limit: 100 },
+        {
+          name: 'default',
+          ttl: 60000,
+          limit: Number(config.get('THROTTLE_DEFAULT_LIMIT', 100)),
+        },
         {
           name: 'auth',
           ttl: 60000,
-          // Overridable so e2e tests can sign up more users than a person would in a minute
           limit: Number(config.get('THROTTLE_AUTH_LIMIT', 10)),
           skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
         },
@@ -61,6 +65,7 @@ const requestPath = (ctx: ExecutionContext) =>
     LimitsModule,
     ScheduleModule.forRoot(),
     ExchangeRatesModule,
+    TaxesModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

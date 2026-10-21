@@ -7,7 +7,8 @@
     "bankAccounts": "Bankovni računi",
     "settings": "Podešavanja",
     "profile": "Profil",
-    "kpo": "KPO Knjiga"
+    "kpo": "KPO Knjiga",
+    "taxes": "Porezi"
   },
   "app": {
     "title": "Preduzetnik Helper",
@@ -36,7 +37,8 @@
       "ru": "Русский",
       "sr": "Српски"
     },
-    "optional": "opciono"
+    "optional": "opciono",
+    "edit": "Izmeni"
   },
   "errors": {
     "downloadPdfFailed": "Neuspešno preuzimanje PDF-a",
@@ -300,7 +302,10 @@
       "title": "Zahteva pažnju",
       "overdue": "Kasni {{days}} dana",
       "draft": "Nacrt od {{date}}, još nije poslat",
-      "empty": "Sve je u redu: nema faktura koje kasne ni neposlatih nacrta."
+      "empty": "Sve je u redu: nema faktura koje kasne ni neposlatih nacrta.",
+      "taxOverdue": "Rok {{date}} je prošao, nije plaćeno",
+      "taxDueSoon": "Platiti do {{date}}",
+      "taxTitle": "Porezi za {{period}}"
     }
   },
   "limits": {
@@ -422,6 +427,104 @@
     "entriesCount": "Unosa: {{count}}",
     "previousYear": "Prethodna godina",
     "nextYear": "Sledeća godina"
+  },
+  "taxes": {
+    "title": "Porezi i doprinosi",
+    "subtitle": "Mesečne paušalne obaveze iz rešenja: rok je 15. u narednom mesecu.",
+    "loadError": "Učitavanje poreza nije uspelo.",
+    "noMonths": "Nema obaveza u {{year}}. godini.",
+    "empty": {
+      "title": "Dodajte mesečne obaveze",
+      "description": "Jednom prepišite stavke poreza i doprinosa iz rešenja: iznos, račun, model i poziv na broj. Aplikacija će vas podsećati na rokove i praviti IPS QR kod za plaćanje."
+    },
+    "status": {
+      "paid": "Plaćeno",
+      "overdue": "Kasni",
+      "dueSoon": "Uskoro rok",
+      "upcoming": "Predstoji"
+    },
+    "stats": {
+      "paid": "Plaćeno u {{year}}",
+      "unpaid": "Preostalo za {{year}}",
+      "overdueMonths": "Meseci u kašnjenju: {{count}}",
+      "next": "Sledeći rok",
+      "allPaid": "Sve je plaćeno"
+    },
+    "month": {
+      "due": "Rok {{date}}",
+      "paidOn": "Plaćeno {{date}}",
+      "pay": "Plati",
+      "unmark": "Poništi oznaku plaćanja"
+    },
+    "obligations": {
+      "add": "Dodaj obavezu",
+      "title": "Obaveze iz rešenja",
+      "period": "Period",
+      "ongoing": "bez kraja",
+      "created": "Obaveza dodata",
+      "updated": "Obaveza izmenjena",
+      "deleted": "Obaveza obrisana",
+      "createTitle": "Nova mesečna obaveza",
+      "editTitle": "Izmena mesečne obaveze",
+      "dialogDescription": "Podatke uzmite iz rešenja o paušalnom oporezivanju. Stiglo je novo rešenje sa novim iznosima? Ovoj obavezi postavite poslednji mesec i dodajte novu.",
+      "deleteTitle": "Obrisati obavezu?",
+      "deleteDescription": "„{{name}}“ će nestati iz kalendara.",
+      "deleteHasPayments": "Ova obaveza već ima plaćene mesece. Da bi istorija ostala, postavite poslednji mesec umesto brisanja."
+    },
+    "form": {
+      "sections": {
+        "what": "Šta plaćate",
+        "whatDesc": "Naziv i mesečni iznos kao u rešenju.",
+        "payment": "Podaci za uplatu",
+        "paymentDesc": "Primalac, račun i poziv na broj iz rešenja. Ulaze u QR kod.",
+        "period": "Period",
+        "periodDesc": "Meseci na koje se rešenje odnosi."
+      },
+      "name": "Naziv",
+      "namePlaceholder": "Porez na prihode",
+      "amount": "Mesečni iznos, RSD",
+      "purpose": "Svrha uplate",
+      "purposeHint": "Podrazumevano naziv; mesec se dodaje automatski.",
+      "recipientName": "Primalac",
+      "recipientNamePlaceholder": "Poreska uprava",
+      "recipientAccount": "Račun primaoca",
+      "model": "Model",
+      "reference": "Poziv na broj",
+      "referenceHint": "Poziv na broj iz rešenja",
+      "paymentCode": "Šifra plaćanja",
+      "paymentCodeHint": "253 za poreze i doprinose",
+      "start": "Prvi mesec",
+      "end": "Poslednji mesec",
+      "endHint": "Ostavite prazno dok rešenje važi",
+      "submit": "Sačuvaj",
+      "errors": {
+        "required": "Obavezno polje",
+        "amount": "Unesite iznos veći od nule",
+        "account": "Broj računa u obliku 840-0000000000000-00",
+        "paymentCode": "Tri cifre, počinje sa 1 ili 2",
+        "model": "Dve cifre, npr. 97",
+        "reference": "Samo cifre i crtice",
+        "endBeforeStart": "Ne može biti pre prvog meseca"
+      }
+    },
+    "pay": {
+      "description": "Porezi za {{period}}, rok {{date}}.",
+      "qrLabel": "IPS QR kod za plaćanje",
+      "qrHint": "Skenirajte u aplikaciji banke (IPS Skeniraj)",
+      "noQr": "Od ovih podataka ne može se napraviti QR kod. Proverite broj računa.",
+      "amount": "Iznos",
+      "modelReference": "Model i poziv na broj",
+      "paidAt": "Datum plaćanja",
+      "markPaid": "Označi kao plaćeno",
+      "marked": "Označeno kao plaćeno",
+      "copy": "Kopiraj: {{field}}",
+      "copyFailed": "Kopiranje nije uspelo"
+    },
+    "errors": {
+      "saveFailed": "Čuvanje obaveze nije uspelo",
+      "deleteFailed": "Brisanje obaveze nije uspelo",
+      "markFailed": "Promena statusa plaćanja nije uspela"
+    }
   },
   "profileCompleteness": {
     "title": "Dovršite profil kompanije",

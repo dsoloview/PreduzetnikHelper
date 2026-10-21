@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, TrendingUp, Settings, Landmark, UserCircle, BookOpen, X } from "lucide-react";
+import { LayoutDashboard, Users, FileText, TrendingUp, Settings, Landmark, UserCircle, BookOpen, Receipt, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/shared/lib/utils";
@@ -15,6 +15,7 @@ const navItems = [
   { to: "/invoices", icon: FileText, labelKey: "nav.invoices" },
   { to: "/limits", icon: TrendingUp, labelKey: "nav.limits" },
   { to: "/bank-accounts", icon: Landmark, labelKey: "nav.bankAccounts" },
+  { to: "/taxes", icon: Receipt, labelKey: "nav.taxes" },
   { to: "/kpo", icon: BookOpen, labelKey: "nav.kpo" },
 ];
 

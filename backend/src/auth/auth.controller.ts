@@ -19,7 +19,6 @@ import {
   ApiCookieAuth,
 } from '@nestjs/swagger';
 import { AuthResponseDto } from './dto/auth-response.dto';
-import { Throttle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 
 const REFRESH_COOKIE = 'refreshToken';
@@ -29,7 +28,6 @@ const readCookie = (req: Request, name: string): string | undefined =>
   (req.cookies as Record<string, string | undefined> | undefined)?.[name];
 
 @ApiTags('Auth')
-@Throttle({ auth: { ttl: 60000, limit: 10 } })
 @Controller('auth')
 export class AuthController {
   constructor(

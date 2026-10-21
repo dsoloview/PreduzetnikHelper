@@ -7,3 +7,4 @@ export * from './types/invoice.types';
 export * from './types/kpo.types';
 export * from './types/limits.types';
 export * from './types/exchange-rate.types';
+export * from './types/taxes.types';

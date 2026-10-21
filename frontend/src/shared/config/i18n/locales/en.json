@@ -7,7 +7,8 @@
     "bankAccounts": "Bank Accounts",
     "settings": "Settings",
     "profile": "Profile",
-    "kpo": "KPO Book"
+    "kpo": "KPO Book",
+    "taxes": "Taxes"
   },
   "app": {
     "title": "Preduzetnik Helper",
@@ -36,7 +37,8 @@
       "ru": "Russian",
       "sr": "Serbian"
     },
-    "optional": "optional"
+    "optional": "optional",
+    "edit": "Edit"
   },
   "errors": {
     "downloadPdfFailed": "Failed to download PDF",
@@ -300,7 +302,10 @@
       "title": "Needs attention",
       "overdue": "Overdue by {{days}} days",
       "draft": "Draft from {{date}}, not sent yet",
-      "empty": "All good: no overdue invoices or unsent drafts."
+      "empty": "All good: no overdue invoices or unsent drafts.",
+      "taxOverdue": "Was due {{date}}, not paid",
+      "taxDueSoon": "Pay by {{date}}",
+      "taxTitle": "Taxes for {{period}}"
     }
   },
   "limits": {
@@ -422,6 +427,104 @@
     "entriesCount": "Entries: {{count}}",
     "previousYear": "Previous year",
     "nextYear": "Next year"
+  },
+  "taxes": {
+    "title": "Taxes & contributions",
+    "subtitle": "Monthly paušal payments from your tax decision: due by the 15th of the next month.",
+    "loadError": "Failed to load taxes.",
+    "noMonths": "No payments due in {{year}}.",
+    "empty": {
+      "title": "Add your monthly payments",
+      "description": "Copy the tax and contribution lines from your rešenje once: amount, account, model and reference number. The app will remind you each month and generate an IPS QR code for paying."
+    },
+    "status": {
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "dueSoon": "Due soon",
+      "upcoming": "Upcoming"
+    },
+    "stats": {
+      "paid": "Paid in {{year}}",
+      "unpaid": "Left to pay in {{year}}",
+      "overdueMonths": "Overdue months: {{count}}",
+      "next": "Next due date",
+      "allPaid": "Everything is paid"
+    },
+    "month": {
+      "due": "Due {{date}}",
+      "paidOn": "Paid {{date}}",
+      "pay": "Pay",
+      "unmark": "Mark as unpaid"
+    },
+    "obligations": {
+      "add": "Add payment",
+      "title": "Payments from the decision",
+      "period": "Period",
+      "ongoing": "ongoing",
+      "created": "Payment added",
+      "updated": "Payment updated",
+      "deleted": "Payment deleted",
+      "createTitle": "New monthly payment",
+      "editTitle": "Edit monthly payment",
+      "dialogDescription": "Take the details from your paušal tax decision (rešenje). A new decision with new amounts? End this payment in the last month and add a new one.",
+      "deleteTitle": "Delete payment?",
+      "deleteDescription": "\"{{name}}\" will be removed from the calendar.",
+      "deleteHasPayments": "This payment already has paid months. Set the month it ends instead of deleting it, so the history stays."
+    },
+    "form": {
+      "sections": {
+        "what": "What you pay",
+        "whatDesc": "Name and monthly amount as in the decision.",
+        "payment": "Payment details",
+        "paymentDesc": "Recipient, account and reference number from the decision. They go into the QR code.",
+        "period": "Period",
+        "periodDesc": "Months the decision covers."
+      },
+      "name": "Name",
+      "namePlaceholder": "Porez na prihode",
+      "amount": "Monthly amount, RSD",
+      "purpose": "Payment purpose",
+      "purposeHint": "Defaults to the name; the month is appended automatically.",
+      "recipientName": "Recipient",
+      "recipientNamePlaceholder": "Poreska uprava",
+      "recipientAccount": "Recipient account",
+      "model": "Model",
+      "reference": "Reference number",
+      "referenceHint": "Poziv na broj from the decision",
+      "paymentCode": "Payment code",
+      "paymentCodeHint": "253 for taxes and contributions",
+      "start": "First month",
+      "end": "Last month",
+      "endHint": "Leave empty while the decision is in force",
+      "submit": "Save",
+      "errors": {
+        "required": "Required",
+        "amount": "Enter an amount above zero",
+        "account": "Account number like 840-0000000000000-00",
+        "paymentCode": "Three digits, starting with 1 or 2",
+        "model": "Two digits, e.g. 97",
+        "reference": "Digits and dashes only",
+        "endBeforeStart": "Cannot be before the first month"
+      }
+    },
+    "pay": {
+      "description": "Taxes for {{period}}, due {{date}}.",
+      "qrLabel": "IPS QR code for the payment",
+      "qrHint": "Scan in your bank's mobile app (IPS Skeniraj)",
+      "noQr": "A QR code cannot be built from these details. Check the account number.",
+      "amount": "Amount",
+      "modelReference": "Model and reference",
+      "paidAt": "Payment date",
+      "markPaid": "Mark as paid",
+      "marked": "Marked as paid",
+      "copy": "Copy: {{field}}",
+      "copyFailed": "Could not copy"
+    },
+    "errors": {
+      "saveFailed": "Failed to save the payment",
+      "deleteFailed": "Failed to delete the payment",
+      "markFailed": "Failed to update the payment status"
+    }
   },
   "profileCompleteness": {
     "title": "Complete your business profile",

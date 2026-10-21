@@ -21,26 +21,28 @@ enum Currency {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  password      String
-  name          String
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  name           String
   // Serbian business details
-  companyName   String?        @map("company_name")
-  pib           String?
-  mbr           String?
-  activityCode  String?        @map("activity_code") // Šifra delatnosti
-  address       String?
-  city          String?
-  postalCode    String?        @map("postal_code")
-  municipality  String? // Opština — affects tax coefficient
-  phone         String?
-  bankAccounts  BankAccount[]
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  clients       Client[]
-  invoices      Invoice[]
-  refreshTokens RefreshToken[]
+  companyName    String?         @map("company_name")
+  pib            String?
+  mbr            String?
+  activityCode   String?         @map("activity_code") // Šifra delatnosti
+  address        String?
+  city           String?
+  postalCode     String?         @map("postal_code")
+  municipality   String? // Opština — affects tax coefficient
+  phone          String?
+  bankAccounts   BankAccount[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  clients        Client[]
+  invoices       Invoice[]
+  refreshTokens  RefreshToken[]
+  taxObligations TaxObligation[]
+  taxPayments    TaxPayment[]
 
   @@map("users")
 }
@@ -164,4 +166,47 @@ model InvoiceItem {
   invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@map("invoice_items")
+}
+
+/// A monthly tax or contribution from the paušal decision (rešenje), with the payment details printed on it
+model TaxObligation {
+  id               String       @id @default(uuid())
+  userId           String       @map("user_id")
+  name             String
+  amount           Decimal // Monthly amount in RSD
+  recipientName    String       @map("recipient_name")
+  recipientAccount String       @map("recipient_account")
+  paymentCode      String       @default("253") @map("payment_code") // Šifra plaćanja
+  model            String       @default("97")
+  reference        String // Poziv na broj
+  purpose          String?
+  startYear        Int          @map("start_year")
+  startMonth       Int          @map("start_month")
+  endYear          Int?         @map("end_year") // Set when a new decision replaces this one
+  endMonth         Int?         @map("end_month")
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments         TaxPayment[]
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("tax_obligations")
+}
+
+/// A month of an obligation marked as paid; the amount is kept as paid even if the obligation changes later
+model TaxPayment {
+  id           String        @id @default(uuid())
+  userId       String        @map("user_id")
+  obligationId String        @map("obligation_id")
+  year         Int
+  month        Int
+  amount       Decimal
+  paidAt       DateTime      @map("paid_at")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  obligation   TaxObligation @relation(fields: [obligationId], references: [id], onDelete: NoAction)
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  @@unique([obligationId, year, month])
+  @@index([userId, year])
+  @@map("tax_payments")
 }

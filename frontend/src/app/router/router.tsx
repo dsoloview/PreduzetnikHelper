@@ -8,6 +8,7 @@ import { BankAccountsPage } from "@/pages/bank-accounts/ui/BankAccountsPage";
 import { LimitsPage } from "@/pages/limits/ui/LimitsPage";
 import { ProfilePage } from "@/pages/profile/ui/ProfilePage";
 import { KpoPage } from "@/pages/kpo/ui/KpoPage";
+import { TaxesPage } from "@/pages/taxes/ui/TaxesPage";
 import { SettingsPage } from "@/pages/settings/ui/SettingsPage";
 import { useAuthStore } from "@/entities/user/model/auth.store";
 import { ProtectedRoute, PublicRoute } from "./route-guards";
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
       {
         path: "kpo",
         element: <KpoPage />,
+      },
+      {
+        path: "taxes",
+        element: <TaxesPage />,
       },
       {
         path: "settings",
