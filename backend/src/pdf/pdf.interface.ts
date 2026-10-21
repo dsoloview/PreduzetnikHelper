@@ -26,6 +26,7 @@ export interface InvoicePdfData {
     mbr: string | null;
   };
   client: {
+    type: 'DOMESTIC' | 'INTERNATIONAL';
     name: string;
     address: string | null;
     postalCode: string | null;
