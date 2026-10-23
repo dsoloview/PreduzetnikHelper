@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { FilePlus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { IClient } from "@preduzetnik/shared";
 import {
   DropdownMenu,
@@ -12,7 +13,7 @@ import { Button } from "@/shared/ui/button";
 import { EditClientDialog } from "@/features/client-management/ui/EditClientDialog";
 import { DeleteClientDialog } from "@/features/client-management/ui/DeleteClientDialog";
 
-/** Edit / delete menu with its dialogs */
+/** New invoice / edit / delete menu with its dialogs */
 export const ClientActionsMenu = ({ client }: { client: IClient }) => {
   const { t } = useTranslation();
   const [showEdit, setShowEdit] = useState(false);
@@ -27,6 +28,12 @@ export const ClientActionsMenu = ({ client }: { client: IClient }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link to={`/invoices/new?clientId=${client.id}`}>
+              <FilePlus className="mr-2 size-4" />
+              {t("clients.actions.createInvoice")}
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowEdit(true)}>
             <Pencil className="mr-2 size-4" />
             {t("clients.actions.edit")}

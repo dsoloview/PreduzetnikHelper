@@ -15,6 +15,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
 import { TaxesModule } from './taxes/taxes.module';
 import type { Request } from 'express';
+import { isCredentialRequest } from './common/throttle/credential-paths';
 
 const requestPath = (ctx: ExecutionContext) =>
   ctx.switchToHttp().getRequest<Request>().path;
@@ -45,7 +46,7 @@ const requestPath = (ctx: ExecutionContext) =>
           name: 'auth',
           ttl: 60000,
           limit: Number(config.get('THROTTLE_AUTH_LIMIT', 10)),
-          skipIf: (ctx) => !requestPath(ctx).startsWith('/api/auth/'),
+          skipIf: (ctx) => !isCredentialRequest(requestPath(ctx)),
         },
         {
           name: 'pdf',

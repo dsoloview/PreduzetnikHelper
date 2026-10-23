@@ -1,12 +1,13 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslation } from "react-i18next";
 import { format, addDays } from "date-fns";
-import { Plus, Trash2, CalendarIcon } from "lucide-react";
+import { Plus, Trash2, CalendarIcon, ChevronDown, History } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
@@ -14,17 +15,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { Calendar } from "@/shared/ui/calendar";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { RequiredMark } from "@/shared/ui/required-mark";
-import { FormActions, FormSection } from "@/shared/ui/form-layout";
+import { FormSection } from "@/shared/ui/form-layout";
+import { Spinner } from "@/shared/ui/spinner";
 import { cn } from "@/shared/lib/utils";
 import { useFormatters } from "@/shared/lib/format";
 
 import { useClients } from "@/entities/client/api/client.queries";
 import { useBankAccounts } from "@/entities/bank-account/api/bank-account.queries";
+import { useInvoices } from "@/entities/invoice/api/invoice.queries";
 import { useProfile } from "@/entities/user/api/user.queries";
 import { useExchangeRates } from "@/entities/exchange-rate/api/exchange-rate.queries";
 import type { ICreateInvoiceRequest, Currency } from "@preduzetnik/shared";
+import { defaultsForClient, itemSuggestions } from "../lib/invoice-defaults";
 
 const buildInvoiceSchema = (t: (key: string) => string) =>
   z
@@ -62,19 +65,37 @@ const buildInvoiceSchema = (t: (key: string) => string) =>
 /** Quick picks for the due date, counted from the issue date */
 const DUE_IN_DAYS = [7, 15, 30] as const;
 
+const BLANK_ITEM = { description: "", quantity: 1, unitPrice: 0 };
+
+const toNumber = (v: string) => (v === "" || v === "-" ? undefined : Number(v));
+
 export type InvoiceFormValues = z.infer<ReturnType<typeof buildInvoiceSchema>>;
 
 interface InvoiceFormProps {
   onSubmit: (data: ICreateInvoiceRequest) => void;
+  onCancel: () => void;
   defaultValues?: Partial<InvoiceFormValues>;
+  initialPrefilledFrom?: string | null;
   isLoading?: boolean;
-  submitLabel?: string;
+  submitLabel: string;
 }
 
-export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }: InvoiceFormProps) => {
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+  <Card className="gap-0 px-4 py-4 sm:px-5 sm:py-5">{children}</Card>
+);
+
+export const InvoiceForm = ({
+  onSubmit,
+  onCancel,
+  defaultValues,
+  initialPrefilledFrom,
+  isLoading,
+  submitLabel,
+}: InvoiceFormProps) => {
   const { t } = useTranslation();
   const { data: clients } = useClients();
   const { data: bankAccounts } = useBankAccounts();
+  const { data: invoices } = useInvoices();
   const { data: profile } = useProfile();
   const { number, money } = useFormatters();
 
@@ -95,13 +116,13 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
       placeOfIssue: profile?.city ?? "Beograd",
       domesticSupply: true,
       currency: "RSD",
-      items: [{ description: "", quantity: 1, unitPrice: 0 }],
+      items: [BLANK_ITEM],
       note: "",
       ...defaultValues,
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "items",
   });
@@ -110,6 +131,8 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   const watchedItems = useWatch({ control: form.control, name: "items" });
   const currency = useWatch({ control: form.control, name: "currency" });
   const issueDate = useWatch({ control: form.control, name: "issueDate" });
+  const exchangeRate = useWatch({ control: form.control, name: "exchangeRate" });
+  const note = useWatch({ control: form.control, name: "note" });
 
   const rateDate = issueDate ? format(issueDate, "yyyy-MM-dd") : undefined;
   const { data: nbsRates, isFetching: isRateLoading } = useExchangeRates(rateDate, currency !== "RSD");
@@ -139,15 +162,25 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
     form.setValue("currency", defaultAccount.currency, { shouldValidate: false });
   }, [defaultAccount]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Supply to a foreign client usually happens outside Serbia and doesn't count toward the 8M VAT limit
-  const watchedClientId = useWatch({ control: form.control, name: "clientId" });
-  useEffect(() => {
-    if (!watchedClientId || watchedClientId === defaultValues?.clientId) return;
-    const client = clients?.find((c) => c.id === watchedClientId);
-    if (client) {
-      form.setValue("domesticSupply", client.type === "DOMESTIC", { shouldValidate: false });
-    }
-  }, [watchedClientId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [prefilledFrom, setPrefilledFrom] = useState<string | null>(initialPrefilledFrom ?? null);
+
+  const applyClientDefaults = (clientId: string) => {
+    const client = clients?.find((c) => c.id === clientId);
+    if (!client) return;
+    const defaults = defaultsForClient(
+      client,
+      invoices ?? [],
+      bankAccounts ?? [],
+      form.getValues("issueDate") ?? today,
+      form.getValues("items"),
+    );
+    const validate = { shouldValidate: form.formState.isSubmitted };
+    form.setValue("domesticSupply", defaults.domesticSupply);
+    if (defaults.bankAccountId) form.setValue("bankAccountId", defaults.bankAccountId, validate);
+    if (defaults.dueDate) form.setValue("dueDate", defaults.dueDate, validate);
+    if (defaults.items) replace(defaults.items);
+    setPrefilledFrom(defaults.prefilledFrom);
+  };
 
   // Sync currency when the user picks a different bank account
   useEffect(() => {
@@ -158,12 +191,37 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
     }
   }, [watchedBankAccountId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const suggestions = useMemo(
+    () => itemSuggestions(invoices ?? [], currency as Currency),
+    [invoices, currency],
+  );
+
+  const domesticSupply = useWatch({ control: form.control, name: "domesticSupply" });
+  const [showExtra, setShowExtra] = useState(!!defaultValues?.note);
+
   const totalAmount = watchedItems.reduce(
     (acc, item) => acc + ((item?.quantity ?? 0) * (item?.unitPrice ?? 0)),
     0,
   );
   const itemsRootError = form.formState.errors.items?.root?.message
     ?? form.formState.errors.items?.message;
+
+  const applySuggestion = (index: number, description: string) => {
+    const suggestion = suggestions.find((s) => s.description === description);
+    if (suggestion && !form.getValues(`items.${index}.unitPrice`)) {
+      form.setValue(`items.${index}.unitPrice`, suggestion.unitPrice, { shouldValidate: form.formState.isSubmitted });
+    }
+  };
+
+  const handleItemKeyDown = (index: number) => (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    if (index === fields.length - 1) {
+      append(BLANK_ITEM, { focusName: `items.${index + 1}.description` });
+    } else {
+      form.setFocus(`items.${index + 1}.description`);
+    }
+  };
 
   const handleFormSubmit = (values: InvoiceFormValues) => {
     const requestData: ICreateInvoiceRequest = {
@@ -182,15 +240,22 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-      <FormSection title={t("invoices.form.sections.client")} description={t("invoices.form.sections.clientDesc")}>
+    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <SectionCard>
+        <FormSection title={t("invoices.form.sections.client")} description={t("invoices.form.sections.clientDesc")}>
           <Controller
             name="clientId"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid} className="sm:col-span-2">
                 <FieldLabel>{t("invoices.form.client")}<RequiredMark /></FieldLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    applyClientDefaults(value);
+                  }}
+                >
                   <SelectTrigger aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder={t("invoices.form.selectClient")} />
                   </SelectTrigger>
@@ -213,7 +278,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               <Field data-invalid={fieldState.invalid} className="sm:col-span-2">
                 <FieldLabel>{t("invoices.form.bankAccount")}<RequiredMark /></FieldLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger aria-invalid={fieldState.invalid}>
+                  <SelectTrigger aria-invalid={fieldState.invalid} className="min-w-0 [&>span]:truncate">
                     <SelectValue placeholder={t("invoices.form.selectBankAccount")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -253,9 +318,7 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               <Input
                 inputMode="decimal"
                 aria-invalid={!!form.formState.errors.exchangeRate}
-                {...form.register("exchangeRate", {
-                  setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
-                })}
+                {...form.register("exchangeRate", { setValueAs: toNumber })}
               />
               {form.formState.errors.exchangeRate && (
                 <FieldError errors={[form.formState.errors.exchangeRate]} />
@@ -272,9 +335,11 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               </p>
             </Field>
           )}
-      </FormSection>
+        </FormSection>
+      </SectionCard>
 
-      <FormSection title={t("invoices.form.sections.dates")} description={t("invoices.form.sections.datesDesc")}>
+      <SectionCard>
+        <FormSection title={t("invoices.form.sections.dates")} description={t("invoices.form.sections.datesDesc")}>
           <Controller
             name="issueDate"
             control={form.control}
@@ -354,151 +419,210 @@ export const InvoiceForm = ({ onSubmit, defaultValues, isLoading, submitLabel }:
               </Field>
             )}
           />
-          <Controller
-            name="domesticSupply"
-            control={form.control}
-            render={({ field }) => (
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:col-span-2">
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
-                <span>
-                  <span className="block text-sm font-medium">{t("invoices.form.domesticSupply")}</span>
-                  <span className="block text-xs text-muted-foreground">{t("invoices.form.domesticSupplyHint")}</span>
-                </span>
-              </label>
-            )}
-          />
-      </FormSection>
+        </FormSection>
+      </SectionCard>
 
-      <div className="space-y-4">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-semibold">{t("invoices.form.items")}</h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">{t("invoices.form.itemsDesc")}</p>
+      <SectionCard>
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold">{t("invoices.form.items")}</h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t("invoices.form.itemsDesc")}</p>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={() => append(BLANK_ITEM)}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t("invoices.form.addItem")}
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => append({ description: "", quantity: 1, unitPrice: 0 })}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t("invoices.form.addItem")}
-          </Button>
-        </div>
 
-        <div className="-mx-1 overflow-x-auto px-1">
-        <Table className="min-w-[560px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40%]">
-                {t("invoices.form.description")}<RequiredMark />
-              </TableHead>
-              <TableHead className="w-[15%]">
-                {t("invoices.form.quantity")}<RequiredMark />
-              </TableHead>
-              <TableHead className="w-[20%]">
-                {t("invoices.form.price")}<RequiredMark />
-              </TableHead>
-              <TableHead className="w-[20%] text-right">{t("invoices.form.total")}</TableHead>
-              <TableHead className="w-[5%]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+          {prefilledFrom && (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-accent/60 px-3 py-2 text-xs">
+              <History className="size-3.5 shrink-0 text-primary" />
+              <span>{t("invoices.form.prefilledFrom", { number: prefilledFrom })}</span>
+              <button
+                type="button"
+                className="font-medium text-primary hover:underline"
+                onClick={() => {
+                  replace([BLANK_ITEM]);
+                  setPrefilledFrom(null);
+                }}
+              >
+                {t("invoices.form.clearItems")}
+              </button>
+            </div>
+          )}
+
+          <datalist id="invoice-item-suggestions">
+            {suggestions.map((s) => (
+              <option key={s.description} value={s.description} />
+            ))}
+          </datalist>
+
+          <div className="hidden grid-cols-[minmax(0,1fr)_5.5rem_8rem_8rem_2.25rem] gap-2 px-1 text-xs font-medium text-muted-foreground sm:grid">
+            <span>{t("invoices.form.description")}<RequiredMark /></span>
+            <span>{t("invoices.form.quantity")}<RequiredMark /></span>
+            <span>{t("invoices.form.price")}<RequiredMark /></span>
+            <span className="text-right">{t("invoices.form.total")}</span>
+            <span />
+          </div>
+
+          <div className="space-y-2">
             {fields.map((field, index) => {
               const itemErrors = form.formState.errors.items?.[index];
               const row = watchedItems[index];
               const rowTotal = (row?.quantity ?? 0) * (row?.unitPrice ?? 0);
+              const description = form.register(`items.${index}.description`, {
+                onChange: (event) => applySuggestion(index, event.target.value),
+              });
               return (
-                <TableRow key={field.id} className="align-top">
-                  <TableCell>
+                <div
+                  key={field.id}
+                  className="space-y-2 rounded-lg border p-3 sm:grid sm:grid-cols-[minmax(0,1fr)_5.5rem_8rem_8rem_2.25rem] sm:items-start sm:gap-2 sm:space-y-0 sm:border-0 sm:p-0"
+                >
+                  <div>
                     <Input
-                      {...form.register(`items.${index}.description`)}
+                      {...description}
+                      list="invoice-item-suggestions"
+                      autoComplete="off"
+                      placeholder={t("invoices.form.description")}
+                      aria-label={t("invoices.form.description")}
                       aria-invalid={!!itemErrors?.description}
+                      onKeyDown={handleItemKeyDown(index)}
                     />
                     {itemErrors?.description?.message && (
-                      <p className="mt-1 text-xs text-destructive">
-                        {itemErrors.description.message}
-                      </p>
+                      <p className="mt-1 text-xs text-destructive">{itemErrors.description.message}</p>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      inputMode="decimal"
-                      aria-invalid={!!itemErrors?.quantity}
-                      {...form.register(`items.${index}.quantity`, {
-                        setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
-                      })}
-                    />
-                    {itemErrors?.quantity?.message && (
-                      <p className="mt-1 text-xs text-destructive">
-                        {itemErrors.quantity.message}
-                      </p>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      inputMode="decimal"
-                      aria-invalid={!!itemErrors?.unitPrice}
-                      {...form.register(`items.${index}.unitPrice`, {
-                        setValueAs: (v) => (v === "" || v === "-" ? undefined : Number(v)),
-                      })}
-                    />
-                    {itemErrors?.unitPrice?.message && (
-                      <p className="mt-1 text-xs text-destructive">
-                        {itemErrors.unitPrice.message}
-                      </p>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium pt-3 text-right whitespace-nowrap">
-                    {number(rowTotal, 2)}
-                  </TableCell>
-                  <TableCell>
+                  </div>
+                  <div className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto_2.25rem] items-start gap-2 sm:contents">
+                    <div>
+                      <span className="mb-1 block text-xs text-muted-foreground sm:hidden">{t("invoices.form.quantity")}</span>
+                      <Input
+                        inputMode="decimal"
+                        aria-label={t("invoices.form.quantity")}
+                        aria-invalid={!!itemErrors?.quantity}
+                        onKeyDown={handleItemKeyDown(index)}
+                        {...form.register(`items.${index}.quantity`, { setValueAs: toNumber })}
+                      />
+                      {itemErrors?.quantity?.message && (
+                        <p className="mt-1 text-xs text-destructive">{itemErrors.quantity.message}</p>
+                      )}
+                    </div>
+                    <div>
+                      <span className="mb-1 block text-xs text-muted-foreground sm:hidden">{t("invoices.form.price")}</span>
+                      <Input
+                        inputMode="decimal"
+                        aria-label={t("invoices.form.price")}
+                        aria-invalid={!!itemErrors?.unitPrice}
+                        onKeyDown={handleItemKeyDown(index)}
+                        {...form.register(`items.${index}.unitPrice`, { setValueAs: toNumber })}
+                      />
+                      {itemErrors?.unitPrice?.message && (
+                        <p className="mt-1 text-xs text-destructive">{itemErrors.unitPrice.message}</p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <span className="mb-1 block text-xs text-muted-foreground sm:hidden">{t("invoices.form.total")}</span>
+                      <p className="text-sm font-medium whitespace-nowrap sm:pt-2">{number(rowTotal, 2)}</p>
+                    </div>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
+                      className="mt-5 sm:mt-0"
                       onClick={() => remove(index)}
                       disabled={fields.length === 1}
                       aria-label={t("app.delete")}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                </div>
               );
             })}
-          </TableBody>
-        </Table>
-        </div>
-        {itemsRootError && (
-          <p className="text-sm text-destructive">{itemsRootError}</p>
-        )}
-      </div>
+          </div>
+          {itemsRootError && <p className="text-sm text-destructive">{itemsRootError}</p>}
+          <p className="hidden text-xs text-muted-foreground sm:block">{t("invoices.form.itemsEnterHint")}</p>
+        </section>
+      </SectionCard>
 
-      <Controller
-        name="note"
-        control={form.control}
-        render={({ field }) => (
-          <Field>
-            <FieldLabel>{t("invoices.form.note")}</FieldLabel>
-            <Textarea
-              {...field}
-              value={field.value ?? ""}
-              placeholder={t("invoices.form.notePlaceholder")}
-              rows={3}
+      <SectionCard>
+        <button
+          type="button"
+          onClick={() => setShowExtra((value) => !value)}
+          aria-expanded={showExtra}
+          className="flex w-full items-start justify-between gap-3 text-left"
+        >
+          <span>
+            <span className="block text-sm font-semibold">{t("invoices.form.sections.extra")}</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              {[
+                domesticSupply ? t("invoices.form.domesticSupply") : t("invoices.form.foreignSupply"),
+                note?.trim() ? t("invoices.form.hasNote") : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          </span>
+          <ChevronDown className={cn("mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform", showExtra && "rotate-180")} />
+        </button>
+        {showExtra && (
+          <div className="mt-4 space-y-4">
+            <Controller
+              name="domesticSupply"
+              control={form.control}
+              render={({ field }) => (
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50">
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
+                  <span>
+                    <span className="block text-sm font-medium">{t("invoices.form.domesticSupply")}</span>
+                    <span className="block text-xs text-muted-foreground">{t("invoices.form.domesticSupplyHint")}</span>
+                  </span>
+                </label>
+              )}
             />
-          </Field>
+            <Controller
+              name="note"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t("invoices.form.note")}</FieldLabel>
+                  <Textarea
+                    {...field}
+                    value={field.value ?? ""}
+                    placeholder={t("invoices.form.notePlaceholder")}
+                    rows={3}
+                  />
+                </Field>
+              )}
+            />
+          </div>
         )}
-      />
+      </SectionCard>
 
-      <div className="flex flex-col items-end gap-1">
-        <div className="text-xs text-muted-foreground italic">{t("invoices.form.noVatNotice")}</div>
-        <div className="text-xl font-semibold">
-          {t("invoices.form.grandTotal")}: {money(totalAmount, currency, { decimals: 2 })}
+      {/* Negative margins match the editor page padding so the bar spans its full width */}
+      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 border-t bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mb-6 sm:px-6 lg:-mx-8 lg:-mb-8 lg:px-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">{t("invoices.form.grandTotal")}</p>
+            <p className="truncate text-lg font-semibold sm:text-xl">{money(totalAmount, currency, { decimals: 2 })}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {currency !== "RSD" && exchangeRate
+                ? `≈ ${money(totalAmount * exchangeRate, "RSD")} · `
+                : ""}
+              {t("invoices.form.noVatNotice")}
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+              {t("app.cancel")}
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Spinner className="mr-2" />}
+              {submitLabel}
+            </Button>
+          </div>
         </div>
       </div>
-
-      <FormActions submitLabel={submitLabel ?? t("invoices.form.submit")} isLoading={isLoading} />
     </form>
   );
 };

@@ -151,7 +151,8 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
-      "menu": "Actions"
+      "menu": "Actions",
+      "createInvoice": "Create invoice"
     },
     "loadError": "Failed to load clients.",
     "search": "Search by name, tax ID or city…",
@@ -242,23 +243,33 @@
         "client": "Client and payment",
         "clientDesc": "Who is billed and where the money goes.",
         "dates": "Dates and place",
-        "datesDesc": "The year of the issue date sets the invoice number."
+        "datesDesc": "The year of the issue date sets the invoice number.",
+        "extra": "More options"
       },
       "itemsDesc": "Services or goods with quantity and price in the invoice currency.",
-      "dueIn": "in {{days}} days"
+      "dueIn": "in {{days}} days",
+      "prefilledFrom": "Items, account and payment term copied from invoice {{number}}",
+      "clearItems": "Clear items",
+      "itemsEnterHint": "Enter moves to the next row; on the last row it adds a new one.",
+      "foreignSupply": "Supply abroad",
+      "hasNote": "has a note"
     },
     "create": {
       "button": "Create Invoice",
       "title": "Create New Invoice",
       "description": "Fill in the details to issue a new invoice.",
-      "success": "Invoice created successfully!"
+      "success": "Invoice created successfully!",
+      "successNumber": "Invoice {{number}} created",
+      "repeatDescription": "A copy of invoice {{number}} with new dates. Check the items and create the invoice."
     },
     "edit": {
       "title": "Edit Invoice",
       "description": "Only DRAFT invoices can be edited.",
       "submit": "Save Changes",
       "success": "Invoice updated successfully!",
-      "error": "Failed to update invoice."
+      "error": "Failed to update invoice.",
+      "titleNumber": "Invoice {{number}}",
+      "notDraft": "Only drafts can be edited. This invoice has already been sent or paid."
     },
     "delete": {
       "title": "Delete Invoice",
@@ -270,8 +281,10 @@
     "overdueDays": "{{days}} days overdue",
     "dueOn": "Due {{date}}",
     "actions": {
-      "downloadPdf": "Download PDF"
-    }
+      "downloadPdf": "Download PDF",
+      "repeat": "Create a similar one"
+    },
+    "notFound": "Invoice not found."
   },
   "dashboard": {
     "title": "Dashboard",

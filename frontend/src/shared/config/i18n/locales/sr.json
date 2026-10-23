@@ -152,7 +152,8 @@
     "actions": {
       "edit": "Izmeni",
       "delete": "Obriši",
-      "menu": "Radnje"
+      "menu": "Radnje",
+      "createInvoice": "Izdaj fakturu"
     },
     "search": "Pretraga po nazivu, PIB-u ili gradu…",
     "table": {
@@ -242,23 +243,33 @@
         "client": "Klijent i plaćanje",
         "clientDesc": "Kome se izdaje faktura i gde stiže novac.",
         "dates": "Datumi i mesto",
-        "datesDesc": "Godina datuma izdavanja određuje broj fakture."
+        "datesDesc": "Godina datuma izdavanja određuje broj fakture.",
+        "extra": "Dodatno"
       },
       "itemsDesc": "Usluge ili roba sa količinom i cenom u valuti fakture.",
-      "dueIn": "za {{days}} dana"
+      "dueIn": "za {{days}} dana",
+      "prefilledFrom": "Stavke, račun i rok plaćanja preuzeti su iz fakture {{number}}",
+      "clearItems": "Obriši stavke",
+      "itemsEnterHint": "Enter prelazi u sledeći red; u poslednjem redu dodaje novi.",
+      "foreignSupply": "Promet u inostranstvu",
+      "hasNote": "ima napomenu"
     },
     "create": {
       "button": "Kreiraj fakturu",
       "title": "Nova faktura",
       "description": "Popunite podatke za izdavanje fakture.",
-      "success": "Faktura kreirana!"
+      "success": "Faktura kreirana!",
+      "successNumber": "Faktura {{number}} je kreirana",
+      "repeatDescription": "Kopija fakture {{number}} sa novim datumima. Proverite stavke i kreirajte fakturu."
     },
     "edit": {
       "title": "Izmeni fakturu",
       "description": "Moguće je izmeniti samo nacrte.",
       "submit": "Sačuvaj",
       "success": "Faktura ažurirana!",
-      "error": "Neuspešno ažuriranje fakture."
+      "error": "Neuspešno ažuriranje fakture.",
+      "titleNumber": "Faktura {{number}}",
+      "notDraft": "Mogu se menjati samo nacrti. Ova faktura je već poslata ili plaćena."
     },
     "delete": {
       "title": "Obriši fakturu",
@@ -270,8 +281,10 @@
     "overdueDays": "kasni {{days}} dana",
     "dueOn": "Rok {{date}}",
     "actions": {
-      "downloadPdf": "Preuzmi PDF"
-    }
+      "downloadPdf": "Preuzmi PDF",
+      "repeat": "Napravi istu"
+    },
+    "notFound": "Faktura nije pronađena."
   },
   "dashboard": {
     "title": "Početna",

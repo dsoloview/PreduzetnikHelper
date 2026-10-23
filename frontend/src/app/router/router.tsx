@@ -4,6 +4,7 @@ import { RegisterPage } from "@/pages/register/ui/RegisterPage";
 import { DashboardPage } from "@/pages/dashboard/ui/DashboardPage";
 import { ClientsPage } from "@/pages/clients/ui/ClientsPage";
 import { InvoicesPage } from "@/pages/invoices/ui/InvoicesPage";
+import { InvoiceEditorPage } from "@/pages/invoice-editor/ui/InvoiceEditorPage";
 import { BankAccountsPage } from "@/pages/bank-accounts/ui/BankAccountsPage";
 import { LimitsPage } from "@/pages/limits/ui/LimitsPage";
 import { ProfilePage } from "@/pages/profile/ui/ProfilePage";
@@ -38,6 +39,14 @@ export const router = createBrowserRouter([
       {
         path: "invoices",
         element: <InvoicesPage />,
+      },
+      {
+        path: "invoices/new",
+        element: <InvoiceEditorPage />,
+      },
+      {
+        path: "invoices/:id/edit",
+        element: <InvoiceEditorPage />,
       },
       {
         path: "bank-accounts",

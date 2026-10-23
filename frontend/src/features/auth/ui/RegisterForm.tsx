@@ -62,7 +62,7 @@ export const RegisterForm = () => {
         <CardTitle>{t("auth.register.title")}</CardTitle>
         <CardDescription>{t("auth.register.description")}</CardDescription>
       </CardHeader>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <CardContent>
           <FieldGroup>
             <Controller

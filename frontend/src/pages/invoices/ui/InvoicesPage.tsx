@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
-import { FileDown, FileText, Search, Trash2, X } from "lucide-react";
+import { CopyPlus, FileDown, FileText, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { IInvoiceResponse } from "@preduzetnik/shared";
 
@@ -14,8 +14,6 @@ import {
   getDisplayStatus,
   type InvoiceDisplayStatus,
 } from "@/entities/invoice/lib/display-status";
-import { CreateInvoiceDialog } from "@/features/invoice-management/ui/CreateInvoiceDialog";
-import { EditInvoiceDialog } from "@/features/invoice-management/ui/EditInvoiceDialog";
 import { ProfileCompletenessAlert } from "@/widgets/profile-completeness/ui/ProfileCompletenessAlert";
 import { invoiceApi } from "@/shared/api/invoice.api";
 import { cn } from "@/shared/lib/utils";
@@ -50,14 +48,24 @@ interface RowActionsProps {
   onDelete: () => void;
 }
 
-/** PDF for every invoice; edit and delete only while it is a draft */
 const RowActions = ({ invoice, isDownloading, onDownload, onDelete }: RowActionsProps) => {
   const { t } = useTranslation();
   const isDraft = invoice.status === "DRAFT";
 
   return (
     <div className="flex items-center justify-end gap-0.5">
-      {isDraft && <EditInvoiceDialog invoice={invoice} />}
+      {isDraft && (
+        <Button variant="ghost" size="icon" asChild>
+          <Link to={`/invoices/${invoice.id}/edit`} aria-label={t("app.edit")} title={t("app.edit")}>
+            <Pencil className="size-4" />
+          </Link>
+        </Button>
+      )}
+      <Button variant="ghost" size="icon" asChild>
+        <Link to={`/invoices/new?from=${invoice.id}`} aria-label={t("invoices.actions.repeat")} title={t("invoices.actions.repeat")}>
+          <CopyPlus className="size-4" />
+        </Link>
+      </Button>
       <Button
         variant="ghost"
         size="icon"
@@ -211,7 +219,15 @@ export const InvoicesPage = () => {
 
   return (
     <PageContainer>
-      <PageHeader title={t("nav.invoices")} description={t("invoices.subtitle")} actions={<CreateInvoiceDialog />} />
+      <PageHeader title={t("nav.invoices")} description={t("invoices.subtitle")} actions={
+          <Button className="gap-2" asChild>
+            <Link to="/invoices/new">
+              <Plus className="size-4" />
+              {t("invoices.create.button")}
+            </Link>
+          </Button>
+        }
+      />
 
       <ProfileCompletenessAlert />
 

@@ -16,6 +16,14 @@ export const useInvoices = () => {
   });
 };
 
+export const useInvoice = (id: string | undefined) => {
+  return useQuery({
+    queryKey: invoiceKeys.detail(id ?? ""),
+    queryFn: () => invoiceApi.getById(id!),
+    enabled: !!id,
+  });
+};
+
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -31,8 +39,9 @@ export const useUpdateInvoice = () => {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: IUpdateInvoiceRequest }) =>
       invoiceApi.update(id, dto),
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(id) });
     },
   });
 };
